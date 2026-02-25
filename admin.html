@@ -598,14 +598,12 @@ function resetPeluang(){
 }
 
 function prosesPeluang(){
-
   const ptn   = document.getElementById("ptnPeluang").value;
   const prodi = document.getElementById("prodiPeluang").value;
 
   const r = snbt.find(x => x[1] == ptn && x[2] == prodi);
   if(!r) return;
 
-  // ================= INPUT SKOR =================
   const mapel = {
     PU  : parseFloat(PU.value)||0,
     PPU : parseFloat(PPU.value)||0,
@@ -619,9 +617,7 @@ function prosesPeluang(){
   const materi1 = r[9];
   const materi2 = r[10];
 
-  // ================= HITUNG PEMBOBOTAN =================
   let skorBobot = 0;
-
   for(let k in mapel){
     if(k == materi1 || k == materi2){
       skorBobot += mapel[k] * 0.25;
@@ -631,8 +627,6 @@ function prosesPeluang(){
   }
 
   const skorAman = parseFloat(r[8]) || 0;
-
-  // ================= HITUNG PELUANG =================
   let peluang = ((skorBobot - skorAman) * 100 / 5) + 50;
 
   if(peluang < 0) peluang = 0;
@@ -642,88 +636,41 @@ function prosesPeluang(){
   if(peluang > 60) kategoriPeluang = "Tinggi";
   if(peluang < 40) kategoriPeluang = "Rendah";
 
-  // ================= CARI 2 TERTINGGI & TERENDAH =================
   const sorted = Object.entries(mapel).sort((a,b)=>b[1]-a[1]);
-
   const tertinggi = sorted.slice(0,2).map(x=>x[0]);
   const terendah  = sorted.slice(-2).map(x=>x[0]);
 
-  const maksimal =
-    tertinggi.includes(materi1) &&
-    tertinggi.includes(materi2)
-    ? "sudah maksimal"
-    : "belum maksimal";
+  const maksimal = tertinggi.includes(materi1) && tertinggi.includes(materi2) ? "sudah maksimal" : "belum maksimal";
 
-  // ================= RENDER =================
+  // RENDER STRUKTUR BARU
   document.getElementById("hasilPeluang").innerHTML = `
-
-  <h3 style="text-align:center;margin-top:40px">
-    Hasil Analisis Peluang
-  </h3>
+  <h3 style="text-align:center;margin-top:40px">Hasil Analisis Peluang</h3>
 
   <div class="partisi-2">
-
+    <div><canvas id="chartBar"></canvas></div>
     <div>
-      <canvas id="chartBar"></canvas>
+      <p>Kampus ${ptn}, Prodi ${prodi} memprioritaskan <b>${materi1}</b> & <b>${materi2}</b>.<br><br>
+      Pembobotan saat ini <b>${maksimal}</b>.</p>
     </div>
-
-    <div>
-      <p>
-      Kampus ${ptn}, Prodi ${prodi} lebih memprioritaskan materi 
-      <b>${materi1}</b> dan <b>${materi2}</b>.<br><br>
-      Hasil pembobotan saat ini <b>${maksimal}</b>.<br><br>
-      Hindari prodi dengan materi <b>${terendah[0]}</b> & <b>${terendah[1]}</b>.
-      </p>
-    </div>
-
   </div>
 
-  <h3 style="text-align:center;margin-top:40px">
-    Hasil Analisis Lanjutan
-  </h3>
-
-  <div style="text-align:center;margin-bottom:10px">
-    Detail ${ptn}, ${prodi}
-  </div>
-
-  <div class="partisi-3">
-
+  <div class="partisi-2" style="align-items: center; background: #f9f9f9; padding: 20px; border-radius: 15px; margin-top: 20px;">
     <div>
-      <div class="card-blue">
-        Skor Pembobotan<br>
-        <b>${skorBobot.toFixed(2)}</b>
+      <div class="card-blue" style="margin-bottom:10px">
+        Skor Pembobotan: <b>${skorBobot.toFixed(2)}</b> (Aman: ${skorAman})
       </div>
-      <div class="card-blue" style="margin-top:10px">
-        Skor Aman Prodi<br>
-        <b>${skorAman}</b>
-      </div>
-    </div>
-
-    <div>
       <div class="card-green">
-        Persentase Peluang Lolos<br>
-        <b>${peluang.toFixed(2)}%</b>
-      </div>
-      <div class="card-green" style="margin-top:10px">
-        Kategori Peluang<br>
-        <b>${kategoriPeluang}</b>
+        Kategori: <b>${kategoriPeluang}</b>
       </div>
     </div>
 
-    <div>
-      <canvas id="chartPie"></canvas>
+    <div style="text-align:center;">
+      <div style="max-width: 180px; margin: 0 auto;">
+        <canvas id="chartPie"></canvas>
+      </div>
+      <div id="persenText" style="margin-top:10px; font-size:12px; font-weight:bold;"></div>
     </div>
-
   </div>
-
-  <p style="margin-top:30px;text-align:center">
-    Kesimpulan: 
-    ${kategoriPeluang=="Rendah"
-      ?"Disarankan memilih prodi lain."
-      :kategoriPeluang=="Sedang"
-      ?"Boleh dicoba tapi hati-hati."
-      :"Silahkan dipilih, peluang tinggi."}
-  </p>
   `;
 
   renderChartBar(mapel, tertinggi, terendah);
@@ -757,44 +704,43 @@ function renderChartBar(data, tertinggi, terendah){
 let chartPieInstance = null;
 
 function renderChartPie(persen){
-
   const canvas = document.getElementById("chartPie");
   if(!canvas) return;
-
   const ctx = canvas.getContext("2d");
 
-  if(chartPieInstance){
-    chartPieInstance.destroy();
-  }
+  if(chartPieInstance) chartPieInstance.destroy();
 
-  chartPieInstance = new Chart(ctx,{
-    type:"pie", // <-- jadi lingkaran penuh
-    data:{
-      labels:["Peluang Lolos","Risiko"],
-      datasets:[{
-        data:[persen, 100-persen],
-        backgroundColor:["#16a34a","#dc2626"],
-        borderWidth:0
+  chartPieInstance = new Chart(ctx, {
+    type: 'doughnut',
+    data: {
+      labels: ["Peluang", "Risiko"],
+      datasets: [{
+        data: [persen, 100 - persen],
+        backgroundColor: ["#16a34a", "#dc2626"],
+        hoverOffset: 10,
+        borderWidth: 2,
+        borderColor: '#ffffff',
+        // Efek kedalaman
+        weight: 2
       }]
     },
-    options:{
-      responsive:true,
-      plugins:{
-        legend:{ display:false }
+    options: {
+      cutout: '65%', // Membuatnya terlihat seperti cincin modern
+      plugins: {
+        legend: { display: false }
+      },
+      animation: {
+        animateRotate: true,
+        animateScale: true
       }
     }
   });
 
-  // Tambahkan teks di bawah chart
+  // Keterangan Persentase di Bawah Chart
   document.getElementById("persenText").innerHTML = `
-    <div style="margin-top:15px;text-align:center;font-weight:bold">
-      <span style="color:#16a34a">
-        Peluang: ${persen.toFixed(2)}%
-      </span>
-      &nbsp;&nbsp;|&nbsp;&nbsp;
-      <span style="color:#dc2626">
-        Risiko: ${(100-persen).toFixed(2)}%
-      </span>
+    <div style="display:flex; justify-content:space-around; gap:10px;">
+      <span style="color:#16a34a">Peluang: ${persen.toFixed(1)}%</span>
+      <span style="color:#dc2626">Risiko: ${(100-persen).toFixed(1)}%</span>
     </div>
   `;
 }
