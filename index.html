@@ -7,116 +7,136 @@
 <style>
 :root{
   --blue:#1f6feb;
-  --light:#f4f8ff;
+  --blue2:#4fa3ff;
+  --bg:#f4f8ff;
   --card:#ffffff;
-  --shadow:0 10px 30px rgba(0,0,0,.08);
+  --text:#1f2d3d;
+  --muted:#6b7a90;
+  --shadow:0 8px 25px rgba(0,0,0,.08);
 }
 
 *{box-sizing:border-box;font-family:Segoe UI,Arial,sans-serif;}
 
 body{
   margin:0;
-  background:linear-gradient(135deg,#e8f2ff,#fdfefe);
-  display:flex;
-  justify-content:center;
-  align-items:center;
-  min-height:100vh;
-  color:#1f2d3d;
+  background:var(--bg);
+  color:var(--text);
+  padding-bottom:80px;
 }
 
-.container{
-  width:100%;
-  max-width:900px;
-  padding:20px;
+/* HEADER */
+.header{
+  background:linear-gradient(135deg,var(--blue),var(--blue2));
+  color:white;
+  padding:18px;
+  border-radius:0 0 24px 24px;
+  box-shadow:0 6px 20px rgba(0,0,0,.2);
 }
 
+.header h2{margin:0;font-size:20px;}
+.header p{margin:4px 0 0;font-size:13px;opacity:.9}
+
+/* CARD */
 .card{
   background:var(--card);
-  border-radius:20px;
-  padding:30px;
+  margin:16px;
+  padding:16px;
+  border-radius:18px;
   box-shadow:var(--shadow);
-  border:1px solid #e3ecff;
 }
 
-h1{
-  color:var(--blue);
-  font-size:26px;
-  margin-bottom:10px;
-}
-
-p{
-  color:#6b7a90;
-  margin-bottom:20px;
-}
-
-select,button,input{
-  padding:12px 14px;
-  border-radius:12px;
-  border:1px solid #dbe7ff;
-  font-size:14px;
-  outline:none;
-}
-
+/* FORM */
 select,input{
   width:100%;
-  margin-bottom:12px;
+  padding:12px;
+  border-radius:12px;
+  border:1px solid #dbe7ff;
+  margin-bottom:10px;
+  font-size:14px;
 }
 
 button{
-  background:linear-gradient(135deg,#1f6feb,#4fa3ff);
-  color:white;
+  width:100%;
+  padding:12px;
+  border-radius:14px;
   border:none;
+  background:linear-gradient(135deg,var(--blue),var(--blue2));
+  color:white;
   font-weight:600;
-  cursor:pointer;
-  transition:.2s;
-  box-shadow:0 6px 16px rgba(31,111,235,.25);
+  font-size:15px;
+  box-shadow:0 4px 12px rgba(31,111,235,.3);
 }
 
-button:hover{
-  transform:translateY(-2px);
-}
-
+/* RESULT */
 .result{
-  margin-top:20px;
+  margin-top:12px;
+  padding:12px;
   background:#f7fbff;
-  padding:15px;
   border-radius:12px;
   border:1px solid #e3ecff;
+  font-size:14px;
 }
 
-footer{
+/* BOTTOM NAV */
+.navbar{
+  position:fixed;
+  bottom:0;
+  left:0;
+  width:100%;
+  background:white;
+  border-top:1px solid #e3ecff;
+  display:flex;
+  justify-content:space-around;
+  padding:8px 0;
+  box-shadow:0 -4px 20px rgba(0,0,0,.06);
+}
+
+.navbar div{
   text-align:center;
   font-size:12px;
-  color:#8da2c0;
-  margin-top:15px;
+  color:var(--muted);
+}
+
+.navbar div.active{
+  color:var(--blue);
+  font-weight:bold;
 }
 </style>
 </head>
 
 <body>
 
-<div class="container">
-  <div class="card">
+<!-- HEADER -->
+<div class="header">
+  <h2>Rasionalisasi SNBT</h2>
+  <p>Analisis peluang masuk PTN & target belajar</p>
+</div>
 
-    <h1>Rasionalisasi SNBT</h1>
-    <p>Pilih PTN dan Prodi untuk melihat peluang masuk dan rekomendasi belajar.</p>
+<!-- MAIN CARD -->
+<div class="card">
+  <h3>🎓 Pilih PTN & Prodi</h3>
+  <select id="ptn"></select>
+  <select id="prodi"></select>
+  <button onclick="showData()">Tampilkan Data</button>
 
-    <select id="ptn"></select>
-    <select id="prodi"></select>
-    <button onclick="showData()">Tampilkan Data</button>
+  <div id="hasil" class="result"></div>
+</div>
 
-    <div id="hasil" class="result"></div>
-
-    <footer>© Rasionalisasi SNBT • AI Education System</footer>
-
-  </div>
+<!-- BOTTOM NAVIGATION -->
+<div class="navbar">
+  <div class="active">🏠 Home</div>
+  <div>📊 Peluang</div>
+  <div>💡 Saran</div>
+  <div>🎯 Target</div>
 </div>
 
 <script>
-const API = "PASTE_URL_APPS_SCRIPT_ANDA"; // GANTI
+// GANTI DENGAN URL API APPS SCRIPT ANDA
+const API = "PASTE_URL_API_JSON_ANDA";
 
 let snbt=[];
 
+// Load data
 fetch(API)
 .then(res=>res.json())
 .then(d=>{
@@ -131,6 +151,7 @@ function loadPTN(){
   ptnSet.forEach(x=>p.innerHTML+=`<option>${x}</option>`);
 }
 
+// Load Prodi
 document.getElementById("ptn").onchange=()=>{
   const p=document.getElementById("ptn").value;
   const pro=document.getElementById("prodi");
@@ -140,6 +161,7 @@ document.getElementById("ptn").onchange=()=>{
   });
 };
 
+// Show data
 function showData(){
   const p=document.getElementById("ptn").value;
   const pro=document.getElementById("prodi").value;
@@ -147,14 +169,18 @@ function showData(){
   if(!r) return;
 
   document.getElementById("hasil").innerHTML=`
-  <b>${r[2]} - ${r[1]}</b><br><br>
+  <b>${r[2]}</b><br>
+  <small>${r[1]}</small><br><br>
+
   Skor SNBT: <b>${r[8]}</b><br>
   Kuota: ${r[4]}<br>
   Peminat: ${r[5]}<br>
   Keketatan: ${r[6]}<br><br>
-  Materi Utama: ${r[9]}<br>
-  Materi Pendukung: ${r[10]}<br><br>
-  <b>Saran:</b> ${r[11]}
+
+  📘 Materi Utama: ${r[9]}<br>
+  📗 Materi Pendukung: ${r[10]}<br><br>
+
+  💡 <b>Saran:</b><br>${r[11]}
   `;
 }
 </script>
