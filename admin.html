@@ -297,6 +297,10 @@ select,input{
   border: 1px solid #fef3c7;
   text-align: center;
 }
+
+.card-red { background: #dc2626; color: white; padding: 15px; border-radius: 10px; text-align: center; }
+.card-kuning { background: #f4c430; color: #1f2d3d; padding: 15px; border-radius: 10px; text-align: center; }
+/* .card-green sudah ada di file Anda */
   
 </style>
 </head>
@@ -636,53 +640,42 @@ function prosesPeluang() {
     PM: parseFloat(document.getElementById("PM").value) || 0
   };
 
-  // 2. HITUNG SKOR PEMBOBOTAN PRODI (Materi1 & 2 x 0.25, Sisanya x 0.1)
+  // 2. HITUNG PEMBOBOTAN (Materi Prioritas x 0.25, Lainnya x 0.1)
   const materi1 = r[9]; 
   const materi2 = r[10];
   let skorBobot = 0;
-
   for (let k in mapel) {
-    if (k == materi1 || k == materi2) {
-      skorBobot += mapel[k] * 0.25;
-    } else {
-      skorBobot += mapel[k] * 0.1;
-    }
+    skorBobot += (k == materi1 || k == materi2) ? mapel[k] * 0.25 : mapel[k] * 0.1;
   }
 
-  // 3. HITUNG PELUANG (RUMUS SIMULASI: Selisih 5 poin = 1%)
+  // 3. HITUNG PELUANG (Selisih 5 poin = 1%)
   const skorAman = parseFloat(r[8]) || 0;
   const selisih = skorBobot - skorAman;
   let peluang = (selisih / 5) + 50;
+  peluang = Math.max(0, Math.min(99, peluang));
 
-  // Batasan minimal 0%, maksimal 99%
-  if (peluang < 0) peluang = 0;
-  if (peluang > 99) peluang = 99;
-
-  // 4. TENTUKAN WARNA DAN KATEGORI BERDASARKAN PERSENTASE
+  // 4. LOGIKA WARNA KARTU DINAMIS (PARTISI TENGAH)
   let katPeluang = "Sedang";
-  let colorClass = "card-kuning"; // Default Kuning (40-60)
-  let hexColor = "#e0a800";
+  let colorClass = "card-kuning"; 
+  let hexColor = "#e0a800"; // Untuk teks indikator chart
 
   if (peluang > 60) {
     katPeluang = "Tinggi";
-    colorClass = "card-green"; // Hijau (>60)
+    colorClass = "card-green"; 
     hexColor = "#16a34a";
   } else if (peluang < 40) {
     katPeluang = "Rendah";
-    colorClass = "card-red"; // Merah (<40)
+    colorClass = "card-red"; 
     hexColor = "#dc2626";
   }
 
-  // 5. ANALISIS TERTINGGI & TERENDAH
+  // 5. ANALISIS DATA
   const sorted = Object.entries(mapel).sort((a, b) => b[1] - a[1]);
   const tertinggi = sorted.slice(0, 2).map(x => x[0]);
   const terendah = sorted.slice(-2).map(x => x[0]);
-  
-  const maksimal = (tertinggi.includes(materi1) && tertinggi.includes(materi2)) 
-    ? "sudah maksimal" 
-    : "belum maksimal";
+  const maksimal = (tertinggi.includes(materi1) && tertinggi.includes(materi2)) ? "sudah maksimal" : "belum maksimal";
 
-  // 6. RENDER LAYOUT HASIL
+  // 6. RENDER HTML
   document.getElementById("hasilPeluang").innerHTML = `
     <h3 style="text-align:center; margin-top:40px;">Hasil Analisis Peluang</h3>
     
@@ -692,9 +685,8 @@ function prosesPeluang() {
         <canvas id="chartBar"></canvas>
       </div>
       <div style="font-size:14px; line-height:1.6; align-self:center; text-align:justify; padding-left:15px;">
-        <p>Berdasarkan data prodi yang dipilih, <b>Kampus ${ptn}</b> pada program studi <b>${prodi}</b> memberikan bobot prioritas yang lebih tinggi pada materi <b>${materi1}</b> dan <b>${materi2}</b>. Melalui analisis skor yang Anda masukkan, hasil pembobotan saat ini dinyatakan <b>${maksimal}</b> karena kesesuaian antara nilai subtes tertinggi Anda dengan mata uji utama prodi tersebut.</p>
-        
-        <p>Untuk memaksimalkan strategi pemilihan, sangat disarankan bagi Anda untuk mempertimbangkan kembali atau menghindari program studi yang sangat memprioritaskan materi <b>${terendah[0]}</b> serta <b>${terendah[1]}</b>, mengingat kedua materi tersebut merupakan skor input terendah Anda saat ini.</p>
+        <p>Berdasarkan kriteria pemilihan, <b>Kampus ${ptn}</b> untuk program studi <b>${prodi}</b> menaruh perhatian utama pada subtes <b>${materi1}</b> dan <b>${materi2}</b>. Dari data yang dimasukkan, performa pembobotan Anda saat ini dinilai <b>${maksimal}</b> karena korelasi antara nilai tertinggi Anda dengan materi prioritas prodi tersebut.</p>
+        <p>Sebagai langkah strategis, disarankan bagi Anda untuk mewaspadai pemilihan prodi yang memiliki pembobotan tinggi pada materi <b>${terendah[0]}</b> dan <b>${terendah[1]}</b>, mengingat kedua materi tersebut merupakan titik terendah dari skor Anda saat ini.</p>
       </div>
     </div>
 
@@ -703,13 +695,13 @@ function prosesPeluang() {
 
     <div class="partisi-3" style="align-items: center;">
       <div style="display:flex; flex-direction:column; gap:10px;">
-        <div class="card-blue" style="padding:15px;"><small style="font-size:11px;">Skor Pembobotan</small><br><b style="font-size:18px;">${skorBobot.toFixed(2)}</b></div>
-        <div class="card-blue" style="padding:15px;"><small style="font-size:11px;">Skor Aman Prodi</small><br><b style="font-size:18px;">${skorAman}</b></div>
+        <div class="card-blue">Skor Pembobotan<br><b style="font-size:18px;">${skorBobot.toFixed(2)}</b></div>
+        <div class="card-blue">Skor Aman Prodi<br><b style="font-size:18px;">${skorAman}</b></div>
       </div>
       
       <div style="display:flex; flex-direction:column; gap:10px;">
-        <div class="${colorClass}" style="padding:15px;"><small style="font-size:11px;">Persentase Peluang Lolos</small><br><b style="font-size:18px;">${peluang.toFixed(2)}%</b></div>
-        <div class="${colorClass}" style="padding:15px;"><small style="font-size:11px;">Kategori Peluang</small><br><b style="font-size:18px;">${katPeluang}</b></div>
+        <div class="${colorClass}">Peluang Lolos<br><b style="font-size:18px;">${peluang.toFixed(2)}%</b></div>
+        <div class="${colorClass}">Kategori Peluang<br><b style="font-size:18px;">${katPeluang}</b></div>
       </div>
 
       <div style="text-align:center;">
@@ -720,20 +712,19 @@ function prosesPeluang() {
       </div>
     </div>
 
-    <div style="margin-top:40px; padding:25px; border-top:1px solid #e3ecff; font-size:15px; color:var(--text); text-align:center; background:#fcfdff; border-radius:15px;">
-      <p style="font-weight:bold; margin-bottom:10px; text-transform:uppercase; letter-spacing:1px; color:var(--muted);">Kesimpulan Akhir</p>
+    <div style="margin-top:40px; padding:25px; border-top:1px solid #e3ecff; font-size:15px; text-align:center; background:#fcfdff; border-radius:15px;">
+      <p style="font-weight:bold; margin-bottom:10px; color:var(--muted);">KESIMPULAN AKHIR</p>
       <p style="line-height:1.7; max-width:850px; margin:0 auto;">
-        Melihat hasil kalkulasi peluang lolos Anda yang berada pada kategori <b>${katPeluang}</b>, 
+        Melihat kalkulasi peluang lolos Anda yang berada pada kategori <b>${katPeluang}</b>, 
         <span style="color: ${hexColor}; font-weight:bold;">
-          ${katPeluang == "Rendah" ? "sangat disarankan untuk mencari alternatif program studi lain yang lebih sesuai dengan sebaran skor Anda agar peluang kelulusan pada seleksi ini lebih terjamin." : 
-            katPeluang == "Sedang" ? "program studi ini boleh dicoba untuk dipilih, namun Anda tetap perlu waspada dan mempertimbangkan strategi cadangan mengingat persaingan yang cukup ketat." : 
-            "program studi ini sangat direkomendasikan untuk Anda pilih karena skor pembobotan Anda telah melampaui ambang batas aman yang ditentukan."}
+          ${katPeluang == "Rendah" ? "sangat disarankan untuk mencari alternatif prodi lain yang lebih relevan dengan keunggulan subtes Anda agar peluang kelulusan lebih terjamin." : 
+            katPeluang == "Sedang" ? "pilihan prodi ini masih bisa dicoba, namun tetaplah berhati-hati dan siapkan strategi cadangan karena persaingan berada pada level kompetitif." : 
+            "program studi ini sangat ideal untuk dipilih karena skor Anda telah melampaui ambang batas aman secara signifikan."}
         </span>
       </p>
     </div>
   `;
 
-  // 7. JALANKAN CHART
   renderChartBar(mapel, tertinggi, terendah);
   renderChartPie(peluang);
 }
