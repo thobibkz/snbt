@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Rasionalisasi SNBT</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<style>
+:root{
+  --blue:#1f6feb;
+  --blue2:#4fa3ff;
+  --bg:#f4f8ff;
+  --card:#ffffff;
+  --text:#1f2d3d;
+  --muted:#6b7a90;
+  --shadow:0 8px 25px rgba(0,0,0,.08);
+}
+
+*{box-sizing:border-box;font-family:Segoe UI,Arial,sans-serif;}
+
+body{
+  margin:0;
+  background:var(--bg);
+  color:var(--text);
+  padding-bottom:80px;
+}
+
+/* HEADER */
+.header{
+  background:linear-gradient(135deg,var(--blue),var(--blue2));
+  color:white;
+  padding:18px;
+  border-radius:0 0 24px 24px;
+  box-shadow:0 6px 20px rgba(0,0,0,.2);
+}
+
+.header h2{margin:0;font-size:20px;}
+.header p{margin:4px 0 0;font-size:13px;opacity:.9}
+
+/* CARD */
+.card{
+  background:var(--card);
+  margin:16px;
+  padding:16px;
+  border-radius:18px;
+  box-shadow:var(--shadow);
+}
+
+/* FORM */
+select,input{
+  width:100%;
+  padding:12px;
+  border-radius:12px;
+  border:1px solid #dbe7ff;
+  margin-bottom:10px;
+  font-size:14px;
+}
+
+button{
+  width:100%;
+  padding:12px;
+  border-radius:14px;
+  border:none;
+  background:linear-gradient(135deg,var(--blue),var(--blue2));
+  color:white;
+  font-weight:600;
+  font-size:15px;
+  box-shadow:0 4px 12px rgba(31,111,235,.3);
+}
+
+/* RESULT */
+.result{
+  margin-top:12px;
+  padding:12px;
+  background:#f7fbff;
+  border-radius:12px;
+  border:1px solid #e3ecff;
+  font-size:14px;
+}
+
+/* BOTTOM NAV */
+.navbar{
+  position:fixed;
+  bottom:0;
+  left:0;
+  width:100%;
+  background:white;
+  border-top:1px solid #e3ecff;
+  display:flex;
+  justify-content:space-around;
+  padding:8px 0;
+  box-shadow:0 -4px 20px rgba(0,0,0,.06);
+}
+
+.navbar div{
+  text-align:center;
+  font-size:12px;
+  color:var(--muted);
+}
+
+.navbar div.active{
+  color:var(--blue);
+  font-weight:bold;
+}
+</style>
+</head>
+
+<body>
+
+<!-- HEADER -->
+<div class="header">
+  <h2>Rasionalisasi SNBT</h2>
+  <p>Analisis peluang masuk PTN & target belajar</p>
+</div>
+
+<!-- MAIN CARD -->
+<div class="card">
+  <h3>🎓 Pilih PTN & Prodi</h3>
+  <select id="ptn"></select>
+  <select id="prodi"></select>
+  <button onclick="showData()">Tampilkan Data</button>
+
+  <div id="hasil" class="result"></div>
+</div>
+
+<!-- BOTTOM NAVIGATION -->
+<div class="navbar">
+  <div class="active">🏠 Home</div>
+  <div>📊 Peluang</div>
+  <div>💡 Saran</div>
+  <div>🎯 Target</div>
+</div>
+
+<script>
+// GANTI DENGAN URL API APPS SCRIPT ANDA
+const API = "PASTE_URL_API_JSON_ANDA";
+
+let snbt=[];
+
+// Load data
+fetch(API)
+.then(res=>res.json())
+.then(d=>{
+  snbt=d;
+  loadPTN();
+});
+
+function loadPTN(){
+  const ptnSet=[...new Set(snbt.slice(1).map(r=>r[1]))];
+  const p=document.getElementById("ptn");
+  p.innerHTML="<option>Pilih PTN</option>";
+  ptnSet.forEach(x=>p.innerHTML+=`<option>${x}</option>`);
+}
+
+// Load Prodi
+document.getElementById("ptn").onchange=()=>{
+  const p=document.getElementById("ptn").value;
+  const pro=document.getElementById("prodi");
+  pro.innerHTML="";
+  snbt.filter(r=>r[1]==p).forEach(r=>{
+    pro.innerHTML+=`<option>${r[2]}</option>`;
+  });
+};
+
+// Show data
+function showData(){
+  const p=document.getElementById("ptn").value;
+  const pro=document.getElementById("prodi").value;
+  const r=snbt.find(x=>x[1]==p && x[2]==pro);
+  if(!r) return;
+
+  document.getElementById("hasil").innerHTML=`
+  <b>${r[2]}</b><br>
+  <small>${r[1]}</small><br><br>
+
+  Skor SNBT: <b>${r[8]}</b><br>
+  Kuota: ${r[4]}<br>
+  Peminat: ${r[5]}<br>
+  Keketatan: ${r[6]}<br><br>
+
+  📘 Materi Utama: ${r[9]}<br>
+  📗 Materi Pendukung: ${r[10]}<br><br>
+
+  💡 <b>Saran:</b><br>${r[11]}
+  `;
+}
+</script>
+
+</body>
+</html>
