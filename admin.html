@@ -219,6 +219,66 @@ select,input{
     grid-template-columns:1fr;
   }
 }
+
+/* ===== PRIMARY 3D BUTTON ===== */
+.btn-3d-primary{
+  background: linear-gradient(145deg, #2563eb, #1e40af);
+  color: white;
+  border: none;
+  padding: 12px 22px;
+  font-size: 15px;
+  font-weight: 600;
+  border-radius: 12px;
+  cursor: pointer;
+  box-shadow:
+    0 6px 0 #1e3a8a,
+    0 10px 18px rgba(0,0,0,0.25);
+  transition: all 0.15s ease;
+}
+
+.btn-3d-primary:hover{
+  transform: translateY(-2px);
+  box-shadow:
+    0 8px 0 #1e3a8a,
+    0 14px 22px rgba(0,0,0,0.3);
+}
+
+.btn-3d-primary:active{
+  transform: translateY(4px);
+  box-shadow:
+    0 2px 0 #1e3a8a,
+    0 5px 10px rgba(0,0,0,0.2);
+}
+
+/* ===== RESET BUTTON (SOFT 3D) ===== */
+.btn-3d-reset{
+  background: linear-gradient(145deg, #f3f4f6, #d1d5db);
+  color: #111827;
+  border: none;
+  padding: 10px 18px;
+  font-size: 14px;
+  font-weight: 600;
+  border-radius: 10px;
+  cursor: pointer;
+  box-shadow:
+    0 4px 0 #9ca3af,
+    0 6px 12px rgba(0,0,0,0.15);
+  transition: all 0.15s ease;
+}
+
+.btn-3d-reset:hover{
+  transform: translateY(-2px);
+  box-shadow:
+    0 6px 0 #9ca3af,
+    0 10px 16px rgba(0,0,0,0.2);
+}
+
+.btn-3d-reset:active{
+  transform: translateY(3px);
+  box-shadow:
+    0 1px 0 #9ca3af,
+    0 3px 6px rgba(0,0,0,0.15);
+}
   
 </style>
 </head>
@@ -483,14 +543,14 @@ function loadPeluang(){
     </div>
 
     <!-- BUTTON -->
-    <div style="margin-top:15px; display:flex; gap:10px; align-items:center;">
-      <button onclick="prosesPeluang()" class="btn-primary">
-        Proses Peluang Lolos
-      </button>
-      <button onclick="resetPeluang()" class="btn-small">
-        Reset
-      </button>
-    </div>
+<div style="margin-top:20px; display:flex; gap:12px; align-items:center;">
+  <button onclick="prosesPeluang()" class="btn-3d-primary">
+    🚀 Proses Peluang Lolos
+  </button>
+  <button onclick="resetPeluang()" class="btn-3d-reset">
+    Reset
+  </button>
+</div>
 
     <!-- HASIL AKAN MUNCUL DI SINI -->
     <div id="hasilPeluang"></div>
@@ -694,25 +754,49 @@ function renderChartBar(data, tertinggi, terendah){
   });
 }  
 
+let chartPieInstance = null;
+
 function renderChartPie(persen){
 
-  const ctx = document.getElementById("chartPie");
+  const canvas = document.getElementById("chartPie");
+  if(!canvas) return;
 
-  new Chart(ctx,{
-    type:"doughnut",
+  const ctx = canvas.getContext("2d");
+
+  if(chartPieInstance){
+    chartPieInstance.destroy();
+  }
+
+  chartPieInstance = new Chart(ctx,{
+    type:"pie", // <-- jadi lingkaran penuh
     data:{
-      labels:["Lolos","Tidak"],
+      labels:["Peluang Lolos","Risiko"],
       datasets:[{
-        data:[persen,100-persen],
-        backgroundColor:["#16a34a","#e5e7eb"]
+        data:[persen, 100-persen],
+        backgroundColor:["#16a34a","#dc2626"],
+        borderWidth:0
       }]
     },
     options:{
-      cutout:"55%",
-      plugins:{ legend:{display:false}},
-      responsive:true
+      responsive:true,
+      plugins:{
+        legend:{ display:false }
+      }
     }
   });
+
+  // Tambahkan teks di bawah chart
+  document.getElementById("persenText").innerHTML = `
+    <div style="margin-top:15px;text-align:center;font-weight:bold">
+      <span style="color:#16a34a">
+        Peluang: ${persen.toFixed(2)}%
+      </span>
+      &nbsp;&nbsp;|&nbsp;&nbsp;
+      <span style="color:#dc2626">
+        Risiko: ${(100-persen).toFixed(2)}%
+      </span>
+    </div>
+  `;
 }
   
 // ================= SARAN PRODI ==================
