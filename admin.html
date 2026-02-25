@@ -86,6 +86,37 @@ select,input{
   font-size:14px;
 }
 .result b{color:var(--blue);}
+
+/* GRID HASIL */
+.result-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(160px,1fr));
+  gap:14px;
+  margin-top:15px;
+}
+
+.info-card{
+  padding:18px;
+  border-radius:16px;
+  color:white;
+  font-weight:600;
+  box-shadow:0 6px 18px rgba(0,0,0,.15);
+}
+
+.info-card small{
+  display:block;
+  font-size:13px;
+  opacity:.9;
+  margin-bottom:6px;
+  font-weight:500;
+}
+
+.blue{background:linear-gradient(135deg,#2b6cff,#1f3fbf);}
+.green{background:linear-gradient(135deg,#27ae60,#1e874b);}
+.orange{background:linear-gradient(135deg,#ff7a18,#e65100);}
+.red{background:linear-gradient(135deg,#d63031,#a4161a);}
+.gray{background:#eef2f7;color:#1f2d3d;font-weight:600;}
+  
 </style>
 </head>
 
@@ -177,17 +208,59 @@ function showData(){
   if(!r) return;
 
   document.getElementById("hasil").innerHTML=`
-  <b>${r[2]}</b><br>
-  <small>${r[1]}</small><hr>
-  <b>Skor Aman:</b> ${r[8]}<br>
-  <b>Kuota:</b> ${r[4]}<br>
-  <b>Peminat:</b> ${r[5]}<br>
-  <b>Keketatan:</b> ${r[6]}<br>
-  <b>Kategori:</b> ${r[7]}<br><br>
-  <b>Materi 1:</b> ${r[9]}<br>
-  <b>Materi 2:</b> ${r[10]}<br>
-  <b>Portofolio:</b> ${r[3]}<br><br>
-  <b>Saran:</b><br>${r[11]}
+  <div style="margin-bottom:10px">
+    <h3 style="margin:0">${r[2]}</h3>
+    <small>${r[1]}</small>
+  </div>
+
+  <div class="result-grid">
+
+    <div class="info-card blue">
+      <small>SKOR AMAN</small>
+      <div style="font-size:28px">${r[8]}</div>
+    </div>
+
+    <div class="info-card red">
+      <small>Keketatan</small>
+      <div style="font-size:24px">${r[6]}</div>
+    </div>
+
+    <div class="info-card gray">
+      <small>SUBTES 1</small>
+      <div style="font-size:20px">${r[9]}</div>
+    </div>
+
+    <div class="info-card gray">
+      <small>Portofolio</small>
+      <div style="font-size:18px">${r[3]}</div>
+    </div>
+
+    <div class="info-card green">
+      <small>Kuota</small>
+      <div style="font-size:26px">${r[4]}</div>
+    </div>
+
+    <div class="info-card orange">
+      <small>Peminat</small>
+      <div style="font-size:22px">${r[5]}</div>
+    </div>
+
+    <div class="info-card red">
+      <small>Kategori</small>
+      <div style="font-size:20px">${r[7]}</div>
+    </div>
+
+    <div class="info-card gray">
+      <small>SUBTES 2</small>
+      <div style="font-size:20px">${r[10]}</div>
+    </div>
+
+    <div class="info-card gray">
+      <small>Saran</small>
+      <div style="font-size:16px">${r[11]}</div>
+    </div>
+
+  </div>
   `;
 }
 
