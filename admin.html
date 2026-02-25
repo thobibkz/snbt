@@ -185,5 +185,12 @@ function showData(){
 }
 </script>
 
+<script>
+if(localStorage.getItem("role")!="admin"){
+  alert("Akses ditolak");
+  location.href="index.html";
+}
+</script>
+  
 </body>
 </html>
