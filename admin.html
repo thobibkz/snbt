@@ -279,6 +279,24 @@ select,input{
     0 1px 0 #9ca3af,
     0 3px 6px rgba(0,0,0,0.15);
 }
+
+.card-red {
+  background: #fee2e2;
+  color: #dc2626;
+  padding: 20px;
+  border-radius: 16px;
+  border: 1px solid #fecaca;
+  text-align: center;
+}
+
+.card-kuning {
+  background: #fffbeb;
+  color: #e0a800;
+  padding: 20px;
+  border-radius: 16px;
+  border: 1px solid #fef3c7;
+  text-align: center;
+}
   
 </style>
 </head>
@@ -640,12 +658,22 @@ function prosesPeluang() {
   if (peluang < 0) peluang = 0;
   if (peluang > 99) peluang = 99;
 
-  // Tentukan Kategori
+  // 4. TENTUKAN WARNA DAN KATEGORI BERDASARKAN PERSENTASE
   let katPeluang = "Sedang";
-  if (peluang > 60) katPeluang = "Tinggi";
-  if (peluang < 40) katPeluang = "Rendah";
+  let colorClass = "card-kuning"; // Default Kuning (40-60)
+  let hexColor = "#e0a800";
 
-  // 4. ANALISIS TERTINGGI & TERENDAH
+  if (peluang > 60) {
+    katPeluang = "Tinggi";
+    colorClass = "card-green"; // Hijau (>60)
+    hexColor = "#16a34a";
+  } else if (peluang < 40) {
+    katPeluang = "Rendah";
+    colorClass = "card-red"; // Merah (<40)
+    hexColor = "#dc2626";
+  }
+
+  // 5. ANALISIS TERTINGGI & TERENDAH
   const sorted = Object.entries(mapel).sort((a, b) => b[1] - a[1]);
   const tertinggi = sorted.slice(0, 2).map(x => x[0]);
   const terendah = sorted.slice(-2).map(x => x[0]);
@@ -654,7 +682,7 @@ function prosesPeluang() {
     ? "sudah maksimal" 
     : "belum maksimal";
 
-  // 5. RENDER LAYOUT HASIL
+  // 6. RENDER LAYOUT HASIL
   document.getElementById("hasilPeluang").innerHTML = `
     <h3 style="text-align:center; margin-top:40px;">Hasil Analisis Peluang</h3>
     
@@ -680,13 +708,13 @@ function prosesPeluang() {
       </div>
       
       <div style="display:flex; flex-direction:column; gap:10px;">
-        <div class="card-green" style="padding:15px;"><small style="font-size:11px;">Peluang Lolos</small><br><b style="font-size:18px;">${peluang.toFixed(2)}%</b></div>
-        <div class="card-green" style="padding:15px;"><small style="font-size:11px;">Kategori Peluang</small><br><b style="font-size:18px;">${katPeluang}</b></div>
+        <div class="${colorClass}" style="padding:15px;"><small style="font-size:11px;">Persentase Peluang Lolos</small><br><b style="font-size:18px;">${peluang.toFixed(2)}%</b></div>
+        <div class="${colorClass}" style="padding:15px;"><small style="font-size:11px;">Kategori Peluang</small><br><b style="font-size:18px;">${katPeluang}</b></div>
       </div>
 
       <div style="text-align:center;">
         <div style="max-width:160px; margin:0 auto;"><canvas id="chartPie"></canvas></div>
-        <div id="persenText" style="font-size:12px; font-weight:bold; margin-top:10px; color:#16a34a;">
+        <div id="persenText" style="font-size:12px; font-weight:bold; margin-top:10px; color:${hexColor};">
            Peluang: ${peluang.toFixed(1)}%
         </div>
       </div>
@@ -696,7 +724,7 @@ function prosesPeluang() {
       <p style="font-weight:bold; margin-bottom:10px; text-transform:uppercase; letter-spacing:1px; color:var(--muted);">Kesimpulan Akhir</p>
       <p style="line-height:1.7; max-width:850px; margin:0 auto;">
         Melihat hasil kalkulasi peluang lolos Anda yang berada pada kategori <b>${katPeluang}</b>, 
-        <span style="color: ${katPeluang == 'Rendah' ? '#dc2626' : katPeluang == 'Tinggi' ? '#16a34a' : '#e0a800'}; font-weight:bold;">
+        <span style="color: ${hexColor}; font-weight:bold;">
           ${katPeluang == "Rendah" ? "sangat disarankan untuk mencari alternatif program studi lain yang lebih sesuai dengan sebaran skor Anda agar peluang kelulusan pada seleksi ini lebih terjamin." : 
             katPeluang == "Sedang" ? "program studi ini boleh dicoba untuk dipilih, namun Anda tetap perlu waspada dan mempertimbangkan strategi cadangan mengingat persaingan yang cukup ketat." : 
             "program studi ini sangat direkomendasikan untuk Anda pilih karena skor pembobotan Anda telah melampaui ambang batas aman yang ditentukan."}
@@ -705,7 +733,7 @@ function prosesPeluang() {
     </div>
   `;
 
-  // 6. JALANKAN CHART
+  // 7. JALANKAN CHART
   renderChartBar(mapel, tertinggi, terendah);
   renderChartPie(peluang);
 }
