@@ -148,17 +148,23 @@ select,input{
 
   .result-grid{
     grid-template-columns: repeat(2, 1fr);
-    grid-auto-rows: auto;
+    grid-template-areas:
+      "skor skor"
+      "kuota peminat"
+      "keketatan kategori"
+      "materi1 materi2"
+      "portofolio saran";
   }
 
-  .span-2{
-    grid-column: span 2;
-  }
-
-  /* 4 card terakhir jadi grid 2x2 */
-  .mobile-stack{
-    grid-column: span 1;
-  }
+  .skor{ grid-area: skor; }
+  .kuota{ grid-area: kuota; }
+  .peminat{ grid-area: peminat; }
+  .keketatan{ grid-area: keketatan; }
+  .kategori{ grid-area: kategori; }
+  .materi1{ grid-area: materi1; }
+  .materi2{ grid-area: materi2; }
+  .portofolio{ grid-area: portofolio; }
+  .saran{ grid-area: saran; }
 
 }
   
@@ -296,49 +302,56 @@ function showData(){
 
   <div class="result-grid">
 
-    <!-- BARIS 1 -->
-    <div class="info-card blue span-2">
+    <!-- SKOR -->
+    <div class="info-card blue span-2 skor">
       <small>SKOR AMAN</small>
       <div style="font-size:32px">${r[8]}</div>
     </div>
 
-    <div class="info-card ${katClass}">
+    <!-- KEKETATAN -->
+    <div class="info-card ${katClass} keketatan">
       <small>Keketatan</small>
       <div style="font-size:22px">${keketatanFormat}</div>
     </div>
 
-    <div class="info-card gray mobile-stack">
+    <!-- MATERI 1 -->
+    <div class="info-card gray materi1">
       <small>Materi 1</small>
       <div style="font-size:18px">${r[9]}</div>
     </div>
 
-    <div class="info-card gray mobile-stack">
+    <!-- PORTOFOLIO -->
+    <div class="info-card gray portofolio">
       <small>Portofolio</small>
       <div style="font-size:18px">${r[3]}</div>
     </div>
 
-    <!-- BARIS 2 -->
-    <div class="info-card green">
+    <!-- KUOTA -->
+    <div class="info-card green kuota">
       <small>Kuota</small>
       <div style="font-size:26px">${r[4]}</div>
     </div>
 
-    <div class="info-card orange">
+    <!-- PEMINAT -->
+    <div class="info-card orange peminat">
       <small>Peminat</small>
       <div style="font-size:22px">${r[5]}</div>
     </div>
 
-    <div class="info-card ${katClass}">
+    <!-- KATEGORI -->
+    <div class="info-card ${katClass} kategori">
       <small>Kategori</small>
       <div style="font-size:20px">${r[7]}</div>
     </div>
 
-    <div class="info-card gray mobile-stack">
+    <!-- MATERI 2 -->
+    <div class="info-card gray materi2">
       <small>Materi 2</small>
       <div style="font-size:18px">${r[10]}</div>
     </div>
 
-    <div class="info-card gray mobile-stack">
+    <!-- SARAN -->
+    <div class="info-card gray saran">
       <small>Saran</small>
       <div style="font-size:16px">${r[11]}</div>
     </div>
