@@ -982,27 +982,129 @@ function changePageSaran(type, newPage, skorX, skorY, t1, t2) {
 }
 
 // ================= PERBANDINGAN ==================
+let prodiTerpilih = [];
+
 function loadPerbandingan(){
-  document.getElementById("content").innerHTML=`
+  prodiTerpilih = []; // Reset array saat menu dibuka
+  document.getElementById("content").innerHTML = `
   <div class="card">
-    <h3>⚖ Perbandingan Prodi</h3>
-    <input type="text" id="prodi1" placeholder="Prodi 1">
-    <input type="text" id="prodi2" placeholder="Prodi 2">
-    <button onclick="bandingkan()">Bandingkan</button>
-    <div id="hasilBanding" class="result"></div>
+    <h3 style="margin-bottom:20px;">⚖ Perbandingan Prodi</h3>
+    
+    <div style="margin-bottom:15px">
+      <input list="ptnListBanding" id="ptnBanding" placeholder="Pilih PTN...">
+      <datalist id="ptnListBanding"></datalist>
+
+      <input list="prodiListBanding" id="prodiBanding" placeholder="Pilih Prodi...">
+      <datalist id="prodiListBanding"></datalist>
+    </div>
+
+    <div style="margin-top:20px; display:flex; gap:10px; align-items:center; justify-content:center; flex-wrap:wrap;">
+      <button onclick="tambahProdiBanding()" class="btn-3d-primary" style="background:linear-gradient(145deg, #3b82f6, #2563eb);">➕ Tambah Prodi</button>
+      <button onclick="bandingkanProdi()" class="btn-3d-primary">📊 Bandingkan</button>
+      <button onclick="loadPerbandingan()" class="btn-3d-reset" style="padding: 8px 15px; font-size:12px; background:linear-gradient(145deg, #fee2e2, #fca5a5); color:#991b1b; border:1px solid #f87171;">Reset</button>
+    </div>
+
+    <div id="previewBanding" class="partisi-2" style="margin-top:25px;"></div>
+
+    <div id="hasilBandingUtama" style="margin-top:30px;"></div>
   </div>`;
+
+  // Inisialisasi Filter PTN
+  const ptnSet = [...new Set(snbt.map(r => r[1]))];
+  const list = document.getElementById("ptnListBanding");
+  ptnSet.forEach(x => list.innerHTML += `<option value="${x}">`);
+
+  // Event Filter Prodi
+  document.getElementById("ptnBanding").oninput = function(){
+    const p = this.value;
+    const prList = document.getElementById("prodiListBanding");
+    prList.innerHTML = "";
+    snbt.filter(r => r[1] == p).forEach(r => {
+      prList.innerHTML += `<option value="${r[2]}">`;
+    });
+  };
 }
 
-function bandingkan(){
-  const p1=snbt.find(r=>r[2]==document.getElementById("prodi1").value);
-  const p2=snbt.find(r=>r[2]==document.getElementById("prodi2").value);
-  if(!p1||!p2) return;
+function tambahProdiBanding() {
+  const ptn = document.getElementById("ptnBanding").value;
+  const prodi = document.getElementById("prodiBanding").value;
+  const r = snbt.find(x => x[1] == ptn && x[2] == prodi);
 
-  document.getElementById("hasilBanding").innerHTML=`
-  <b>${p1[2]}</b> vs <b>${p2[2]}</b><hr>
-  Skor Aman: ${p1[8]} vs ${p2[8]}<br>
-  Keketatan: ${p1[6]} vs ${p2[6]}<br>
-  Kuota: ${p1[4]} vs ${p2[4]}
+  if (!r) { alert("Pilih PTN dan Prodi yang valid!"); return; }
+  if (prodiTerpilih.length >= 2) { alert("Maksimal 2 prodi untuk dibandingkan!"); return; }
+  
+  prodiTerpilih.push(r);
+  renderPreviewBanding();
+  
+  // Reset input setelah tambah
+  document.getElementById("ptnBanding").value = "";
+  document.getElementById("prodiBanding").value = "";
+}
+
+function renderPreviewBanding() {
+  const container = document.getElementById("previewBanding");
+  container.innerHTML = prodiTerpilih.map((r, i) => `
+    <div class="card-blue" style="background:#1e3a8a; position:relative;">
+      <small>${r[1]}</small><br>
+      <b style="font-size:16px;">${r[2]}</b>
+      <div style="margin-top:10px; font-size:11px; opacity:0.8;">Prodi ${i+1}</div>
+    </div>
+  `).join(prodiTerpilih.length === 2 ? '<div style="align-self:center; text-align:center; font-weight:bold; font-size:24px;">VS</div>' : '');
+}
+
+function bandingkanProdi() {
+  if (prodiTerpilih.length < 2) {
+    alert("Tambahkan 2 prodi terlebih dahulu!");
+    return;
+  }
+
+  const p1 = prodiTerpilih[0];
+  const p2 = prodiTerpilih[1];
+
+  // Helper untuk menentukan warna (Hijau = Menang/Lebih baik)
+  const getCol = (v1, v2, type) => {
+    if (v1 === v2) return ["card-blue", "card-blue"];
+    let win;
+    if (type === 'high') win = v1 > v2; // Kuota/Keketatan: lebih tinggi lebih baik
+    if (type === 'low') win = v1 < v2;  // Peminat/Skor: lebih rendah lebih baik
+    return win ? ["card-green", "card-red"] : ["card-red", "card-green"];
+  };
+
+  const cKuota = getCol(parseFloat(p1[4]), parseFloat(p2[4]), 'high');
+  const cPeminat = getCol(parseFloat(p1[5]), parseFloat(p2[5]), 'low');
+  const cKeketatan = getCol(parseFloat(p1[6]), parseFloat(p2[6]), 'high');
+  const cSkor = getCol(parseFloat(p1[8]), parseFloat(p2[8]), 'low');
+
+  document.getElementById("hasilBandingUtama").innerHTML = `
+    <h3 style="text-align:center; margin-bottom:20px;">Hasil Komparasi Data</h3>
+    
+    <div style="display:flex; flex-direction:column; gap:15px;">
+      
+      <div style="text-align:center; font-weight:bold; font-size:12px; color:var(--muted);">KUOTA TAMPUNG</div>
+      <div class="partisi-2" style="margin-top:0;">
+        <div class="${cKuota[0]}"><b>${p1[4]}</b></div>
+        <div class="${cKuota[1]}"><b>${p2[4]}</b></div>
+      </div>
+
+      <div style="text-align:center; font-weight:bold; font-size:12px; color:var(--muted);">JUMLAH PEMINAT</div>
+      <div class="partisi-2" style="margin-top:0;">
+        <div class="${cPeminat[0]}"><b>${p1[5]}</b></div>
+        <div class="${cPeminat[1]}"><b>${p2[5]}</b></div>
+      </div>
+
+      <div style="text-align:center; font-weight:bold; font-size:12px; color:var(--muted);">KEKETATAN (%)</div>
+      <div class="partisi-2" style="margin-top:0;">
+        <div class="${cKeketatan[0]}"><b>${p1[6]}%</b></div>
+        <div class="${cKeketatan[1]}"><b>${p2[6]}%</b></div>
+      </div>
+
+      <div style="text-align:center; font-weight:bold; font-size:12px; color:var(--muted);">ESTIMASI SKOR AMAN</div>
+      <div class="partisi-2" style="margin-top:0;">
+        <div class="${cSkor[0]}"><b>${p1[8]}</b></div>
+        <div class="${cSkor[1]}"><b>${p2[8]}</b></div>
+      </div>
+
+    </div>
   `;
 }
 
