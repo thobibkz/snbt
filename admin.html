@@ -597,51 +597,73 @@ function resetPeluang(){
   document.getElementById("hasilPeluang").innerHTML = "";
 }
 
-function prosesPeluang(){
+function prosesPeluang() {
   const ptn = document.getElementById("ptnPeluang").value;
   const prodi = document.getElementById("prodiPeluang").value;
   const r = snbt.find(x => x[1] == ptn && x[2] == prodi);
 
-  if(!r) { alert("Pilih PTN dan Prodi terlebih dahulu!"); return; }
-
-  const mapel = {
-    PU: parseFloat(PU.value)||0, PPU: parseFloat(PPU.value)||0,
-    PBM: parseFloat(PBM.value)||0, PK: parseFloat(PK.value)||0,
-    LBI: parseFloat(LBI.value)||0, LBE: parseFloat(LBE.value)||0,
-    PM: parseFloat(PM.value)||0
-  };
-
-  // LOGIKA PEMBOBOTAN
-  const materi1 = r[9]; const materi2 = r[10];
-  let skorBobot = 0;
-  for(let k in mapel){
-    skorBobot += (k == materi1 || k == materi2) ? mapel[k] * 0.25 : mapel[k] * 0.1;
+  if (!r) {
+    alert("Silakan pilih PTN dan Prodi terlebih dahulu!");
+    return;
   }
 
-  // LOGIKA PELUANG
+  // 1. AMBIL INPUT SKOR
+  const mapel = {
+    PU: parseFloat(document.getElementById("PU").value) || 0,
+    PPU: parseFloat(document.getElementById("PPU").value) || 0,
+    PBM: parseFloat(document.getElementById("PBM").value) || 0,
+    PK: parseFloat(document.getElementById("PK").value) || 0,
+    LBI: parseFloat(document.getElementById("LBI").value) || 0,
+    LBE: parseFloat(document.getElementById("LBE").value) || 0,
+    PM: parseFloat(document.getElementById("PM").value) || 0
+  };
+
+  // 2. HITUNG SKOR PEMBOBOTAN PRODI
+  const materi1 = r[9]; // Diambil dari data kolom 10
+  const materi2 = r[10]; // Diambil dari data kolom 11
+  let skorBobot = 0;
+
+  for (let k in mapel) {
+    if (k == materi1 || k == materi2) {
+      skorBobot += mapel[k] * 0.25;
+    } else {
+      skorBobot += mapel[k] * 0.1;
+    }
+  }
+
+  // 3. HITUNG PELUANG (RUMUS SIMULASI: Selisih 5 poin = 1%)
   const skorAman = parseFloat(r[8]) || 0;
-  let peluang = ((skorBobot - skorAman) * 100 / 5) + 50;
-  peluang = Math.max(0, Math.min(99, peluang));
+  const selisih = skorBobot - skorAman;
+  let peluang = (selisih / 5) + 50;
 
+  // Batasan minimal 0%, maksimal 99%
+  if (peluang < 0) peluang = 0;
+  if (peluang > 99) peluang = 99;
+
+  // Tentukan Kategori
   let katPeluang = "Sedang";
-  if(peluang > 60) katPeluang = "Tinggi";
-  if(peluang < 40) katPeluang = "Rendah";
+  if (peluang > 60) katPeluang = "Tinggi";
+  if (peluang < 40) katPeluang = "Rendah";
 
-  // SORTING TERTINGGI & TERENDAH
-  const sorted = Object.entries(mapel).sort((a,b) => b[1]-a[1]);
-  const tertinggi = sorted.slice(0,2).map(x => x[0]);
+  // 4. ANALISIS TERTINGGI & TERENDAH
+  const sorted = Object.entries(mapel).sort((a, b) => b[1] - a[1]);
+  const tertinggi = sorted.slice(0, 2).map(x => x[0]);
   const terendah = sorted.slice(-2).map(x => x[0]);
-  const maksimal = (tertinggi.includes(materi1) && tertinggi.includes(materi2)) ? "sudah maksimal" : "belum maksimal";
+  
+  const maksimal = (tertinggi.includes(materi1) && tertinggi.includes(materi2)) 
+    ? "sudah maksimal" 
+    : "belum maksimal";
 
-  // RENDER HTML
+  // 5. RENDER LAYOUT HASIL
   document.getElementById("hasilPeluang").innerHTML = `
     <h3 style="text-align:center; margin-top:40px;">Hasil Analisis Peluang</h3>
+    
     <div class="partisi-2">
       <div>
-        <h4 style="text-align:center; font-size:12px;">Diagram Skor Subtes</h4>
+        <h4 style="text-align:center; font-size:13px; color:var(--muted);">Diagram Skor Subtes</h4>
         <canvas id="chartBar"></canvas>
       </div>
-      <div style="font-size:14px; line-height:1.6;">
+      <div style="font-size:14px; line-height:1.6; align-self:center;">
         Kampus <b>${ptn}</b>, Prodi <b>${prodi}</b> lebih memprioritaskan materi <b>${materi1}</b> dan <b>${materi2}</b>.<br><br>
         Hasil pembobotan saat ini <b>${maksimal}</b>.<br><br>
         Hindari prodi dengan materi <b>${terendah[0]} & ${terendah[1]}</b>.
@@ -649,24 +671,38 @@ function prosesPeluang(){
     </div>
 
     <h3 style="text-align:center; margin-top:40px;">Hasil Analisis Lanjutan</h3>
-    <p style="text-align:center;">Detail ${ptn}, ${prodi}</p>
+    <p style="text-align:center; font-size:14px; color:var(--muted);">Detail ${ptn}, ${prodi}</p>
 
     <div class="partisi-3" style="align-items: center;">
       <div style="display:flex; flex-direction:column; gap:10px;">
-        <div class="card-blue"><small>Skor Pembobotan</small><br><b>${skorBobot.toFixed(2)}</b></div>
-        <div class="card-blue"><small>Skor Aman Prodi</small><br><b>${skorAman}</b></div>
+        <div class="card-blue" style="padding:12px;"><small style="font-size:11px;">Skor Pembobotan</small><br><b>${skorBobot.toFixed(2)}</b></div>
+        <div class="card-blue" style="padding:12px;"><small style="font-size:11px;">Skor Aman Prodi</small><br><b>${skorAman}</b></div>
       </div>
+      
       <div style="display:flex; flex-direction:column; gap:10px;">
-        <div class="card-green"><small>Peluang Lolos</small><br><b>${peluang.toFixed(1)}%</b></div>
-        <div class="card-green"><small>Kategori</small><br><b>${katPeluang}</b></div>
+        <div class="card-green" style="padding:12px;"><small style="font-size:11px;">Peluang Lolos</small><br><b>${peluang.toFixed(2)}%</b></div>
+        <div class="card-green" style="padding:12px;"><small style="font-size:11px;">Kategori Peluang</small><br><b>${katPeluang}</b></div>
       </div>
+
       <div style="text-align:center;">
-        <div style="max-width:150px; margin:0 auto;"><canvas id="chartPie"></canvas></div>
-        <div id="persenText" style="font-size:11px; font-weight:bold; margin-top:5px;"></div>
+        <div style="max-width:140px; margin:0 auto;"><canvas id="chartPie"></canvas></div>
+        <div id="persenText" style="font-size:11px; font-weight:bold; margin-top:8px; color:#16a34a;">
+           Peluang: ${peluang.toFixed(1)}%
+        </div>
       </div>
+    </div>
+
+    <div style="margin-top:40px; text-align:center; padding:20px; border-top:1px solid #e3ecff; font-weight:500; font-size:15px; color:var(--text);">
+      Kesimpulan: 
+      <span style="color: ${katPeluang == 'Rendah' ? '#dc2626' : katPeluang == 'Tinggi' ? '#16a34a' : '#e0a800'}">
+        ${katPeluang == "Rendah" ? "Disarankan memilih prodi lain." : 
+          katPeluang == "Sedang" ? "Boleh dicoba tapi hati-hati." : 
+          "Silahkan dipilih, peluang tinggi."}
+      </span>
     </div>
   `;
 
+  // 6. JALANKAN CHART
   renderChartBar(mapel, tertinggi, terendah);
   renderChartPie(peluang);
 }
