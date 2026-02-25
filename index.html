@@ -1,9 +1,122 @@
-<input id="email" placeholder="Email">
-<input id="pass" type="password" placeholder="Password">
-<button onclick="login()">LOGIN</button>
+<!DOCTYPE html>
+<html>
+<head>
+<title>Login Rasionalisasi SNBT</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<style>
+:root{
+  --blue:#1f6feb;
+  --blue2:#4fa3ff;
+  --bg:#f4f8ff;
+  --card:#ffffff;
+  --text:#1f2d3d;
+  --muted:#6b7a90;
+  --shadow:0 8px 25px rgba(0,0,0,.08);
+}
+
+*{box-sizing:border-box;font-family:Segoe UI,Arial,sans-serif;}
+
+body{
+  margin:0;
+  background:var(--bg);
+  color:var(--text);
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  height:100vh;
+}
+
+/* LOGIN CARD */
+.login-card{
+  background:var(--card);
+  width:92%;
+  max-width:360px;
+  padding:22px;
+  border-radius:22px;
+  box-shadow:var(--shadow);
+}
+
+/* HEADER */
+.login-header{
+  text-align:center;
+  margin-bottom:18px;
+}
+
+.login-header h2{
+  margin:0;
+  font-size:22px;
+  background:linear-gradient(135deg,var(--blue),var(--blue2));
+  -webkit-background-clip:text;
+  color:transparent;
+}
+
+.login-header p{
+  margin-top:6px;
+  font-size:13px;
+  color:var(--muted);
+}
+
+/* INPUT */
+input{
+  width:100%;
+  padding:12px;
+  border-radius:12px;
+  border:1px solid #dbe7ff;
+  margin-bottom:12px;
+  font-size:14px;
+}
+
+/* BUTTON */
+button{
+  width:100%;
+  padding:12px;
+  border-radius:14px;
+  border:none;
+  background:linear-gradient(135deg,var(--blue),var(--blue2));
+  color:white;
+  font-weight:600;
+  font-size:15px;
+  box-shadow:0 4px 12px rgba(31,111,235,.3);
+  cursor:pointer;
+}
+
+button:active{
+  transform:scale(.98);
+}
+
+/* FOOTER */
+.footer{
+  text-align:center;
+  margin-top:12px;
+  font-size:12px;
+  color:var(--muted);
+}
+</style>
+</head>
+
+<body>
+
+<div class="login-card">
+
+  <div class="login-header">
+    <h2>Rasionalisasi SNBT</h2>
+    <p>Login untuk analisis peluang masuk PTN</p>
+  </div>
+
+  <input id="email" placeholder="Email">
+  <input id="pass" type="password" placeholder="Password">
+
+  <button onclick="login()">LOGIN</button>
+
+  <div class="footer">
+    Sistem Analisis SNBT © 2026
+  </div>
+
+</div>
 
 <script>
-const API="https://script.google.com/macros/s/XXXX/exec";
+const API="PASTE_URL_API_LOGIN_ANDA"; // Apps Script API login
 
 function login(){
   let email=document.getElementById("email").value;
@@ -17,8 +130,12 @@ function login(){
       if(d.role=="admin") location.href="admin.html";
       else location.href="publik.html";
     } else {
-      alert("Login gagal");
+      alert("Email atau password salah");
     }
-  });
+  })
+  .catch(()=>alert("Server error"));
 }
 </script>
+
+</body>
+</html>
