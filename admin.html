@@ -195,6 +195,36 @@ select,input{
 // ================= API ==================
 const API="https://script.google.com/macros/s/AKfycbziFgn-WoQzX6CBzjemhSdkcwidvK-Hnx1CjWnTgzsmKoV3QfpkWtkxW8C3OZSokpaE/exec?action=snbt";
 
+  // ================= ANIMASI ANGKA NAIK ==================
+function animateValue(element, start, end, duration, isPercent=false){
+
+  let startTime = null;
+
+  function step(timestamp){
+    if(!startTime) startTime = timestamp;
+    const progress = Math.min((timestamp - startTime) / duration, 1);
+    const value = start + (end - start) * progress;
+
+    if(isPercent){
+      element.textContent = value.toFixed(2) + "%";
+    } else {
+      element.textContent = Math.floor(value).toLocaleString();
+    }
+
+    if(progress < 1){
+      requestAnimationFrame(step);
+    } else {
+      if(isPercent){
+        element.textContent = end.toFixed(2) + "%";
+      } else {
+        element.textContent = end.toLocaleString();
+      }
+    }
+  }
+
+  requestAnimationFrame(step);
+}
+  
 // ================= GLOBAL DATA ==================
 let snbt=[];
 
@@ -261,15 +291,11 @@ function showData(){
   if(!r) return;
 
   // ================= FORMAT KEKETATAN =================
-  let keketatanRaw    = parseFloat(r[6]);
-  let keketatanFormat = "-";
+  let keketatanRaw = parseFloat(r[6]);
+  let kekPercent   = 0;
 
   if(!isNaN(keketatanRaw)){
-    if(keketatanRaw < 1){
-      keketatanFormat = (keketatanRaw * 100).toFixed(2) + "%";
-    } else {
-      keketatanFormat = keketatanRaw.toFixed(2) + "%";
-    }
+    kekPercent = keketatanRaw < 1 ? keketatanRaw * 100 : keketatanRaw;
   }
 
   // ================= WARNA KATEGORI =================
@@ -305,13 +331,13 @@ function showData(){
     <!-- SKOR -->
     <div class="info-card blue span-2 skor">
       <small>SKOR AMAN</small>
-      <div style="font-size:32px">${r[8]}</div>
+      <div id="skorVal" style="font-size:32px">0</div>
     </div>
 
     <!-- KEKETATAN -->
     <div class="info-card ${katClass} keketatan">
       <small>Keketatan</small>
-      <div style="font-size:22px">${keketatanFormat}</div>
+      <div id="keketatanVal" style="font-size:22px">0%</div>
     </div>
 
     <!-- MATERI 1 -->
@@ -329,13 +355,13 @@ function showData(){
     <!-- KUOTA -->
     <div class="info-card green kuota">
       <small>Kuota</small>
-      <div style="font-size:26px">${r[4]}</div>
+      <div id="kuotaVal" style="font-size:26px">0</div>
     </div>
 
     <!-- PEMINAT -->
     <div class="info-card orange peminat">
       <small>Peminat</small>
-      <div style="font-size:22px">${r[5]}</div>
+      <div id="peminatVal" style="font-size:22px">0</div>
     </div>
 
     <!-- KATEGORI -->
@@ -358,6 +384,20 @@ function showData(){
 
   </div>
   `;
+
+  // ================= ANIMASI ANGKA =================
+  setTimeout(()=>{
+
+    const skor    = parseFloat(r[8]) || 0;
+    const kuota   = parseFloat(r[4]) || 0;
+    const peminat = parseFloat(r[5]) || 0;
+
+    animateValue(document.getElementById("skorVal"), 0, skor, 1000);
+    animateValue(document.getElementById("kuotaVal"), 0, kuota, 1000);
+    animateValue(document.getElementById("peminatVal"), 0, peminat, 1000);
+    animateValue(document.getElementById("keketatanVal"), 0, kekPercent, 1200, true);
+
+  },100);
 }
 
 // ================= PELUANG LOLOS ==================
