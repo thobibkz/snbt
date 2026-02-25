@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title>Rasionalisasi SNBT</title>
+<title>APLIKASI RASIONALISASI SNBT 2026</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 
 <style>
@@ -16,30 +16,51 @@
 }
 
 *{box-sizing:border-box;font-family:Segoe UI,Arial,sans-serif;}
-
 body{
   margin:0;
   background:var(--bg);
   color:var(--text);
-  padding-bottom:80px;
+  padding-bottom:40px;
 }
 
 /* HEADER */
 .header{
   background:linear-gradient(135deg,var(--blue),var(--blue2));
   color:white;
-  padding:18px;
-  border-radius:0 0 24px 24px;
-  box-shadow:0 6px 20px rgba(0,0,0,.2);
+  padding:28px 16px;
+  text-align:center;
+  border-radius:0 0 26px 26px;
+  box-shadow:0 6px 20px rgba(0,0,0,.25);
 }
+.header h1{margin:0;font-size:20px;font-weight:700;}
+.header p{margin-top:6px;font-size:13px;opacity:.9}
 
-.header h2{margin:0;font-size:20px;}
-.header p{margin:4px 0 0;font-size:13px;opacity:.9}
+/* MENU BUTTONS */
+.menu-bar{
+  display:flex;
+  gap:8px;
+  justify-content:center;
+  flex-wrap:wrap;
+  padding:12px;
+}
+.menu-bar button{
+  background:white;
+  border:1px solid #dbe7ff;
+  padding:8px 12px;
+  border-radius:20px;
+  font-size:13px;
+  cursor:pointer;
+}
+.menu-bar button.active{
+  background:var(--blue);
+  color:white;
+  border:none;
+}
 
 /* CARD */
 .card{
   background:var(--card);
-  margin:16px;
+  margin:12px;
   padding:16px;
   border-radius:18px;
   box-shadow:var(--shadow);
@@ -55,18 +76,6 @@ select,input{
   font-size:14px;
 }
 
-button{
-  width:100%;
-  padding:12px;
-  border-radius:14px;
-  border:none;
-  background:linear-gradient(135deg,var(--blue),var(--blue2));
-  color:white;
-  font-weight:600;
-  font-size:15px;
-  box-shadow:0 4px 12px rgba(31,111,235,.3);
-}
-
 /* RESULT */
 .result{
   margin-top:12px;
@@ -76,31 +85,7 @@ button{
   border:1px solid #e3ecff;
   font-size:14px;
 }
-
-/* BOTTOM NAV */
-.navbar{
-  position:fixed;
-  bottom:0;
-  left:0;
-  width:100%;
-  background:white;
-  border-top:1px solid #e3ecff;
-  display:flex;
-  justify-content:space-around;
-  padding:8px 0;
-  box-shadow:0 -4px 20px rgba(0,0,0,.06);
-}
-
-.navbar div{
-  text-align:center;
-  font-size:12px;
-  color:var(--muted);
-}
-
-.navbar div.active{
-  color:var(--blue);
-  font-weight:bold;
-}
+.result b{color:var(--blue);}
 </style>
 </head>
 
@@ -108,60 +93,83 @@ button{
 
 <!-- HEADER -->
 <div class="header">
-  <h2>Rasionalisasi SNBT</h2>
-  <p>Analisis peluang masuk PTN & target belajar</p>
+  <h1>APLIKASI RASIONALISASI SNBT 2026</h1>
+  <p>Sistem Analisis Peluang & Rasionalisasi Jurusan SNBT 2026</p>
 </div>
 
-<!-- MAIN CARD -->
-<div class="card">
-  <h3>🎓 Pilih PTN & Prodi</h3>
-  <select id="ptn"></select>
-  <select id="prodi"></select>
-  <button onclick="showData()">Tampilkan Data</button>
-
-  <div id="hasil" class="result"></div>
+<!-- MENU UTAMA -->
+<div class="menu-bar">
+  <button class="active" onclick="showMenu('rasionalisasi')">Rasionalisasi Prodi</button>
+  <button onclick="showMenu('peluang')">Peluang Lolos</button>
+  <button onclick="showMenu('saran')">Saran Prodi</button>
+  <button onclick="showMenu('perbandingan')">Perbandingan Prodi</button>
+  <button onclick="showMenu('target')">Target Belajar</button>
 </div>
 
-<!-- BOTTOM NAVIGATION -->
-<div class="navbar">
-  <div class="active">🏠 Home</div>
-  <div>📊 Peluang</div>
-  <div>💡 Saran</div>
-  <div>🎯 Target</div>
-</div>
+<!-- CONTENT AREA -->
+<div id="content"></div>
 
 <script>
-// GANTI DENGAN URL API APPS SCRIPT ANDA
-const API = "PASTE_URL_API_JSON_ANDA";
+// ================= API ==================
+const API="PASTE_URL_API_JSON_ANDA?action=snbt";
 
+// ================= GLOBAL DATA ==================
 let snbt=[];
 
-// Load data
-fetch(API)
-.then(res=>res.json())
-.then(d=>{
+// Load data SNBT
+fetch(API).then(r=>r.json()).then(d=>{
   snbt=d;
-  loadPTN();
+  loadRasionalisasi();
 });
 
-function loadPTN(){
-  const ptnSet=[...new Set(snbt.slice(1).map(r=>r[1]))];
-  const p=document.getElementById("ptn");
-  p.innerHTML="<option>Pilih PTN</option>";
-  ptnSet.forEach(x=>p.innerHTML+=`<option>${x}</option>`);
+// ================= MENU SWITCH ==================
+function showMenu(menu){
+  document.querySelectorAll(".menu-bar button").forEach(b=>b.classList.remove("active"));
+  event.target.classList.add("active");
+
+  if(menu=="rasionalisasi") loadRasionalisasi();
+  else document.getElementById("content").innerHTML=`<div class="card">Fitur ${menu} segera dikembangkan</div>`;
 }
 
-// Load Prodi
-document.getElementById("ptn").onchange=()=>{
-  const p=document.getElementById("ptn").value;
-  const pro=document.getElementById("prodi");
-  pro.innerHTML="";
-  snbt.filter(r=>r[1]==p).forEach(r=>{
-    pro.innerHTML+=`<option>${r[2]}</option>`;
-  });
-};
+// ================= RASIONALISASI UI ==================
+function loadRasionalisasi(){
+  document.getElementById("content").innerHTML=`
+  <div class="card">
+    <h3>🎓 Filter PTN & Prodi</h3>
+    <input list="ptnList" id="ptn" placeholder="Pilih PTN...">
+    <datalist id="ptnList"></datalist>
 
-// Show data
+    <input list="prodiList" id="prodi" placeholder="Pilih Prodi...">
+    <datalist id="prodiList"></datalist>
+
+    <div id="hasil" class="result">Silakan pilih PTN dan Prodi</div>
+  </div>
+  `;
+
+  loadPTN();
+  document.getElementById("ptn").oninput=loadProdi;
+  document.getElementById("prodi").oninput=showData;
+}
+
+// ================= LOAD PTN ==================
+function loadPTN(){
+  const ptnSet=[...new Set(snbt.slice(1).map(r=>r[1]))];
+  const list=document.getElementById("ptnList");
+  list.innerHTML="";
+  ptnSet.forEach(x=>list.innerHTML+=`<option value="${x}">`);
+}
+
+// ================= LOAD PRODI ==================
+function loadProdi(){
+  const p=document.getElementById("ptn").value;
+  const list=document.getElementById("prodiList");
+  list.innerHTML="";
+  snbt.filter(r=>r[1]==p).forEach(r=>{
+    list.innerHTML+=`<option value="${r[2]}">`;
+  });
+}
+
+// ================= SHOW DATA ==================
 function showData(){
   const p=document.getElementById("ptn").value;
   const pro=document.getElementById("prodi").value;
@@ -170,27 +178,30 @@ function showData(){
 
   document.getElementById("hasil").innerHTML=`
   <b>${r[2]}</b><br>
-  <small>${r[1]}</small><br><br>
+  <small>${r[1]}</small><hr>
 
-  Skor SNBT: <b>${r[8]}</b><br>
-  Kuota: ${r[4]}<br>
-  Peminat: ${r[5]}<br>
-  Keketatan: ${r[6]}<br><br>
+  <b>Skor Aman:</b> ${r[8]}<br>
+  <b>Kuota:</b> ${r[4]}<br>
+  <b>Peminat:</b> ${r[5]}<br>
+  <b>Keketatan:</b> ${r[6]}<br>
+  <b>Kategori:</b> ${r[7]}<br><br>
 
-  📘 Materi Utama: ${r[9]}<br>
-  📗 Materi Pendukung: ${r[10]}<br><br>
+  <b>Materi 1:</b> ${r[9]}<br>
+  <b>Materi 2:</b> ${r[10]}<br>
+  <b>Portofolio:</b> ${r[3]}<br><br>
 
-  💡 <b>Saran:</b><br>${r[11]}
+  <b>Saran:</b><br>${r[11]}
   `;
 }
 </script>
 
+<!-- ADMIN PROTECTION -->
 <script>
 if(localStorage.getItem("role")!="admin"){
   alert("Akses ditolak");
   location.href="index.html";
 }
 </script>
-  
+
 </body>
 </html>
