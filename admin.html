@@ -116,6 +116,27 @@ select,input{
 .orange{background:linear-gradient(135deg,#ff7a18,#e65100);}
 .red{background:linear-gradient(135deg,#d63031,#a4161a);}
 .gray{background:#eef2f7;color:#1f2d3d;font-weight:600;}
+
+.kat-sangat-aman{
+  background:linear-gradient(135deg,#0f9d58,#0b7d45);
+}
+
+.kat-aman{
+  background:linear-gradient(135deg,#27ae60,#1e874b);
+}
+
+.kat-sedang{
+  background:linear-gradient(135deg,#f4c430,#e0a800);
+  color:#1f2d3d;
+}
+
+.kat-ketat{
+  background:linear-gradient(135deg,#ff7a18,#e65100);
+}
+
+.kat-sangat-ketat{
+  background:linear-gradient(135deg,#d63031,#a4161a);
+}
   
 </style>
 </head>
@@ -202,11 +223,32 @@ function loadProdi(){
 }
 
 function showData(){
-  const p=document.getElementById("ptn").value;
-  const pro=document.getElementById("prodi").value;
-  const r=snbt.find(x=>x[1]==p && x[2]==pro);
+  const p = document.getElementById("ptn").value;
+  const pro = document.getElementById("prodi").value;
+  const r = snbt.find(x => x[1] == p && x[2] == pro);
   if(!r) return;
 
+  // ================= WARNA KATEGORI DINAMIS =================
+  let kategoriText = (r[7] || "").toLowerCase().trim();
+  let katClass = "gray"; // default aman jika kosong
+
+  if(kategoriText.includes("sangat aman")){
+    katClass = "kat-sangat-aman";
+  }
+  else if(kategoriText.includes("aman")){
+    katClass = "kat-aman";
+  }
+  else if(kategoriText.includes("sedang")){
+    katClass = "kat-sedang";
+  }
+  else if(kategoriText.includes("sangat ketat")){
+    katClass = "kat-sangat-ketat";
+  }
+  else if(kategoriText.includes("ketat")){
+    katClass = "kat-ketat";
+  }
+
+  // ================= TAMPILKAN HASIL =================
   document.getElementById("hasil").innerHTML=`
   <div style="margin-bottom:10px">
     <h3 style="margin:0">${r[2]}</h3>
@@ -245,9 +287,9 @@ function showData(){
       <div style="font-size:22px">${r[5]}</div>
     </div>
 
-    <div class="info-card red">
+    <div class="info-card ${katClass}">
       <small>Kategori</small>
-      <div style="font-size:20px">${r[7]}</div>
+      <div style="font-size:22px">${r[7]}</div>
     </div>
 
     <div class="info-card gray">
