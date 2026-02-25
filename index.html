@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Rasionalisasi SNBT</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<style>
+:root{
+  --blue:#1f6feb;
+  --light:#f4f8ff;
+  --card:#ffffff;
+  --shadow:0 10px 30px rgba(0,0,0,.08);
+}
+
+*{box-sizing:border-box;font-family:Segoe UI,Arial,sans-serif;}
+
+body{
+  margin:0;
+  background:linear-gradient(135deg,#e8f2ff,#fdfefe);
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  min-height:100vh;
+  color:#1f2d3d;
+}
+
+.container{
+  width:100%;
+  max-width:900px;
+  padding:20px;
+}
+
+.card{
+  background:var(--card);
+  border-radius:20px;
+  padding:30px;
+  box-shadow:var(--shadow);
+  border:1px solid #e3ecff;
+}
+
+h1{
+  color:var(--blue);
+  font-size:26px;
+  margin-bottom:10px;
+}
+
+p{
+  color:#6b7a90;
+  margin-bottom:20px;
+}
+
+select,button,input{
+  padding:12px 14px;
+  border-radius:12px;
+  border:1px solid #dbe7ff;
+  font-size:14px;
+  outline:none;
+}
+
+select,input{
+  width:100%;
+  margin-bottom:12px;
+}
+
+button{
+  background:linear-gradient(135deg,#1f6feb,#4fa3ff);
+  color:white;
+  border:none;
+  font-weight:600;
+  cursor:pointer;
+  transition:.2s;
+  box-shadow:0 6px 16px rgba(31,111,235,.25);
+}
+
+button:hover{
+  transform:translateY(-2px);
+}
+
+.result{
+  margin-top:20px;
+  background:#f7fbff;
+  padding:15px;
+  border-radius:12px;
+  border:1px solid #e3ecff;
+}
+
+footer{
+  text-align:center;
+  font-size:12px;
+  color:#8da2c0;
+  margin-top:15px;
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+  <div class="card">
+
+    <h1>Rasionalisasi SNBT</h1>
+    <p>Pilih PTN dan Prodi untuk melihat peluang masuk dan rekomendasi belajar.</p>
+
+    <select id="ptn"></select>
+    <select id="prodi"></select>
+    <button onclick="showData()">Tampilkan Data</button>
+
+    <div id="hasil" class="result"></div>
+
+    <footer>© Rasionalisasi SNBT • AI Education System</footer>
+
+  </div>
+</div>
+
+<script>
+const API = "PASTE_URL_APPS_SCRIPT_ANDA"; // GANTI
+
+let snbt=[];
+
+fetch(API)
+.then(res=>res.json())
+.then(d=>{
+  snbt=d;
+  loadPTN();
+});
+
+function loadPTN(){
+  const ptnSet=[...new Set(snbt.slice(1).map(r=>r[1]))];
+  const p=document.getElementById("ptn");
+  p.innerHTML="<option>Pilih PTN</option>";
+  ptnSet.forEach(x=>p.innerHTML+=`<option>${x}</option>`);
+}
+
+document.getElementById("ptn").onchange=()=>{
+  const p=document.getElementById("ptn").value;
+  const pro=document.getElementById("prodi");
+  pro.innerHTML="";
+  snbt.filter(r=>r[1]==p).forEach(r=>{
+    pro.innerHTML+=`<option>${r[2]}</option>`;
+  });
+};
+
+function showData(){
+  const p=document.getElementById("ptn").value;
+  const pro=document.getElementById("prodi").value;
+  const r=snbt.find(x=>x[1]==p && x[2]==pro);
+  if(!r) return;
+
+  document.getElementById("hasil").innerHTML=`
+  <b>${r[2]} - ${r[1]}</b><br><br>
+  Skor SNBT: <b>${r[8]}</b><br>
+  Kuota: ${r[4]}<br>
+  Peminat: ${r[5]}<br>
+  Keketatan: ${r[6]}<br><br>
+  Materi Utama: ${r[9]}<br>
+  Materi Pendukung: ${r[10]}<br><br>
+  <b>Saran:</b> ${r[11]}
+  `;
+}
+</script>
+
+</body>
+</html>
