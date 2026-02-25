@@ -116,9 +116,10 @@ const API="https://script.google.com/macros/s/AKfycbziFgn-WoQzX6CBzjemhSdkcwidvK
 // ================= GLOBAL DATA ==================
 let snbt=[];
 
-// Load data SNBT
-fetch(API).then(r=>r.json()).then(d=>{
-  snbt=d;
+fetch(API)
+.then(r=>r.json())
+.then(d=>{
+  snbt=d.slice(1); // buang header
   loadRasionalisasi();
 });
 
@@ -128,14 +129,17 @@ function showMenu(menu){
   event.target.classList.add("active");
 
   if(menu=="rasionalisasi") loadRasionalisasi();
-  else document.getElementById("content").innerHTML=`<div class="card">Fitur ${menu} segera dikembangkan</div>`;
+  if(menu=="peluang") loadPeluang();
+  if(menu=="saran") loadSaran();
+  if(menu=="perbandingan") loadPerbandingan();
+  if(menu=="target") loadTarget();
 }
 
-// ================= RASIONALISASI UI ==================
+// ================= RASIONALISASI ==================
 function loadRasionalisasi(){
   document.getElementById("content").innerHTML=`
   <div class="card">
-    <h3>🎓 Filter PTN & Prodi</h3>
+    <h3>🎓 Rasionalisasi Prodi</h3>
     <input list="ptnList" id="ptn" placeholder="Pilih PTN...">
     <datalist id="ptnList"></datalist>
 
@@ -143,23 +147,20 @@ function loadRasionalisasi(){
     <datalist id="prodiList"></datalist>
 
     <div id="hasil" class="result">Silakan pilih PTN dan Prodi</div>
-  </div>
-  `;
+  </div>`;
 
   loadPTN();
   document.getElementById("ptn").oninput=loadProdi;
   document.getElementById("prodi").oninput=showData;
 }
 
-// ================= LOAD PTN ==================
 function loadPTN(){
-  const ptnSet=[...new Set(snbt.slice(1).map(r=>r[1]))];
+  const ptnSet=[...new Set(snbt.map(r=>r[1]))];
   const list=document.getElementById("ptnList");
   list.innerHTML="";
   ptnSet.forEach(x=>list.innerHTML+=`<option value="${x}">`);
 }
 
-// ================= LOAD PRODI ==================
 function loadProdi(){
   const p=document.getElementById("ptn").value;
   const list=document.getElementById("prodiList");
@@ -169,7 +170,6 @@ function loadProdi(){
   });
 }
 
-// ================= SHOW DATA ==================
 function showData(){
   const p=document.getElementById("ptn").value;
   const pro=document.getElementById("prodi").value;
@@ -179,19 +179,99 @@ function showData(){
   document.getElementById("hasil").innerHTML=`
   <b>${r[2]}</b><br>
   <small>${r[1]}</small><hr>
-
   <b>Skor Aman:</b> ${r[8]}<br>
   <b>Kuota:</b> ${r[4]}<br>
   <b>Peminat:</b> ${r[5]}<br>
   <b>Keketatan:</b> ${r[6]}<br>
   <b>Kategori:</b> ${r[7]}<br><br>
-
   <b>Materi 1:</b> ${r[9]}<br>
   <b>Materi 2:</b> ${r[10]}<br>
   <b>Portofolio:</b> ${r[3]}<br><br>
-
   <b>Saran:</b><br>${r[11]}
   `;
+}
+
+// ================= PELUANG LOLOS ==================
+function loadPeluang(){
+  document.getElementById("content").innerHTML=`
+  <div class="card">
+    <h3>📊 Cek Peluang Lolos</h3>
+    <input type="number" id="skorUser" placeholder="Masukkan skor kamu">
+    <button onclick="hitungPeluang()">Hitung</button>
+    <div id="hasilPeluang" class="result"></div>
+  </div>`;
+}
+
+function hitungPeluang(){
+  const skor=parseInt(document.getElementById("skorUser").value);
+  if(!skor) return;
+
+  const lolos=snbt.filter(r=>skor>=parseInt(r[8]));
+  document.getElementById("hasilPeluang").innerHTML=
+    `Kamu berpeluang di <b>${lolos.length}</b> prodi`;
+}
+
+// ================= SARAN PRODI ==================
+function loadSaran(){
+  document.getElementById("content").innerHTML=`
+  <div class="card">
+    <h3>💡 Saran Prodi Berdasarkan Skor</h3>
+    <input type="number" id="skorSaran" placeholder="Masukkan skor kamu">
+    <button onclick="cariSaran()">Cari</button>
+    <div id="hasilSaran" class="result"></div>
+  </div>`;
+}
+
+function cariSaran(){
+  const skor=parseInt(document.getElementById("skorSaran").value);
+  const list=snbt.filter(r=>skor>=parseInt(r[8])-20);
+
+  let html="";
+  list.slice(0,10).forEach(r=>{
+    html+=`<b>${r[2]}</b> - ${r[1]}<br>`;
+  });
+
+  document.getElementById("hasilSaran").innerHTML=html || "Tidak ada saran";
+}
+
+// ================= PERBANDINGAN ==================
+function loadPerbandingan(){
+  document.getElementById("content").innerHTML=`
+  <div class="card">
+    <h3>⚖ Perbandingan Prodi</h3>
+    <input type="text" id="prodi1" placeholder="Prodi 1">
+    <input type="text" id="prodi2" placeholder="Prodi 2">
+    <button onclick="bandingkan()">Bandingkan</button>
+    <div id="hasilBanding" class="result"></div>
+  </div>`;
+}
+
+function bandingkan(){
+  const p1=snbt.find(r=>r[2]==document.getElementById("prodi1").value);
+  const p2=snbt.find(r=>r[2]==document.getElementById("prodi2").value);
+  if(!p1||!p2) return;
+
+  document.getElementById("hasilBanding").innerHTML=`
+  <b>${p1[2]}</b> vs <b>${p2[2]}</b><hr>
+  Skor Aman: ${p1[8]} vs ${p2[8]}<br>
+  Keketatan: ${p1[6]} vs ${p2[6]}<br>
+  Kuota: ${p1[4]} vs ${p2[4]}
+  `;
+}
+
+// ================= TARGET BELAJAR ==================
+function loadTarget(){
+  document.getElementById("content").innerHTML=`
+  <div class="card">
+    <h3>🎯 Target Belajar</h3>
+    <input type="number" id="targetSkor" placeholder="Target skor kamu">
+    <div id="hasilTarget" class="result"></div>
+  </div>`;
+
+  document.getElementById("targetSkor").oninput=function(){
+    document.getElementById("hasilTarget").innerHTML=
+      "Kamu harus fokus meningkatkan latihan agar mencapai skor tersebut.";
+  };
 }
 </script>
 
