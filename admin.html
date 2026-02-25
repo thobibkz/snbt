@@ -233,6 +233,19 @@ function showData(){
   const r = snbt.find(x => x[1] == p && x[2] == pro);
   if(!r) return;
 
+  // ================= FORMAT KEKETATAN =================
+  let keketatanRaw = parseFloat(r[6]);
+  let keketatanFormat = "-";
+
+  if(!isNaN(keketatanRaw)){
+    // Jika angka kecil (<1) diasumsikan desimal (0.12 → 12%)
+    if(keketatanRaw < 1){
+      keketatanFormat = (keketatanRaw * 100).toFixed(2) + "%";
+    }else{
+      keketatanFormat = keketatanRaw.toFixed(2) + "%";
+    }
+  }
+
   // ================= WARNA KATEGORI =================
   let kategoriText = (r[7] || "").toLowerCase().trim();
   let katClass = "gray";
@@ -269,7 +282,7 @@ function showData(){
 
     <div class="info-card ${katClass}">
       <small>Keketatan</small>
-      <div style="font-size:22px">${r[6]}</div>
+      <div style="font-size:22px">${keketatanFormat}</div>
     </div>
 
     <div class="info-card gray">
