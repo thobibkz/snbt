@@ -1043,13 +1043,14 @@ function tambahProdiBanding() {
 
 function renderPreviewBanding() {
   const container = document.getElementById("previewBanding");
+  // Menampilkan prodi yang dipilih dalam 2 kolom tanpa kata "VS"
   container.innerHTML = prodiTerpilih.map((r, i) => `
     <div class="card-blue" style="background:#1e3a8a; position:relative;">
       <small>${r[1]}</small><br>
       <b style="font-size:16px;">${r[2]}</b>
-      <div style="margin-top:10px; font-size:11px; opacity:0.8;">Prodi ${i+1}</div>
+      <div style="margin-top:10px; font-size:11px; opacity:0.8;">Pilihan ${i+1}</div>
     </div>
-  `).join(prodiTerpilih.length === 2 ? '<div style="align-self:center; text-align:center; font-weight:bold; font-size:24px;">VS</div>' : '');
+  `).join(''); 
 }
 
 function bandingkanProdi() {
@@ -1065,14 +1066,17 @@ function bandingkanProdi() {
   const getCol = (v1, v2, type) => {
     if (v1 === v2) return ["card-blue", "card-blue"];
     let win;
-    if (type === 'high') win = v1 > v2; // Kuota/Keketatan: lebih tinggi lebih baik
-    if (type === 'low') win = v1 < v2;  // Peminat/Skor: lebih rendah lebih baik
+    if (type === 'high') win = v1 > v2; // Kuota: lebih tinggi lebih baik
+    if (type === 'low') win = v1 < v2;  // Peminat & Skor: lebih rendah lebih baik
+    if (type === 'tight') win = v1 > v2; // Keketatan %: lebih tinggi lebih baik
+    
     return win ? ["card-green", "card-red"] : ["card-red", "card-green"];
   };
 
+  // Menentukan warna kartu berdasarkan perbandingan nilai
   const cKuota = getCol(parseFloat(p1[4]), parseFloat(p2[4]), 'high');
   const cPeminat = getCol(parseFloat(p1[5]), parseFloat(p2[5]), 'low');
-  const cKeketatan = getCol(parseFloat(p1[6]), parseFloat(p2[6]), 'high');
+  const cKeketatan = getCol(parseFloat(p1[6]), parseFloat(p2[6]), 'tight');
   const cSkor = getCol(parseFloat(p1[8]), parseFloat(p2[8]), 'low');
 
   document.getElementById("hasilBandingUtama").innerHTML = `
