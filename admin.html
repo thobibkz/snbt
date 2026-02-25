@@ -90,9 +90,14 @@ select,input{
 /* GRID HASIL */
 .result-grid{
   display:grid;
-  grid-template-columns:repeat(auto-fit,minmax(160px,1fr));
+  grid-template-columns: repeat(5, 1fr);
+  grid-template-rows: auto auto;
   gap:14px;
   margin-top:15px;
+}
+
+.span-2{
+  grid-column: span 2;
 }
 
 .info-card{
@@ -228,9 +233,9 @@ function showData(){
   const r = snbt.find(x => x[1] == p && x[2] == pro);
   if(!r) return;
 
-  // ================= WARNA KATEGORI DINAMIS =================
+  // ================= WARNA KATEGORI =================
   let kategoriText = (r[7] || "").toLowerCase().trim();
-  let katClass = "gray"; // default
+  let katClass = "gray";
 
   if(kategoriText.includes("sangat aman")){
     katClass = "kat-sangat-aman";
@@ -248,7 +253,6 @@ function showData(){
     katClass = "kat-ketat";
   }
 
-  // ================= TAMPILKAN HASIL =================
   document.getElementById("hasil").innerHTML=`
   <div style="margin-bottom:10px">
     <h3 style="margin:0">${r[2]}</h3>
@@ -257,19 +261,20 @@ function showData(){
 
   <div class="result-grid">
 
-    <div class="info-card blue">
+    <!-- BARIS 1 -->
+    <div class="info-card blue span-2">
       <small>SKOR AMAN</small>
-      <div style="font-size:28px">${r[8]}</div>
+      <div style="font-size:32px">${r[8]}</div>
     </div>
 
     <div class="info-card ${katClass}">
       <small>Keketatan</small>
-      <div style="font-size:24px">${r[6]}</div>
+      <div style="font-size:22px">${r[6]}</div>
     </div>
 
     <div class="info-card gray">
-      <small>SUBTES 1</small>
-      <div style="font-size:20px">${r[9]}</div>
+      <small>Materi 1</small>
+      <div style="font-size:18px">${r[9]}</div>
     </div>
 
     <div class="info-card gray">
@@ -277,6 +282,7 @@ function showData(){
       <div style="font-size:18px">${r[3]}</div>
     </div>
 
+    <!-- BARIS 2 -->
     <div class="info-card green">
       <small>Kuota</small>
       <div style="font-size:26px">${r[4]}</div>
@@ -289,12 +295,12 @@ function showData(){
 
     <div class="info-card ${katClass}">
       <small>Kategori</small>
-      <div style="font-size:22px">${r[7]}</div>
+      <div style="font-size:20px">${r[7]}</div>
     </div>
 
     <div class="info-card gray">
-      <small>SUBTES 2</small>
-      <div style="font-size:20px">${r[10]}</div>
+      <small>Materi 2</small>
+      <div style="font-size:18px">${r[10]}</div>
     </div>
 
     <div class="info-card gray">
