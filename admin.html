@@ -279,6 +279,30 @@ select,input{
     0 1px 0 #9ca3af,
     0 3px 6px rgba(0,0,0,0.15);
 }
+
+.pie-wrapper{
+  text-align:center;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+}
+
+#chartPie{
+  width:180px !important;
+  height:120px !important;
+}
+
+/* efek pipih */
+canvas{
+  filter: drop-shadow(0 8px 6px rgba(0,0,0,0.35));
+  transform: scaleY(0.6);
+}
+
+.pie-text{
+  margin-top:10px;
+  font-weight:600;
+}
   
 </style>
 </head>
@@ -686,44 +710,39 @@ function prosesPeluang(){
     Detail ${ptn}, ${prodi}
   </div>
 
-  <div class="partisi-3">
+<div class="partisi-3">
 
-    <div>
-      <div class="card-blue">
-        Skor Pembobotan<br>
-        <b>${skorBobot.toFixed(2)}</b>
-      </div>
-      <div class="card-blue" style="margin-top:10px">
-        Skor Aman Prodi<br>
-        <b>${skorAman}</b>
-      </div>
+  <!-- KIRI -->
+  <div>
+    <div class="card-blue">
+      Skor Pembobotan<br>
+      <b>${skorBobot.toFixed(2)}</b>
     </div>
-
-    <div>
-      <div class="card-green">
-        Persentase Peluang Lolos<br>
-        <b>${peluang.toFixed(2)}%</b>
-      </div>
-      <div class="card-green" style="margin-top:10px">
-        Kategori Peluang<br>
-        <b>${kategoriPeluang}</b>
-      </div>
+    <div class="card-blue" style="margin-top:10px">
+      Skor Aman Prodi<br>
+      <b>${skorAman}</b>
     </div>
-
-    <div>
-      <canvas id="chartPie"></canvas>
-    </div>
-
   </div>
 
-  <p style="margin-top:30px;text-align:center">
-    Kesimpulan: 
-    ${kategoriPeluang=="Rendah"
-      ?"Disarankan memilih prodi lain."
-      :kategoriPeluang=="Sedang"
-      ?"Boleh dicoba tapi hati-hati."
-      :"Silahkan dipilih, peluang tinggi."}
-  </p>
+  <!-- TENGAH -->
+  <div>
+    <div class="card-green">
+      Persentase Peluang Lolos<br>
+      <b>${peluang.toFixed(2)}%</b>
+    </div>
+    <div class="card-green" style="margin-top:10px">
+      Kategori Peluang<br>
+      <b>${kategoriPeluang}</b>
+    </div>
+  </div>
+
+  <!-- KANAN -->
+  <div class="pie-wrapper">
+    <canvas id="chartPie"></canvas>
+    <div id="persenText" class="pie-text"></div>
+  </div>
+
+</div>
   `;
 
   renderChartBar(mapel, tertinggi, terendah);
@@ -756,6 +775,8 @@ function renderChartBar(data, tertinggi, terendah){
 
 let chartPieInstance = null;
 
+let chartPieInstance = null;
+
 function renderChartPie(persen){
 
   const canvas = document.getElementById("chartPie");
@@ -768,34 +789,28 @@ function renderChartPie(persen){
   }
 
   chartPieInstance = new Chart(ctx,{
-    type:"pie", // <-- jadi lingkaran penuh
+    type:"pie",
     data:{
-      labels:["Peluang Lolos","Risiko"],
+      labels:["Peluang","Risiko"],
       datasets:[{
-        data:[persen, 100-persen],
-        backgroundColor:["#16a34a","#dc2626"],
+        data:[persen,100-persen],
+        backgroundColor:["#6fa843","#d40000"],
         borderWidth:0
       }]
     },
     options:{
-      responsive:true,
-      plugins:{
-        legend:{ display:false }
-      }
+      responsive:false,
+      plugins:{ legend:{display:false} }
     }
   });
 
-  // Tambahkan teks di bawah chart
   document.getElementById("persenText").innerHTML = `
-    <div style="margin-top:15px;text-align:center;font-weight:bold">
-      <span style="color:#16a34a">
-        Peluang: ${persen.toFixed(2)}%
-      </span>
-      &nbsp;&nbsp;|&nbsp;&nbsp;
-      <span style="color:#dc2626">
-        Risiko: ${(100-persen).toFixed(2)}%
-      </span>
-    </div>
+    <span style="color:#6fa843">
+      Peluang: ${persen.toFixed(2)}%
+    </span><br>
+    <span style="color:#d40000">
+      Risiko: ${(100-persen).toFixed(2)}%
+    </span>
   `;
 }
   
