@@ -740,16 +740,44 @@ function renderChartPie(persen) {
 
   if (chartPieInstance) chartPieInstance.destroy();
 
-  // Membuat gradien untuk efek pencahayaan 3D (Silinder)
-  const gradientGreen = ctx.createLinearGradient(0, 0, 150, 0);
-  gradientGreen.addColorStop(0, "#115e2e"); // Gelap di kiri
-  gradientGreen.addColorStop(0.5, "#16a34a"); // Terang di tengah
-  gradientGreen.addColorStop(1, "#115e2e"); // Gelap di kanan
+  // Plugin khusus untuk membuat efek ketebalan silinder 3D
+  const plugin3D = {
+    id: 'pie3D',
+    beforeDraw: (chart) => {
+      const { ctx, config } = chart;
+      const { data } = config;
+      const centerX = chart.getDatasetMeta(0).data[0].x;
+      const centerY = chart.getDatasetMeta(0).data[0].y;
+      const radius = chart.getDatasetMeta(0).data[0].outerRadius;
+      const thickness = 15; // Mengatur ketebalan silinder
 
-  const gradientRed = ctx.createLinearGradient(0, 0, 150, 0);
-  gradientRed.addColorStop(0, "#7f1d1d"); // Gelap di kiri
-  gradientRed.addColorStop(0.5, "#dc2626"); // Terang di tengah
-  gradientRed.addColorStop(1, "#7f1d1d"); // Gelap di kanan
+      // Gambar "Sisi Samping" untuk efek 3D
+      ctx.save();
+      ctx.translate(centerX, centerY);
+      ctx.scale(1, 0.75); // Membuat bentuk elips/perspektif
+
+      for (let i = 0; i < thickness; i++) {
+        ctx.translate(0, 1); // Geser kebawah sedikit demi sedikit
+        
+        let startAngle = -0.5 * Math.PI;
+        data.datasets[0].data.forEach((value, index) => {
+          const sliceAngle = (value / 100) * 2 * Math.PI;
+          
+          // Warna sisi samping dibuat lebih gelap dari warna utama
+          ctx.fillStyle = index === 0 ? "#115e2e" : "#7f1d1d"; 
+          
+          ctx.beginPath();
+          ctx.moveTo(0, 0);
+          ctx.arc(0, 0, radius, startAngle, startAngle + sliceAngle);
+          ctx.closePath();
+          ctx.fill();
+          
+          startAngle += sliceAngle;
+        });
+      }
+      ctx.restore();
+    }
+  };
 
   chartPieInstance = new Chart(ctx, {
     type: 'pie',
@@ -757,50 +785,29 @@ function renderChartPie(persen) {
       labels: ["Peluang", "Risiko"],
       datasets: [{
         data: [persen, 100 - persen],
-        backgroundColor: [gradientGreen, gradientRed],
-        borderWidth: 1,
-        borderColor: "rgba(0,0,0,0.2)",
-        // Efek ketebalan
-        hoverOffset: 5
+        backgroundColor: ["#16a34a", "#dc2626"], // Warna atas yang cerah
+        borderWidth: 0
       }]
     },
     options: {
       responsive: true,
-      maintainAspectRatio: true,
-      rotation: -90, // Memutar agar pembatasnya vertikal seperti gambar
+      maintainAspectRatio: false,
       plugins: {
         legend: { display: false },
         tooltip: { enabled: true }
       },
-      layout: {
-        padding: 10
-      },
-      // Trick: Mengubah rasio aspek canvas agar terlihat pipih (perspektif 3D)
-      aspectRatio: 1.5 
+      // Mengatur rotasi agar terlihat dari sudut pandang miring
+      rotation: -90,
+      layout: { padding: { bottom: 20 } }
     },
-    plugins: [{
-      // Plugin tambahan untuk menggambar bayangan (drop shadow) di bawah pie
-      beforeDraw: (chart) => {
-        const { ctx, chartArea: { top, left, width, height } } = chart;
-        ctx.save();
-        ctx.shadowColor = 'rgba(0, 0, 0, 0.3)';
-        ctx.shadowBlur = 15;
-        ctx.shadowOffsetY = 10;
-        ctx.beginPath();
-        ctx.ellipse(left + width / 2, top + height / 2, width / 2.2, height / 2.2, 0, 0, 2 * Math.PI);
-        ctx.fill();
-        ctx.restore();
-      }
-    }]
+    plugins: [plugin3D]
   });
 
-  // Update Teks Keterangan di bawah (Persis seperti gambar)
+  // Teks Persentase
   document.getElementById("persenText").innerHTML = `
-    <div style="display: flex; flex-direction: column; align-items: center; gap: 5px; margin-top: 10px; font-size: 13px;">
-      <div style="display: flex; gap: 15px;">
-        <span><span style="color:#16a34a">●</span> Peluang: ${persen.toFixed(1)}%</span>
-        <span><span style="color:#dc2626">●</span> Risiko: ${(100 - persen).toFixed(1)}%</span>
-      </div>
+    <div style="display:flex; justify-content:center; gap:15px; margin-top:10px; font-weight:bold;">
+       <span style="color:#16a34a">Peluang: ${persen.toFixed(1)}%</span>
+       <span style="color:#dc2626">Risiko: ${(100-persen).toFixed(1)}%</span>
     </div>
   `;
 }
