@@ -230,7 +230,7 @@ function showData(){
 
   // ================= WARNA KATEGORI DINAMIS =================
   let kategoriText = (r[7] || "").toLowerCase().trim();
-  let katClass = "gray"; // default aman jika kosong
+  let katClass = "gray"; // default
 
   if(kategoriText.includes("sangat aman")){
     katClass = "kat-sangat-aman";
@@ -262,7 +262,7 @@ function showData(){
       <div style="font-size:28px">${r[8]}</div>
     </div>
 
-    <div class="info-card red">
+    <div class="info-card ${katClass}">
       <small>Keketatan</small>
       <div style="font-size:24px">${r[6]}</div>
     </div>
