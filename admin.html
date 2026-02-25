@@ -1068,21 +1068,21 @@ function bandingkanProdi() {
     let win;
     if (type === 'high') win = v1 > v2; // Kuota: Lebih tinggi lebih baik
     if (type === 'low') win = v1 < v2;  // Peminat & Skor: Lebih rendah lebih baik
-    if (type === 'tight') win = v1 > v2; // Keketatan %: Lebih tinggi lebih baik (peluang masuk lebih besar)
+    if (type === 'tight') win = v1 > v2; // Keketatan %: Lebih tinggi lebih baik
     
     return win ? ["card-green", "card-red"] : ["card-red", "card-green"];
   };
 
-  // Parsing data ke Float untuk akurasi perbandingan angka desimal
-  const valKeketatan1 = parseFloat(p1[6]);
-  const valKeketatan2 = parseFloat(p2[6]);
+  // KOREKSI FORMAT KEKETATAN: Dikali 100 untuk mengubah desimal ke persen
+  const valKeketatan1 = parseFloat(p1[6]) * 100;
+  const valKeketatan2 = parseFloat(p2[6]) * 100;
 
   const cKuota = getCol(parseFloat(p1[4]), parseFloat(p2[4]), 'high');
   const cPeminat = getCol(parseFloat(p1[5]), parseFloat(p2[5]), 'low');
   const cKeketatan = getCol(valKeketatan1, valKeketatan2, 'tight');
   const cSkor = getCol(parseFloat(p1[8]), parseFloat(p2[8]), 'low');
 
-  // Inline Style untuk memaksa layout kolom tetap 2 (Kanan-Kiri)
+  // Layout tetap dipaksa Kanan-Kiri (Side by Side)
   const forceSideBySide = "display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 5px;";
 
   document.getElementById("hasilBandingUtama").innerHTML = `
