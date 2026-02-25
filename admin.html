@@ -167,6 +167,56 @@ select,input{
   .saran{ grid-area: saran; }
 
 }
+
+.input-row{
+  display:grid;
+  grid-template-columns: repeat(7,1fr);
+  gap:8px;
+}
+
+.input-row input{
+  padding:8px;
+  text-align:center;
+}
+
+.partisi-2{
+  display:grid;
+  grid-template-columns: 1fr 1fr;
+  gap:20px;
+  margin-top:20px;
+}
+
+.partisi-3{
+  display:grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap:20px;
+  margin-top:20px;
+}
+
+.card-blue{
+  background:#1e40af;
+  color:white;
+  padding:15px;
+  border-radius:10px;
+  text-align:center;
+}
+
+.card-green{
+  background:#16a34a;
+  color:white;
+  padding:15px;
+  border-radius:10px;
+  text-align:center;
+}
+
+@media(max-width:768px){
+  .input-row{
+    grid-template-columns: repeat(2,1fr);
+  }
+  .partisi-2, .partisi-3{
+    grid-template-columns:1fr;
+  }
+}
   
 </style>
 </head>
@@ -402,24 +452,267 @@ function showData(){
 
 // ================= PELUANG LOLOS ==================
 function loadPeluang(){
-  document.getElementById("content").innerHTML=`
+
+  document.getElementById("content").innerHTML = `
+
   <div class="card">
-    <h3>📊 Cek Peluang Lolos</h3>
-    <input type="number" id="skorUser" placeholder="Masukkan skor kamu">
-    <button onclick="hitungPeluang()">Hitung</button>
-    <div id="hasilPeluang" class="result"></div>
-  </div>`;
+
+    <h3 style="margin-bottom:15px">📊 Cek Peluang Lolos</h3>
+
+    <!-- FILTER PTN & PRODI -->
+    <div style="margin-bottom:15px">
+      <select id="ptnPeluang" onchange="loadProdiPeluang()"></select>
+      <select id="prodiPeluang"></select>
+    </div>
+
+    <!-- INPUT SKOR -->
+    <h3 style="text-align:center;margin:20px 0 10px">
+      Masukkan Perkiraan Skor UTBK
+    </h3>
+
+    <div class="input-row">
+      <input type="number" id="PU"  placeholder="PU">
+      <input type="number" id="PPU" placeholder="PPU">
+      <input type="number" id="PBM" placeholder="PBM">
+      <input type="number" id="PK"  placeholder="PK">
+      <input type="number" id="LBI" placeholder="LBI">
+      <input type="number" id="LBE" placeholder="LBE">
+      <input type="number" id="PM"  placeholder="PM">
+    </div>
+
+    <!-- BUTTON -->
+    <div style="margin-top:15px; display:flex; gap:10px; align-items:center;">
+      <button onclick="prosesPeluang()" class="btn-primary">
+        Proses Peluang Lolos
+      </button>
+      <button onclick="resetPeluang()" class="btn-small">
+        Reset
+      </button>
+    </div>
+
+    <!-- HASIL AKAN MUNCUL DI SINI -->
+    <div id="hasilPeluang"></div>
+
+  </div>
+  `;
+
+  // isi dropdown PTN pertama kali
+  loadPTNPeluang();
 }
 
-function hitungPeluang(){
-  const skor=parseInt(document.getElementById("skorUser").value);
-  if(!skor) return;
+function loadPTNPeluang(){
 
-  const lolos=snbt.filter(r=>skor>=parseInt(r[8]));
-  document.getElementById("hasilPeluang").innerHTML=
-    `Kamu berpeluang di <b>${lolos.length}</b> prodi`;
+  const ptnList = [...new Set(snbt.map(x => x[1]))];
+
+  const select = document.getElementById("ptnPeluang");
+  select.innerHTML = `<option value="">Pilih PTN</option>`;
+
+  ptnList.forEach(p=>{
+    select.innerHTML += `<option value="${p}">${p}</option>`;
+  });
 }
 
+function loadProdiPeluang(){
+
+  const ptn = document.getElementById("ptnPeluang").value;
+  const prodiList = snbt
+    .filter(x => x[1] == ptn)
+    .map(x => x[2]);
+
+  const select = document.getElementById("prodiPeluang");
+  select.innerHTML = `<option value="">Pilih Prodi</option>`;
+
+  prodiList.forEach(p=>{
+    select.innerHTML += `<option value="${p}">${p}</option>`;
+  });
+}
+
+function resetPeluang(){
+
+  document.querySelectorAll(".input-row input")
+    .forEach(i => i.value = "");
+
+  document.getElementById("hasilPeluang").innerHTML = "";
+}
+
+function prosesPeluang(){
+
+  const ptn   = document.getElementById("ptnPeluang").value;
+  const prodi = document.getElementById("prodiPeluang").value;
+
+  const r = snbt.find(x => x[1] == ptn && x[2] == prodi);
+  if(!r) return;
+
+  // ================= INPUT SKOR =================
+  const mapel = {
+    PU  : parseFloat(PU.value)||0,
+    PPU : parseFloat(PPU.value)||0,
+    PBM : parseFloat(PBM.value)||0,
+    PK  : parseFloat(PK.value)||0,
+    LBI : parseFloat(LBI.value)||0,
+    LBE : parseFloat(LBE.value)||0,
+    PM  : parseFloat(PM.value)||0
+  };
+
+  const materi1 = r[9];
+  const materi2 = r[10];
+
+  // ================= HITUNG PEMBOBOTAN =================
+  let skorBobot = 0;
+
+  for(let k in mapel){
+    if(k == materi1 || k == materi2){
+      skorBobot += mapel[k] * 0.25;
+    } else {
+      skorBobot += mapel[k] * 0.1;
+    }
+  }
+
+  const skorAman = parseFloat(r[8]) || 0;
+
+  // ================= HITUNG PELUANG =================
+  let peluang = ((skorBobot - skorAman) * 100 / 5) + 50;
+
+  if(peluang < 0) peluang = 0;
+  if(peluang > 99) peluang = 99;
+
+  let kategoriPeluang = "Sedang";
+  if(peluang > 60) kategoriPeluang = "Tinggi";
+  if(peluang < 40) kategoriPeluang = "Rendah";
+
+  // ================= CARI 2 TERTINGGI & TERENDAH =================
+  const sorted = Object.entries(mapel).sort((a,b)=>b[1]-a[1]);
+
+  const tertinggi = sorted.slice(0,2).map(x=>x[0]);
+  const terendah  = sorted.slice(-2).map(x=>x[0]);
+
+  const maksimal =
+    tertinggi.includes(materi1) &&
+    tertinggi.includes(materi2)
+    ? "sudah maksimal"
+    : "belum maksimal";
+
+  // ================= RENDER =================
+  document.getElementById("hasilPeluang").innerHTML = `
+
+  <h3 style="text-align:center;margin-top:40px">
+    Hasil Analisis Peluang
+  </h3>
+
+  <div class="partisi-2">
+
+    <div>
+      <canvas id="chartBar"></canvas>
+    </div>
+
+    <div>
+      <p>
+      Kampus ${ptn}, Prodi ${prodi} lebih memprioritaskan materi 
+      <b>${materi1}</b> dan <b>${materi2}</b>.<br><br>
+      Hasil pembobotan saat ini <b>${maksimal}</b>.<br><br>
+      Hindari prodi dengan materi <b>${terendah[0]}</b> & <b>${terendah[1]}</b>.
+      </p>
+    </div>
+
+  </div>
+
+  <h3 style="text-align:center;margin-top:40px">
+    Hasil Analisis Lanjutan
+  </h3>
+
+  <div style="text-align:center;margin-bottom:10px">
+    Detail ${ptn}, ${prodi}
+  </div>
+
+  <div class="partisi-3">
+
+    <div>
+      <div class="card-blue">
+        Skor Pembobotan<br>
+        <b>${skorBobot.toFixed(2)}</b>
+      </div>
+      <div class="card-blue" style="margin-top:10px">
+        Skor Aman Prodi<br>
+        <b>${skorAman}</b>
+      </div>
+    </div>
+
+    <div>
+      <div class="card-green">
+        Persentase Peluang Lolos<br>
+        <b>${peluang.toFixed(2)}%</b>
+      </div>
+      <div class="card-green" style="margin-top:10px">
+        Kategori Peluang<br>
+        <b>${kategoriPeluang}</b>
+      </div>
+    </div>
+
+    <div>
+      <canvas id="chartPie"></canvas>
+    </div>
+
+  </div>
+
+  <p style="margin-top:30px;text-align:center">
+    Kesimpulan: 
+    ${kategoriPeluang=="Rendah"
+      ?"Disarankan memilih prodi lain."
+      :kategoriPeluang=="Sedang"
+      ?"Boleh dicoba tapi hati-hati."
+      :"Silahkan dipilih, peluang tinggi."}
+  </p>
+  `;
+
+  renderChartBar(mapel, tertinggi, terendah);
+  renderChartPie(peluang);
+}
+
+function renderChartBar(data, tertinggi, terendah){
+
+  const ctx = document.getElementById("chartBar");
+
+  new Chart(ctx,{
+    type:"bar",
+    data:{
+      labels:Object.keys(data),
+      datasets:[{
+        data:Object.values(data),
+        backgroundColor:Object.keys(data).map(k=>{
+          if(tertinggi.includes(k)) return "#16a34a";
+          if(terendah.includes(k))  return "#dc2626";
+          return "#3b82f6";
+        })
+      }]
+    },
+    options:{
+      plugins:{ legend:{display:false}},
+      responsive:true
+    }
+  });
+}  
+
+function renderChartPie(persen){
+
+  const ctx = document.getElementById("chartPie");
+
+  new Chart(ctx,{
+    type:"doughnut",
+    data:{
+      labels:["Lolos","Tidak"],
+      datasets:[{
+        data:[persen,100-persen],
+        backgroundColor:["#16a34a","#e5e7eb"]
+      }]
+    },
+    options:{
+      cutout:"55%",
+      plugins:{ legend:{display:false}},
+      responsive:true
+    }
+  });
+}
+  
 // ================= SARAN PRODI ==================
 function loadSaran(){
   document.getElementById("content").innerHTML=`
