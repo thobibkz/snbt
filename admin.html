@@ -142,6 +142,25 @@ select,input{
 .kat-sangat-ketat{
   background:linear-gradient(135deg,#d63031,#a4161a);
 }
+
+/* ================= RESPONSIVE HP ================= */
+@media (max-width: 768px){
+
+  .result-grid{
+    grid-template-columns: repeat(2, 1fr);
+    grid-auto-rows: auto;
+  }
+
+  .span-2{
+    grid-column: span 2;
+  }
+
+  /* 4 card terakhir jadi grid 2x2 */
+  .mobile-stack{
+    grid-column: span 1;
+  }
+
+}
   
 </style>
 </head>
@@ -228,27 +247,28 @@ function loadProdi(){
 }
 
 function showData(){
-  const p = document.getElementById("ptn").value;
+
+  const p   = document.getElementById("ptn").value;
   const pro = document.getElementById("prodi").value;
+
   const r = snbt.find(x => x[1] == p && x[2] == pro);
   if(!r) return;
 
   // ================= FORMAT KEKETATAN =================
-  let keketatanRaw = parseFloat(r[6]);
+  let keketatanRaw    = parseFloat(r[6]);
   let keketatanFormat = "-";
 
   if(!isNaN(keketatanRaw)){
-    // Jika angka kecil (<1) diasumsikan desimal (0.12 → 12%)
     if(keketatanRaw < 1){
       keketatanFormat = (keketatanRaw * 100).toFixed(2) + "%";
-    }else{
+    } else {
       keketatanFormat = keketatanRaw.toFixed(2) + "%";
     }
   }
 
   // ================= WARNA KATEGORI =================
   let kategoriText = (r[7] || "").toLowerCase().trim();
-  let katClass = "gray";
+  let katClass     = "gray";
 
   if(kategoriText.includes("sangat aman")){
     katClass = "kat-sangat-aman";
@@ -266,8 +286,10 @@ function showData(){
     katClass = "kat-ketat";
   }
 
-  document.getElementById("hasil").innerHTML=`
-  <div style="margin-bottom:10px">
+  // ================= RENDER =================
+  document.getElementById("hasil").innerHTML = `
+  
+  <div style="margin-bottom:12px">
     <h3 style="margin:0">${r[2]}</h3>
     <small>${r[1]}</small>
   </div>
@@ -285,12 +307,12 @@ function showData(){
       <div style="font-size:22px">${keketatanFormat}</div>
     </div>
 
-    <div class="info-card gray">
+    <div class="info-card gray mobile-stack">
       <small>Materi 1</small>
       <div style="font-size:18px">${r[9]}</div>
     </div>
 
-    <div class="info-card gray">
+    <div class="info-card gray mobile-stack">
       <small>Portofolio</small>
       <div style="font-size:18px">${r[3]}</div>
     </div>
@@ -311,12 +333,12 @@ function showData(){
       <div style="font-size:20px">${r[7]}</div>
     </div>
 
-    <div class="info-card gray">
+    <div class="info-card gray mobile-stack">
       <small>Materi 2</small>
       <div style="font-size:18px">${r[10]}</div>
     </div>
 
-    <div class="info-card gray">
+    <div class="info-card gray mobile-stack">
       <small>Saran</small>
       <div style="font-size:16px">${r[11]}</div>
     </div>
