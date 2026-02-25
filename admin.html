@@ -1062,50 +1062,64 @@ function bandingkanProdi() {
   const p1 = prodiTerpilih[0];
   const p2 = prodiTerpilih[1];
 
-  // Helper untuk menentukan warna (Hijau = Menang/Lebih baik)
+  // Helper untuk menentukan warna (Hijau = Lebih Baik, Merah = Kurang Baik)
   const getCol = (v1, v2, type) => {
     if (v1 === v2) return ["card-blue", "card-blue"];
     let win;
-    if (type === 'high') win = v1 > v2; // Kuota: lebih tinggi lebih baik
-    if (type === 'low') win = v1 < v2;  // Peminat & Skor: lebih rendah lebih baik
-    if (type === 'tight') win = v1 > v2; // Keketatan %: lebih tinggi lebih baik
+    if (type === 'high') win = v1 > v2; // Kuota: Lebih tinggi lebih baik
+    if (type === 'low') win = v1 < v2;  // Peminat & Skor: Lebih rendah lebih baik
+    if (type === 'tight') win = v1 > v2; // Keketatan %: Lebih tinggi lebih baik (peluang masuk lebih besar)
     
     return win ? ["card-green", "card-red"] : ["card-red", "card-green"];
   };
 
-  // Menentukan warna kartu berdasarkan perbandingan nilai
+  // Parsing data ke Float untuk akurasi perbandingan angka desimal
+  const valKeketatan1 = parseFloat(p1[6]);
+  const valKeketatan2 = parseFloat(p2[6]);
+
   const cKuota = getCol(parseFloat(p1[4]), parseFloat(p2[4]), 'high');
   const cPeminat = getCol(parseFloat(p1[5]), parseFloat(p2[5]), 'low');
-  const cKeketatan = getCol(parseFloat(p1[6]), parseFloat(p2[6]), 'tight');
+  const cKeketatan = getCol(valKeketatan1, valKeketatan2, 'tight');
   const cSkor = getCol(parseFloat(p1[8]), parseFloat(p2[8]), 'low');
 
+  // Inline Style untuk memaksa layout kolom tetap 2 (Kanan-Kiri)
+  const forceSideBySide = "display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 5px;";
+
   document.getElementById("hasilBandingUtama").innerHTML = `
-    <h3 style="text-align:center; margin-bottom:20px;">Hasil Komparasi Data</h3>
+    <h3 style="text-align:center; margin-top:30px; margin-bottom:20px;">Hasil Komparasi Data</h3>
     
-    <div style="display:flex; flex-direction:column; gap:15px;">
+    <div style="display:flex; flex-direction:column; gap:20px;">
       
-      <div style="text-align:center; font-weight:bold; font-size:12px; color:var(--muted);">KUOTA TAMPUNG</div>
-      <div class="partisi-2" style="margin-top:0;">
-        <div class="${cKuota[0]}"><b>${p1[4]}</b></div>
-        <div class="${cKuota[1]}"><b>${p2[4]}</b></div>
+      <div>
+        <div style="text-align:center; font-weight:bold; font-size:11px; color:var(--muted); text-transform:uppercase;">Kuota Tampung</div>
+        <div style="${forceSideBySide}">
+          <div class="${cKuota[0]}" style="padding:15px;"><b>${p1[4]}</b></div>
+          <div class="${cKuota[1]}" style="padding:15px;"><b>${p2[4]}</b></div>
+        </div>
       </div>
 
-      <div style="text-align:center; font-weight:bold; font-size:12px; color:var(--muted);">JUMLAH PEMINAT</div>
-      <div class="partisi-2" style="margin-top:0;">
-        <div class="${cPeminat[0]}"><b>${p1[5]}</b></div>
-        <div class="${cPeminat[1]}"><b>${p2[5]}</b></div>
+      <div>
+        <div style="text-align:center; font-weight:bold; font-size:11px; color:var(--muted); text-transform:uppercase;">Jumlah Peminat</div>
+        <div style="${forceSideBySide}">
+          <div class="${cPeminat[0]}" style="padding:15px;"><b>${p1[5]}</b></div>
+          <div class="${cPeminat[1]}" style="padding:15px;"><b>${p2[5]}</b></div>
+        </div>
       </div>
 
-      <div style="text-align:center; font-weight:bold; font-size:12px; color:var(--muted);">KEKETATAN (%)</div>
-      <div class="partisi-2" style="margin-top:0;">
-        <div class="${cKeketatan[0]}"><b>${p1[6]}%</b></div>
-        <div class="${cKeketatan[1]}"><b>${p2[6]}%</b></div>
+      <div>
+        <div style="text-align:center; font-weight:bold; font-size:11px; color:var(--muted); text-transform:uppercase;">Keketatan (%)</div>
+        <div style="${forceSideBySide}">
+          <div class="${cKeketatan[0]}" style="padding:15px;"><b>${valKeketatan1.toFixed(2)}%</b></div>
+          <div class="${cKeketatan[1]}" style="padding:15px;"><b>${valKeketatan2.toFixed(2)}%</b></div>
+        </div>
       </div>
 
-      <div style="text-align:center; font-weight:bold; font-size:12px; color:var(--muted);">ESTIMASI SKOR AMAN</div>
-      <div class="partisi-2" style="margin-top:0;">
-        <div class="${cSkor[0]}"><b>${p1[8]}</b></div>
-        <div class="${cSkor[1]}"><b>${p2[8]}</b></div>
+      <div>
+        <div style="text-align:center; font-weight:bold; font-size:11px; color:var(--muted); text-transform:uppercase;">Estimasi Skor Aman</div>
+        <div style="${forceSideBySide}">
+          <div class="${cSkor[0]}" style="padding:15px;"><b>${p1[8]}</b></div>
+          <div class="${cSkor[1]}" style="padding:15px;"><b>${p2[8]}</b></div>
+        </div>
       </div>
 
     </div>
