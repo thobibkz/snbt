@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  
+    
 <style>
 :root{
   --blue:#1f6feb;
@@ -328,7 +328,7 @@ select,input{
 <script>
 // ================= API ==================
 const API="https://script.google.com/macros/s/AKfycbziFgn-WoQzX6CBzjemhSdkcwidvK-Hnx1CjWnTgzsmKoV3QfpkWtkxW8C3OZSokpaE/exec?action=snbt";
-
+  
   // ================= ANIMASI ANGKA NAIK ==================
 function animateValue(element, start, end, duration, isPercent=false){
 
@@ -1124,6 +1124,98 @@ function bandingkanProdi() {
 
     </div>
   `;
+}
+
+  // Tambahkan variabel API Key di bagian atas script Anda
+const GEMINI_API_KEY = "AIzaSyAWTbHfSLIZEHtoCkCexJ9d83SUTQrGXvM";
+
+async function bandingkanProdi() {
+  if (prodiTerpilih.length < 2) {
+    alert("Tambahkan 2 prodi terlebih dahulu!");
+    return;
+  }
+
+  const p1 = prodiTerpilih[0];
+  const p2 = prodiTerpilih[1];
+
+  // ... (Kode perhitungan warna getCol dan logic sebelumnya tetap sama) ...
+  const valKeketatan1 = parseFloat(p1[6]) * 100;
+  const valKeketatan2 = parseFloat(p2[6]) * 100;
+  const cKuota = getCol(parseFloat(p1[4]), parseFloat(p2[4]), 'high');
+  const cPeminat = getCol(parseFloat(p1[5]), parseFloat(p2[5]), 'low');
+  const cKeketatan = getCol(valKeketatan1, valKeketatan2, 'tight');
+  const cSkor = getCol(parseFloat(p1[8]), parseFloat(p2[8]), 'low');
+
+  const forceSideBySide = "display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 5px;";
+
+  // Update InnerHTML untuk menyertakan kontainer Saran Keputusan
+  document.getElementById("hasilBandingUtama").innerHTML = `
+    <h3 style="text-align:center; margin-top:30px; margin-bottom:20px;">Hasil Komparasi Data</h3>
+    
+    <div style="display:flex; flex-direction:column; gap:20px;">
+      <div>
+        <div style="text-align:center; font-weight:bold; font-size:11px; color:var(--muted); text-transform:uppercase;">Keketatan (%)</div>
+        <div style="${forceSideBySide}">
+          <div class="${cKeketatan[0]}" style="padding:15px;"><b>${valKeketatan1.toFixed(2)}%</b></div>
+          <div class="${cKeketatan[1]}" style="padding:15px;"><b>${valKeketatan2.toFixed(2)}%</b></div>
+        </div>
+      </div>
+      </div>
+
+    <h3 style="text-align:center; margin-top:40px; margin-bottom:20px;">Saran Keputusan</h3>
+    <div class="partisi-2" id="aiDecisionContainer">
+      <div class="card-blue" style="background:#f8fafc; color:#1e293b; border:1px solid #e2e8f0;">
+        <b style="color:var(--blue)">🏆 Keputusan Ideal</b>
+        <p id="idealText" style="font-size:13px; line-height:1.5; text-align:justify;">Sedang menganalisis kualitas...</p>
+      </div>
+      <div class="card-blue" style="background:#f8fafc; color:#1e293b; border:1px solid #e2e8f0;">
+        <b style="color:#16a34a">🛡️ Keputusan Aman</b>
+        <p id="safeText" style="font-size:13px; line-height:1.5; text-align:justify;">Sedang menghitung peluang...</p>
+      </div>
+    </div>
+  `;
+
+  // Panggil fungsi AI
+  getAiRecommendation(p1, p2);
+}
+
+async function getAiRecommendation(p1, p2) {
+  const prompt = `
+    Analisis dua pilihan program studi SNBT berikut:
+    Pilihan 1: ${p1[2]} di ${p1[1]} (Skor Aman: ${p1[8]}, Keketatan: ${p1[6]})
+    Pilihan 2: ${p2[2]} di ${p2[1]} (Skor Aman: ${p2[8]}, Keketatan: ${p2[6]})
+
+    Berikan analisis singkat dalam Bahasa Indonesia:
+    1. Keputusan Ideal: Bandingkan berdasarkan gengsi PTN, akreditasi umum, dan prospek karir jangka panjang.
+    2. Keputusan Aman: Tentukan mana yang secara statistik lebih realistis untuk ditembus berdasarkan skor dan keketatan.
+    
+    Format jawaban harus diawali dengan [IDEAL] untuk analisis ideal dan [AMAN] untuk analisis aman.
+  `;
+
+  try {
+    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_API_KEY}`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        contents: [{ parts: [{ text: prompt }] }]
+      })
+    });
+
+    const data = await response.json();
+    const fullText = data.candidates[0].content.parts[0].text;
+
+    // Pecah teks berdasarkan marker
+    const idealPart = fullText.split("[IDEAL]")[1]?.split("[AMAN]")[0] || "Gagal memuat analisis.";
+    const safePart = fullText.split("[AMAN]")[1] || "Gagal memuat analisis.";
+
+    document.getElementById("idealText").innerText = idealPart.trim();
+    document.getElementById("safeText").innerText = safePart.trim();
+
+  } catch (error) {
+    console.error("AI Error:", error);
+    document.getElementById("idealText").innerText = "Gagal terhubung ke AI.";
+    document.getElementById("safeText").innerText = "Pastikan API Key sudah benar.";
+  }
 }
 
 // ================= TARGET BELAJAR ==================
