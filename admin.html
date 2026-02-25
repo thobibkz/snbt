@@ -291,14 +291,11 @@ select,input{
 #chartPie{
   width:180px !important;
   height:120px !important;
-}
-
-/* efek pipih */
-canvas{
   filter: drop-shadow(0 8px 6px rgba(0,0,0,0.35));
   transform: scaleY(0.6);
 }
 
+/* efek pipih */
 .pie-text{
   margin-top:10px;
   font-weight:600;
@@ -749,11 +746,17 @@ function prosesPeluang(){
   renderChartPie(peluang);
 }
 
+let chartBarInstance = null;
+
 function renderChartBar(data, tertinggi, terendah){
 
   const ctx = document.getElementById("chartBar");
 
-  new Chart(ctx,{
+  if(chartBarInstance){
+    chartBarInstance.destroy();
+  }
+
+  chartBarInstance = new Chart(ctx,{
     type:"bar",
     data:{
       labels:Object.keys(data),
@@ -772,8 +775,6 @@ function renderChartBar(data, tertinggi, terendah){
     }
   });
 }  
-
-let chartPieInstance = null;
 
 let chartPieInstance = null;
 
