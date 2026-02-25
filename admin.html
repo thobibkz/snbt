@@ -514,52 +514,52 @@ function showData(){
 
 // ================= PELUANG LOLOS ==================
 function loadPeluang(){
-
   document.getElementById("content").innerHTML = `
-
   <div class="card">
+    <h3 style="text-align:center; margin-bottom:20px;">📊 Cek Peluang Lolos</h3>
 
-    <h3 style="margin-bottom:15px">📊 Cek Peluang Lolos</h3>
+    <div style="margin-bottom:20px;">
+      <input list="ptnListPeluang" id="ptnPeluang" placeholder="Pilih PTN...">
+      <datalist id="ptnListPeluang"></datalist>
 
-    <!-- FILTER PTN & PRODI -->
-    <div style="margin-bottom:15px">
-      <select id="ptnPeluang" onchange="loadProdiPeluang()"></select>
-      <select id="prodiPeluang"></select>
+      <input list="prodiListPeluang" id="prodiPeluang" placeholder="Pilih Prodi...">
+      <datalist id="prodiListPeluang"></datalist>
     </div>
 
-    <!-- INPUT SKOR -->
-    <h3 style="text-align:center;margin:20px 0 10px">
-      Masukkan Perkiraan Skor UTBK
-    </h3>
+    <h3 style="text-align:center; margin:20px 0 10px">Masukkan Perkiraan Skor UTBK</h3>
 
     <div class="input-row">
-      <input type="number" id="PU"  placeholder="PU">
-      <input type="number" id="PPU" placeholder="PPU">
-      <input type="number" id="PBM" placeholder="PBM">
-      <input type="number" id="PK"  placeholder="PK">
-      <input type="number" id="LBI" placeholder="LBI">
-      <input type="number" id="LBE" placeholder="LBE">
-      <input type="number" id="PM"  placeholder="PM">
+      <div><small>PU</small><input type="number" id="PU" placeholder="0"></div>
+      <div><small>PPU</small><input type="number" id="PPU" placeholder="0"></div>
+      <div><small>PBM</small><input type="number" id="PBM" placeholder="0"></div>
+      <div><small>PK</small><input type="number" id="PK" placeholder="0"></div>
+      <div><small>LBI</small><input type="number" id="LBI" placeholder="0"></div>
+      <div><small>LBE</small><input type="number" id="LBE" placeholder="0"></div>
+      <div><small>PM</small><input type="number" id="PM" placeholder="0"></div>
     </div>
 
-    <!-- BUTTON -->
-<div style="margin-top:20px; display:flex; gap:12px; align-items:center;">
-  <button onclick="prosesPeluang()" class="btn-3d-primary">
-    🚀 Proses Peluang Lolos
-  </button>
-  <button onclick="resetPeluang()" class="btn-3d-reset">
-    Reset
-  </button>
-</div>
+    <div style="margin-top:25px; display:flex; gap:12px; justify-content:center; align-items:center;">
+      <button onclick="prosesPeluang()" class="btn-3d-primary">🚀 Proses Peluang Lolos</button>
+      <button onclick="resetPeluang()" class="btn-3d-reset" style="padding: 8px 15px; font-size:12px;">Reset</button>
+    </div>
 
-    <!-- HASIL AKAN MUNCUL DI SINI -->
     <div id="hasilPeluang"></div>
-
   </div>
   `;
 
-  // isi dropdown PTN pertama kali
-  loadPTNPeluang();
+  // Inisialisasi Datalist
+  const ptnSet = [...new Set(snbt.map(r => r[1]))];
+  const pList = document.getElementById("ptnListPeluang");
+  ptnSet.forEach(x => pList.innerHTML += `<option value="${x}">`);
+
+  document.getElementById("ptnPeluang").oninput = function(){
+    const p = this.value;
+    const prList = document.getElementById("prodiListPeluang");
+    prList.innerHTML = "";
+    snbt.filter(r => r[1] == p).forEach(r => {
+      prList.innerHTML += `<option value="${r[2]}">`;
+    });
+  };
 }
 
 function loadPTNPeluang(){
@@ -598,79 +598,73 @@ function resetPeluang(){
 }
 
 function prosesPeluang(){
-  const ptn   = document.getElementById("ptnPeluang").value;
+  const ptn = document.getElementById("ptnPeluang").value;
   const prodi = document.getElementById("prodiPeluang").value;
-
   const r = snbt.find(x => x[1] == ptn && x[2] == prodi);
-  if(!r) return;
+
+  if(!r) { alert("Pilih PTN dan Prodi terlebih dahulu!"); return; }
 
   const mapel = {
-    PU  : parseFloat(PU.value)||0,
-    PPU : parseFloat(PPU.value)||0,
-    PBM : parseFloat(PBM.value)||0,
-    PK  : parseFloat(PK.value)||0,
-    LBI : parseFloat(LBI.value)||0,
-    LBE : parseFloat(LBE.value)||0,
-    PM  : parseFloat(PM.value)||0
+    PU: parseFloat(PU.value)||0, PPU: parseFloat(PPU.value)||0,
+    PBM: parseFloat(PBM.value)||0, PK: parseFloat(PK.value)||0,
+    LBI: parseFloat(LBI.value)||0, LBE: parseFloat(LBE.value)||0,
+    PM: parseFloat(PM.value)||0
   };
 
-  const materi1 = r[9];
-  const materi2 = r[10];
-
+  // LOGIKA PEMBOBOTAN
+  const materi1 = r[9]; const materi2 = r[10];
   let skorBobot = 0;
   for(let k in mapel){
-    if(k == materi1 || k == materi2){
-      skorBobot += mapel[k] * 0.25;
-    } else {
-      skorBobot += mapel[k] * 0.1;
-    }
+    skorBobot += (k == materi1 || k == materi2) ? mapel[k] * 0.25 : mapel[k] * 0.1;
   }
 
+  // LOGIKA PELUANG
   const skorAman = parseFloat(r[8]) || 0;
   let peluang = ((skorBobot - skorAman) * 100 / 5) + 50;
+  peluang = Math.max(0, Math.min(99, peluang));
 
-  if(peluang < 0) peluang = 0;
-  if(peluang > 99) peluang = 99;
+  let katPeluang = "Sedang";
+  if(peluang > 60) katPeluang = "Tinggi";
+  if(peluang < 40) katPeluang = "Rendah";
 
-  let kategoriPeluang = "Sedang";
-  if(peluang > 60) kategoriPeluang = "Tinggi";
-  if(peluang < 40) kategoriPeluang = "Rendah";
+  // SORTING TERTINGGI & TERENDAH
+  const sorted = Object.entries(mapel).sort((a,b) => b[1]-a[1]);
+  const tertinggi = sorted.slice(0,2).map(x => x[0]);
+  const terendah = sorted.slice(-2).map(x => x[0]);
+  const maksimal = (tertinggi.includes(materi1) && tertinggi.includes(materi2)) ? "sudah maksimal" : "belum maksimal";
 
-  const sorted = Object.entries(mapel).sort((a,b)=>b[1]-a[1]);
-  const tertinggi = sorted.slice(0,2).map(x=>x[0]);
-  const terendah  = sorted.slice(-2).map(x=>x[0]);
-
-  const maksimal = tertinggi.includes(materi1) && tertinggi.includes(materi2) ? "sudah maksimal" : "belum maksimal";
-
-  // RENDER STRUKTUR BARU
+  // RENDER HTML
   document.getElementById("hasilPeluang").innerHTML = `
-  <h3 style="text-align:center;margin-top:40px">Hasil Analisis Peluang</h3>
-
-  <div class="partisi-2">
-    <div><canvas id="chartBar"></canvas></div>
-    <div>
-      <p>Kampus ${ptn}, Prodi ${prodi} memprioritaskan <b>${materi1}</b> & <b>${materi2}</b>.<br><br>
-      Pembobotan saat ini <b>${maksimal}</b>.</p>
-    </div>
-  </div>
-
-  <div class="partisi-2" style="align-items: center; background: #f9f9f9; padding: 20px; border-radius: 15px; margin-top: 20px;">
-    <div>
-      <div class="card-blue" style="margin-bottom:10px">
-        Skor Pembobotan: <b>${skorBobot.toFixed(2)}</b> (Aman: ${skorAman})
+    <h3 style="text-align:center; margin-top:40px;">Hasil Analisis Peluang</h3>
+    <div class="partisi-2">
+      <div>
+        <h4 style="text-align:center; font-size:12px;">Diagram Skor Subtes</h4>
+        <canvas id="chartBar"></canvas>
       </div>
-      <div class="card-green">
-        Kategori: <b>${kategoriPeluang}</b>
+      <div style="font-size:14px; line-height:1.6;">
+        Kampus <b>${ptn}</b>, Prodi <b>${prodi}</b> lebih memprioritaskan materi <b>${materi1}</b> dan <b>${materi2}</b>.<br><br>
+        Hasil pembobotan saat ini <b>${maksimal}</b>.<br><br>
+        Hindari prodi dengan materi <b>${terendah[0]} & ${terendah[1]}</b>.
       </div>
     </div>
 
-    <div style="text-align:center;">
-      <div style="max-width: 180px; margin: 0 auto;">
-        <canvas id="chartPie"></canvas>
+    <h3 style="text-align:center; margin-top:40px;">Hasil Analisis Lanjutan</h3>
+    <p style="text-align:center;">Detail ${ptn}, ${prodi}</p>
+
+    <div class="partisi-3" style="align-items: center;">
+      <div style="display:flex; flex-direction:column; gap:10px;">
+        <div class="card-blue"><small>Skor Pembobotan</small><br><b>${skorBobot.toFixed(2)}</b></div>
+        <div class="card-blue"><small>Skor Aman Prodi</small><br><b>${skorAman}</b></div>
       </div>
-      <div id="persenText" style="margin-top:10px; font-size:12px; font-weight:bold;"></div>
+      <div style="display:flex; flex-direction:column; gap:10px;">
+        <div class="card-green"><small>Peluang Lolos</small><br><b>${peluang.toFixed(1)}%</b></div>
+        <div class="card-green"><small>Kategori</small><br><b>${katPeluang}</b></div>
+      </div>
+      <div style="text-align:center;">
+        <div style="max-width:150px; margin:0 auto;"><canvas id="chartPie"></canvas></div>
+        <div id="persenText" style="font-size:11px; font-weight:bold; margin-top:5px;"></div>
+      </div>
     </div>
-  </div>
   `;
 
   renderChartBar(mapel, tertinggi, terendah);
@@ -704,44 +698,30 @@ function renderChartBar(data, tertinggi, terendah){
 let chartPieInstance = null;
 
 function renderChartPie(persen){
-  const canvas = document.getElementById("chartPie");
-  if(!canvas) return;
-  const ctx = canvas.getContext("2d");
-
+  const ctx = document.getElementById("chartPie").getContext("2d");
   if(chartPieInstance) chartPieInstance.destroy();
 
   chartPieInstance = new Chart(ctx, {
     type: 'doughnut',
     data: {
-      labels: ["Peluang", "Risiko"],
+      labels: ['Peluang', 'Risiko'],
       datasets: [{
         data: [persen, 100 - persen],
-        backgroundColor: ["#16a34a", "#dc2626"],
-        hoverOffset: 10,
-        borderWidth: 2,
+        backgroundColor: ['#16a34a', '#dc2626'],
+        borderWidth: 5,
         borderColor: '#ffffff',
-        // Efek kedalaman
-        weight: 2
+        hoverOffset: 15
       }]
     },
     options: {
-      cutout: '65%', // Membuatnya terlihat seperti cincin modern
-      plugins: {
-        legend: { display: false }
-      },
-      animation: {
-        animateRotate: true,
-        animateScale: true
-      }
+      cutout: '60%',
+      plugins: { legend: { display: false } },
+      animation: { animateRotate: true }
     }
   });
 
-  // Keterangan Persentase di Bawah Chart
   document.getElementById("persenText").innerHTML = `
-    <div style="display:flex; justify-content:space-around; gap:10px;">
-      <span style="color:#16a34a">Peluang: ${persen.toFixed(1)}%</span>
-      <span style="color:#dc2626">Risiko: ${(100-persen).toFixed(1)}%</span>
-    </div>
+    <span style="color:#16a34a">${persen.toFixed(1)}% Peluang</span>
   `;
 }
   
