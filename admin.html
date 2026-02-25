@@ -835,7 +835,6 @@ function renderChartPie(persen) {
 }
   
 // ================= SARAN PRODI ==================
-// ================= SARAN PRODI ==================
 function loadSaran(){
   document.getElementById("content").innerHTML = `
   <div class="card">
@@ -861,8 +860,8 @@ function loadSaran(){
 }
 
 function resetSaran() {
-  const inputs = ["sPU", "sPPU", "sPBM", "sPK", "sLBI", "sLBE", "sPM"];
-  inputs.forEach(id => document.getElementById(id).value = "");
+  const ids = ["sPU", "sPPU", "sPBM", "sPK", "sLBI", "sLBE", "sPM"];
+  ids.forEach(id => document.getElementById(id).value = "");
   document.getElementById("hasilSaranUtama").innerHTML = "";
 }
 
@@ -881,12 +880,12 @@ function cariSaranProdi() {
     PM: parseFloat(document.getElementById("sPM").value) || 0
   };
 
-  // 1. HITUNG 2 TERTINGGI
+  // 1. IDENTIFIKASI 2 SUBTES TERTINGGI INPUTAN
   const sorted = Object.entries(mapel).sort((a, b) => b[1] - a[1]);
   const t1 = sorted[0][0];
   const t2 = sorted[1][0];
 
-  // 2. HITUNG SKOR X (PEMBOBOTAN TERBAIK)
+  // 2. HITUNG SKOR X (PEMBOBOTAN TERBAIK: 2 Tertinggi x 0.25, Sisanya x 0.1)
   let skorX = 0;
   for (let k in mapel) {
     skorX += (k == t1 || k == t2) ? mapel[k] * 0.25 : mapel[k] * 0.1;
@@ -896,16 +895,16 @@ function cariSaranProdi() {
   const totalSkor = Object.values(mapel).reduce((a, b) => a + b, 0);
   const skorY = totalSkor / 7;
 
-  // 4. RENDER INFORMASI CARD
+  // 4. TAMPILKAN INFO RINGKASAN
   document.getElementById("hasilSaranUtama").innerHTML = `
     <div class="card-blue" style="margin-bottom:10px; background:#1e3a8a;">
-      Subtes terbaik Anda adalah <b>${t1}</b> dan <b>${t2}</b>, dengan pembobotan skor <b>${skorX.toFixed(2)}</b>
+      subtes terbaik anda adalah <b>${t1}</b> dan <b>${t2}</b>, dengan pembobotan skor <b>${skorX.toFixed(2)}</b>
     </div>
     <div class="card-blue" style="margin-bottom:25px; background:#3b82f6;">
       Pembobotan skor rerata adalah <b>${skorY.toFixed(2)}</b>
     </div>
 
-    <h4 style="text-align:center; color:var(--muted); margin-bottom:15px;">Berikut Saran Prodi dari Skor yang Anda Input</h4>
+    <h4 style="text-align:center; color:var(--muted); margin-bottom:15px;">Berikut Saran Prodi dari Skor yang anda input</h4>
     <input type="text" id="filterSaran" placeholder="🔍 Filter PTN atau Jurusan..." oninput="renderTabelSaran(${skorX}, ${skorY}, '${t1}', '${t2}')">
 
     <div class="partisi-2">
@@ -920,29 +919,29 @@ function cariSaranProdi() {
 function renderTabelSaran(skorX, skorY, t1, t2) {
   const keyword = (document.getElementById("filterSaran")?.value || "").toLowerCase();
   
-  // Filter Data Rerata
+  // A. LOGIKA SARAN RERATA: Skor Aman Prodi <= Skor Y (Rerata User)
   const dataRerata = snbt.filter(r => (parseFloat(r[8]) <= skorY) && 
     (r[1].toLowerCase().includes(keyword) || r[2].toLowerCase().includes(keyword)));
 
-  // Filter Data Terbaik
-  const dataTerbaik = snbt.filter(r => (parseFloat(r[8]) <= skorX) && 
-    (r[9] == t1 || r[10] == t1 || r[9] == t2 || r[10] == t2) &&
-    (r[1].toLowerCase().includes(keyword) || r[2].toLowerCase().includes(keyword)));
+  // B. LOGIKA SARAN TERBAIK (Sesuai Syarat Baru):
+  // 1. (Materi1 == t1 && Materi2 == t2) ATAU (Materi1 == t2 && Materi2 == t1) -> Bolak-balik sama
+  // 2. Skor Aman Prodi <= Skor X (Pembobotan Terbaik User)
+  const dataTerbaik = snbt.filter(r => {
+    const prodiM1 = r[9];
+    const prodiM2 = r[10];
+    const skorAmanProdi = parseFloat(r[8]);
 
-  // Render HTML Tabel Rerata
-  renderTabelHtml("boxRerata", "Saran Rerata", dataRerata, currentPageRerata, (p) => {
-    currentPageRerata = p;
-    renderTabelSaran(skorX, skorY, t1, t2);
+    const isMatchMateri = (prodiM1 == t1 && prodiM2 == t2) || (prodiM1 == t2 && prodiM2 == t1);
+    const isSkorCukup = skorX >= skorAmanProdi;
+
+    return isMatchMateri && isSkorCukup && (r[1].toLowerCase().includes(keyword) || r[2].toLowerCase().includes(keyword));
   });
 
-  // Render HTML Tabel Terbaik
-  renderTabelHtml("boxTerbaik", "Saran Terbaik", dataTerbaik, currentPageTerbaik, (p) => {
-    currentPageTerbaik = p;
-    renderTabelSaran(skorX, skorY, t1, t2);
-  });
+  renderTabelHtml("boxRerata", "Saran Rerata", dataRerata, currentPageRerata, "Rerata", skorX, skorY, t1, t2);
+  renderTabelHtml("boxTerbaik", "Saran Terbaik", dataTerbaik, currentPageTerbaik, "Terbaik", skorX, skorY, t1, t2);
 }
 
-function renderTabelHtml(targetId, judul, data, page, onPageChange) {
+function renderTabelHtml(targetId, judul, data, page, type, skorX, skorY, t1, t2) {
   const start = (page - 1) * rowsPerPage;
   const paginated = data.slice(start, start + rowsPerPage);
   const totalPages = Math.ceil(data.length / rowsPerPage);
@@ -957,34 +956,29 @@ function renderTabelHtml(targetId, judul, data, page, onPageChange) {
         </tr>
       </thead>
       <tbody>
-        ${paginated.map((r, i) => `
+        ${paginated.length > 0 ? paginated.map((r, i) => `
           <tr style="border-bottom:1px solid #f1f5f9;">
             <td style="padding:10px; color:var(--muted);">${start + i + 1}</td>
             <td style="padding:10px;"><b>${r[1]}</b><br><span style="color:var(--blue)">${r[2]}</span></td>
           </tr>
-        `).join('')}
+        `).join('') : `<tr><td colspan="2" style="padding:20px; text-align:center; color:var(--muted);">Tidak ada prodi yang sesuai</td></tr>`}
       </tbody>
     </table>
     
     <div style="margin-top:15px; display:flex; justify-content:center; gap:10px; align-items:center;">
-      <button onclick="changePage('${targetId}', ${page - 1})" ${page === 1 ? 'disabled' : ''} style="padding:5px 10px; cursor:pointer; border-radius:5px; border:1px solid #ddd; background:white;">Prev</button>
-      <span style="font-size:12px; color:var(--muted);">Page ${page} of ${totalPages || 1}</span>
-      <button onclick="changePage('${targetId}', ${page + 1})" ${page >= totalPages ? 'disabled' : ''} style="padding:5px 10px; cursor:pointer; border-radius:5px; border:1px solid #ddd; background:white;">Next</button>
+      <button onclick="changePageSaran('${type}', ${page - 1}, ${skorX}, ${skorY}, '${t1}', '${t2}')" ${page <= 1 ? 'disabled' : ''} style="padding:5px 10px; cursor:pointer;">Prev</button>
+      <span style="font-size:12px;">Halaman ${page} / ${totalPages || 1}</span>
+      <button onclick="changePageSaran('${type}', ${page + 1}, ${skorX}, ${skorY}, '${t1}', '${t2}')" ${page >= totalPages ? 'disabled' : ''} style="padding:5px 10px; cursor:pointer;">Next</button>
     </div>
   `;
-
-  // Karena button onclick butuh fungsi global, kita akali dengan menyimpan argumen ke dataset atau window
-  window["lastArgs" + targetId] = { page, totalPages };
   document.getElementById(targetId).innerHTML = html;
 }
 
 // Fungsi bantu navigasi halaman
-function changePage(targetId, newPage) {
-  // Trigger ulang render tabel saran (Skor disimpan di variabel global/logic di atas)
-  if(targetId == "boxRerata") currentPageRerata = newPage;
-  if(targetId == "boxTerbaik") currentPageTerbaik = newPage;
-  // Memanggil tombol proses ulang secara otomatis untuk update tabel
-  cariSaranProdi();
+function changePageSaran(type, newPage, skorX, skorY, t1, t2) {
+  if(type === "Rerata") currentPageRerata = newPage;
+  else currentPageTerbaik = newPage;
+  renderTabelSaran(skorX, skorY, t1, t2);
 }
 
 // ================= PERBANDINGAN ==================
