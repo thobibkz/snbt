@@ -1041,17 +1041,23 @@ function renderPreviewBanding() {
 }
 
 async function bandingkanProdi() {
-  if (prodiTerpilih.length < 2) { alert("Tambahkan 2 prodi terlebih dahulu!"); return; }
+  // 1. Validasi Input
+  if (prodiTerpilih.length < 2) { 
+    alert("Tambahkan 2 prodi terlebih dahulu!"); 
+    return; 
+  }
 
   const p1 = prodiTerpilih[0];
   const p2 = prodiTerpilih[1];
 
+  // 2. Fungsi Pembantu untuk Menentukan Warna (Menang/Kalah)
   const getCol = (v1, v2, type) => {
     if (v1 === v2) return ["card-blue", "card-blue"];
     let win = type === 'high' ? v1 > v2 : (type === 'tight' ? v1 > v2 : v1 < v2);
     return win ? ["card-green", "card-red"] : ["card-red", "card-green"];
   };
 
+  // 3. Kalkulasi Data
   const valK1 = parseFloat(p1[6]) * 100;
   const valK2 = parseFloat(p2[6]) * 100;
   const cKuota = getCol(parseFloat(p1[4]), parseFloat(p2[4]), 'high');
@@ -1061,6 +1067,7 @@ async function bandingkanProdi() {
 
   const forceSideBySide = "display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 5px;";
 
+  // 4. Render Tampilan Hasil ke HTML
   document.getElementById("hasilBandingUtama").innerHTML = `
     <h3 style="text-align:center;">Hasil Komparasi Data</h3>
     <div style="display:flex; flex-direction:column; gap:20px;">
@@ -1087,10 +1094,10 @@ async function bandingkanProdi() {
       </div>
     </div>`;
 
+  // 5. Jalankan Rekomendasi AI
   getAiRecommendation(p1, p2);
 }
 
-// 1. Letakkan fungsi pemanggil AI (getAiRecommendation)
 async function getAiRecommendation(p1, p2) {
   const idealEl = document.getElementById("idealText");
   const safeEl = document.getElementById("safeText");
@@ -1145,13 +1152,6 @@ async function getAiRecommendation(p1, p2) {
   }
 }
 
-// 2. Pastikan fungsi bandingkanProdi memanggilnya di baris paling akhir
-async function bandingkanProdi() {
-  // ... (kode perhitungan skor dan render HTML tabel komparasi) ...
-  
-  // Baris WAJIB agar AI jalan:
-  getAiRecommendation(p1, p2);
-}
 
 // ================= TARGET BELAJAR ==================
 function loadTarget(){
