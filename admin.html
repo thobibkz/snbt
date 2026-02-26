@@ -1109,29 +1109,13 @@ async function getAiRecommendation(p1, p2) {
   ada 2 prodi yang akan dibandingkan
   Prodi 1: ${p1[2]} di ${p1[1]} (Skor Aman: ${p1[8]}, Keketatan: ${p1[6]}). 
   Prodi 2: ${p2[2]} di ${p2[1]} (Skor Aman: ${p2[8]}, Keketatan: ${p2[6]}). 
+Tugas Anda adalah memberikan rekomendasi dalam dua kategori: [IDEAL] dan [AMAN].
+  
+  FOKUS [AMAN]: Peluang lolos realistis (Prioritas: skor & keketatan rendah).
+  FOKUS [IDEAL]: Kualitas, reputasi, dan prospek karir terbaik.
+  Khusus data bertanda "(prodi baru)", jelaskan pengertian dan karirnya karena data statistik belum tersedia.
 
-FOKUS ANALISIS KEPUTUSAN IDEAL:
-Kualitas dan reputasi terbaik.
-PRIORITAS:
-- kualitas kampus
-- mutu akademik prodi
-- prospek dan jenjang karier
-
-FOKUS ANALISIS KEPUTUSAN AMAN:
-Peluang LOLOS SNBT secara realistis.
-PRIORITAS:
-- skor aman lebih rendah
-- keketatan lebih rendah
-- peluang diterima lebih besar
-(Jika ada data yang isinya (prodi baru) artinya prodi baru sampaikan saja pengertian jurusan tersebut dan jenjang karirnya)
-
-ATURAN PENULISAN (WAJIB):
-- Jangan gunakan markdown (**, ##, -, *)
-- Jangan gunakan HTML (<br>, <b>, <ul>)
-- Gunakan teks polos saja
-- Jangan gunakan tanda titik dua (:) setelah judul
-
-Gunakan struktur PERSIS seperti di bawah ini
+  WAJIB GUNAKAN FORMAT JAWABAN BERIKUT UNTUK MASING-MASING KATEGORI:
 
   KEPUTUSAN
   PTN : (Nama PTN & Prodinya)
@@ -1146,6 +1130,8 @@ Gunakan struktur PERSIS seperti di bawah ini
   (Pengertian singkat jurusan)
   Karir Fresh Graduate : (Sebutkan 2-5 pekerjaan)
   Karir Professional : (Sebutkan 2-5 pekerjaan)
+
+  Gunakan penanda [IDEAL] sebelum jawaban kategori Ideal dan [AMAN] sebelum jawaban kategori Aman.
   `;
 
   try {
