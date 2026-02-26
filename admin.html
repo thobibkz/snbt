@@ -1091,18 +1091,46 @@ async function bandingkanProdi() {
 }
 
 async function getAiRecommendation(p1, p2) {
-  const prompt = `Analisis SNBT: Pilihan 1: ${p1[2]} (${p1[1]}), Pilihan 2: ${p2[2]} (${p2[1]}). Berikan analisis singkat Bahasa Indonesia. Format: [IDEAL] isi... [AMAN] isi...`;
+  const idealEl = document.getElementById("idealText");
+  const safeEl = document.getElementById("safeText");
+
+  // Menggunakan model terbaru (sesuaikan dengan ketersediaan di Google AI Studio Anda)
+  // Opsi: "gemini-2.0-flash" atau "gemini-2.0-flash-exp"
+  const MODEL_NAME = "gemini-2.0-flash"; 
+
+  const prompt = `Analisis strategis SNBT 2026. 
+  Pilihan 1: ${p1[2]} di ${p1[1]} (Skor Aman: ${p1[8]}, Keketatan: ${p1[6]}). 
+  Pilihan 2: ${p2[2]} di ${p2[1]} (Skor Aman: ${p2[8]}, Keketatan: ${p2[6]}). 
+  Berikan analisis singkat. 
+  Wajib gunakan format: [IDEAL] ...teks analisis... [AMAN] ...teks analisis...`;
+
   try {
-    const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_API_KEY}`, {
+    // URL diubah menggunakan MODEL_NAME yang baru
+    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${MODEL_NAME}:generateContent?key=${GEMINI_API_KEY}`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] })
+      body: JSON.stringify({
+        contents: [{ parts: [{ text: prompt }] }]
+      })
     });
-    const d = await res.json();
+
+    if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(`Error ${response.status}: ${errorData.error.message}`);
+    }
+
+    const d = await response.json();
     const txt = d.candidates[0].content.parts[0].text;
-    document.getElementById("idealText").innerText = txt.split("[IDEAL]")[1]?.split("[AMAN]")[0] || "Gagal analisis";
-    document.getElementById("safeText").innerText = txt.split("[AMAN]")[1] || "Gagal analisis";
-  } catch (e) { console.error(e); }
+    
+    // Pemisahan teks berdasarkan marker [IDEAL] dan [AMAN]
+    idealEl.innerText = txt.includes("[IDEAL]") ? txt.split("[IDEAL]")[1].split("[AMAN]")[0].trim() : "Analisis Ideal tidak tersedia.";
+    safeEl.innerText = txt.includes("[AMAN]") ? txt.split("[AMAN]")[1].trim() : "Analisis Aman tidak tersedia.";
+
+  } catch (e) {
+    console.error("AI Error:", e);
+    idealEl.innerText = "Gagal memuat analisis terbaru.";
+    safeEl.innerText = "Pastikan model tersedia untuk API Key Anda.";
+  }
 }
 
 // ================= TARGET BELAJAR ==================
