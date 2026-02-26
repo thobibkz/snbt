@@ -1105,11 +1105,32 @@ async function getAiRecommendation(p1, p2) {
   // Meniru acuan model terbaru dari Google AI Studio Anda
   const MODEL_NAME = "gemini-3-flash-preview"; 
 
-  const prompt = `Analisis strategis SNBT 2026. 
-  Pilihan 1: ${p1[2]} di ${p1[1]} (Skor Aman: ${p1[8]}, Keketatan: ${p1[6]}). 
-  Pilihan 2: ${p2[2]} di ${p2[1]} (Skor Aman: ${p2[8]}, Keketatan: ${p2[6]}). 
-  Berikan analisis singkat dalam Bahasa Indonesia. 
-  Wajib gunakan format penanda: [IDEAL] untuk analisis kualitas, dan [AMAN] untuk analisis peluang.`;
+  const prompt = `Anda adalah konselor SNBT 2026. 
+  ada 2 prodi yang akan dibandingkan
+  Prodi 1: ${p1[2]} di ${p1[1]} (Skor Aman: ${p1[8]}, Keketatan: ${p1[6]}). 
+  Prodi 2: ${p2[2]} di ${p2[1]} (Skor Aman: ${p2[8]}, Keketatan: ${p2[6]}). 
+Tugas Anda adalah memberikan rekomendasi dalam dua kategori: [IDEAL] dan [AMAN].
+  
+  FOKUS [AMAN]: Peluang lolos realistis (Prioritas: skor & keketatan rendah).
+  FOKUS [IDEAL]: Kualitas, reputasi, dan prospek karir terbaik.
+  Khusus data bertanda "(prodi baru)", jelaskan pengertian dan karirnya karena data statistik belum tersedia.
+
+  WAJIB GUNAKAN FORMAT JAWABAN BERIKUT UNTUK MASING-MASING KATEGORI:
+
+  KEPUTUSAN
+  PTN : (Nama PTN & Prodinya)
+  Akreditasi : (Akreditasi Prodi tersebut)
+
+  ALASAN UTAMA
+  Alasan 1 : (Alasan singkat)
+  Alasan 2 : (Alasan singkat)
+  ... (maksimal 5 alasan)
+
+  JENJANG KARIR
+  (Pengertian singkat jurusan)
+  Karir Fresh Graduate : (Sebutkan 2-5 pekerjaan)
+  Karir Professional : (Sebutkan 2-5 pekerjaan)
+  `;
 
   try {
     // Menggunakan endpoint v1beta agar mendukung model 'preview' terbaru
