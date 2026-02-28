@@ -564,13 +564,13 @@ function loadPeluang(){
     <h3 style="text-align:center; margin:20px 0 10px">Masukkan Perkiraan Skor UTBK</h3>
 
     <div class="input-row">
-      <div><input type="number" id="PU" placeholder="PU" value="${s.PU}" oninput="savePeluangInput()"></div>
-      <div><input type="number" id="PPU" placeholder="PPU" value="${s.PPU}" oninput="savePeluangInput()"></div>
-      <div><input type="number" id="PBM" placeholder="PBM" value="${s.PBM}" oninput="savePeluangInput()"></div>
-      <div><input type="number" id="PK" placeholder="PK" value="${s.PK}" oninput="savePeluangInput()"></div>
-      <div><input type="number" id="LBI" placeholder="LBI" value="${s.LBI}" oninput="savePeluangInput()"></div>
-      <div><input type="number" id="LBE" placeholder="LBE" value="${s.LBE}" oninput="savePeluangInput()"></div>
-      <div><input type="number" id="PM" placeholder="PM" value="${s.PM}" oninput="savePeluangInput()"></div>
+      <div><input type="number" id="PU" placeholder="PU" value="${k.PU}" oninput="savePeluangInput()"></div>
+      <div><input type="number" id="PPU" placeholder="PPU" value="${k.PPU}" oninput="savePeluangInput()"></div>
+      <div><input type="number" id="PBM" placeholder="PBM" value="${k.PBM}" oninput="savePeluangInput()"></div>
+      <div><input type="number" id="PK" placeholder="PK" value="${k.PK}" oninput="savePeluangInput()"></div>
+      <div><input type="number" id="LBI" placeholder="LBI" value="${k.LBI}" oninput="savePeluangInput()"></div>
+      <div><input type="number" id="LBE" placeholder="LBE" value="${k.LBE}" oninput="savePeluangInput()"></div>
+      <div><input type="number" id="PM" placeholder="PM" value="${k.PM}" oninput="savePeluangInput()"></div>
     </div>
 
     <div style="margin-top:25px; display:flex; gap:12px; justify-content:center; align-items:center;">
@@ -938,8 +938,6 @@ function cariSaranProdi() {
     LBI: parseFloat(document.getElementById("sLBI").value) || 0,
     LBE: parseFloat(document.getElementById("sLBE").value) || 0,
     PM: parseFloat(document.getElementById("sPM").value) || 0
- // Tambahkan di baris terakhir fungsi cariSaranProdi()
-inputState.saran.hasil = document.getElementById("hasilSaranUtama").innerHTML;
   };
 
   // 1. IDENTIFIKASI 2 SUBTES TERTINGGI INPUTAN
@@ -976,6 +974,7 @@ inputState.saran.hasil = document.getElementById("hasilSaranUtama").innerHTML;
   `;
 
   renderTabelSaran(skorX, skorY, t1, t2);
+inputState.saran.hasil = document.getElementById("hasilSaranUtama").innerHTML;
 }
 
 function renderTabelSaran(skorX, skorY, t1, t2) {
