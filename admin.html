@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2"></script>
     
 <style>
 :root{
@@ -981,7 +982,6 @@ function changePageSaran(type, newPage, skorX, skorY, t1, t2) {
   renderTabelSaran(skorX, skorY, t1, t2);
 }
 
-// ================= PERBANDINGAN ==================
 // ================= PERBANDINGAN PRODI ==================
 let prodiTerpilih = [];
 
@@ -1177,13 +1177,11 @@ function loadTarget() {
       <h3 style="margin-top:0">🎯 Analisis Target Belajar SNBT 2026</h3>
       
       <div style="margin-bottom:20px;">
-        <label style="font-size:12px; color:var(--muted)">Cari Perguruan Tinggi:</label>
         <input list="ptnTargetList" id="filterPtnTarget" placeholder="Ketik nama PTN..." oninput="updateProdiTarget()" style="width:100%; padding:12px; border-radius:12px; border:1px solid #ddd; margin-bottom:10px;">
         <datalist id="ptnTargetList">
           ${ptnList.map(p => `<option value="${p}">`).join("")}
         </datalist>
         
-        <label style="font-size:12px; color:var(--muted); margin-top:10px; display:block;">Cari Program Studi:</label>
         <input list="prodiTargetList" id="filterProdiTarget" placeholder="Ketik nama Prodi..." oninput="hitungTarget()" style="width:100%; padding:12px; border-radius:12px; border:1px solid #ddd;">
         <datalist id="prodiTargetList"></datalist>
       </div>
@@ -1204,11 +1202,11 @@ function loadTarget() {
       </div>
 
       <div id="diagramSection" style="display:none; grid-template-columns: 1fr 1fr; gap:20px;">
-        <div>
+        <div style="position: relative; height:350px; width:100%">
           <h4 style="text-align:center; font-size:13px;">Target Soal</h4>
           <canvas id="chartSoal"></canvas>
         </div>
-        <div>
+        <div style="position: relative; height:350px; width:100%">
           <h4 style="text-align:center; font-size:13px;">Target Skor</h4>
           <canvas id="chartSkor"></canvas>
         </div>
@@ -1221,7 +1219,6 @@ function updateProdiTarget() {
   const prodiDataList = document.getElementById("prodiTargetList");
   const prodiInput = document.getElementById("filterProdiTarget");
   
-  // Kosongkan input prodi dan listnya saat PTN berubah
   prodiDataList.innerHTML = "";
   prodiInput.value = "";
 
@@ -1229,7 +1226,7 @@ function updateProdiTarget() {
     const filtered = snbt.filter(item => item[1] === ptn);
     filtered.forEach(item => {
       const opt = document.createElement("option");
-      opt.value = item[2]; // Nama Prodi
+      opt.value = item[2];
       prodiDataList.appendChild(opt);
     });
   }
@@ -1240,8 +1237,6 @@ let chartSoal, chartSkor;
 function hitungTarget() {
   const ptn = document.getElementById("filterPtnTarget").value;
   const prodiName = document.getElementById("filterProdiTarget").value;
-  
-  // Cari data berdasarkan PTN dan Prodi
   const data = snbt.find(item => item[1] === ptn && item[2] === prodiName);
 
   if (!data) {
@@ -1250,7 +1245,6 @@ function hitungTarget() {
     return;
   }
 
-  // Sesuai struktur: 8:skor, 9:materi1, 10:materi2
   const skorAman = parseFloat(data[8]) || 0;
   const mat1 = (data[9] || "").toString().toUpperCase().trim();
   const mat2 = (data[10] || "").toString().toUpperCase().trim();
@@ -1284,11 +1278,11 @@ function hitungTarget() {
     if (isPriority) {
       sus += 1;
       nSkor += 100;
-      colorsSoal.push("#f44336"); // Merah
+      colorsSoal.push("#f44336");
       colorsSkor.push("#f44336");
     } else {
-      colorsSoal.push("#2196f3"); // Biru
-      colorsSkor.push("#4caf50"); // Hijau
+      colorsSoal.push("#2196f3");
+      colorsSkor.push("#4caf50");
     }
 
     labels.push(s.key);
@@ -1297,21 +1291,61 @@ function hitungTarget() {
     tooltipsSoal.push(`Total Soal: ${mud+sed+sus}, Mudah: ${mud}, Sedang: ${sed}, Susah: ${sus}`);
   });
 
+  renderCharts(labels, dataSoal, dataSkor, colorsSoal, colorsSkor, tooltipsSoal);
+}
+
+function renderCharts(labels, dataSoal, dataSkor, colorsSoal, colorsSkor, tooltipsSoal) {
   if (chartSoal) chartSoal.destroy();
   if (chartSkor) chartSkor.destroy();
 
+  // Daftarkan plugin secara lokal untuk chart ini
+  const commonOptions = (maxVal) => ({
+    indexAxis: 'y',
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: {
+      legend: { display: false },
+      tooltip: { callbacks: { label: (ctx) => tooltipsSoal[ctx.dataIndex] } },
+      datalabels: { // Pengaturan angka di samping bar
+        anchor: 'end',
+        align: 'right',
+        color: '#444',
+        font: { weight: 'bold', size: 10 },
+        formatter: Math.round
+      }
+    },
+    scales: {
+      x: { 
+        max: maxVal, 
+        beginAtZero: true,
+        grid: { display: false },
+        ticks: { display: false } // Sembunyikan angka di bawah karena sudah ada di samping bar
+      },
+      y: { grid: { display: false } }
+    },
+    layout: { padding: { right: 35 } } // Jarak agar angka tidak terpotong
+  });
+
   chartSoal = new Chart(document.getElementById("chartSoal"), {
     type: 'bar',
-    data: { labels: labels, datasets: [{ data: dataSoal, backgroundColor: colorsSoal, borderRadius: 5 }] },
-    options: { indexAxis: 'y', plugins: { legend: { display: false }, tooltip: { callbacks: { label: (ctx) => tooltipsSoal[ctx.dataIndex] } } }, scales: { x: { max: 30, beginAtZero: true } } }
+    plugins: [ChartDataLabels],
+    data: {
+      labels: labels,
+      datasets: [{ data: dataSoal, backgroundColor: colorsSoal, borderRadius: 5 }]
+    },
+    options: commonOptions(35)
   });
 
   chartSkor = new Chart(document.getElementById("chartSkor"), {
     type: 'bar',
-    data: { labels: labels, datasets: [{ data: dataSkor, backgroundColor: colorsSkor, borderRadius: 5 }] },
-    options: { indexAxis: 'y', plugins: { legend: { display: false } }, scales: { x: { max: 1000, beginAtZero: true } } }
+    plugins: [ChartDataLabels],
+    data: {
+      labels: labels,
+      datasets: [{ data: dataSkor, backgroundColor: colorsSkor, borderRadius: 5 }]
+    },
+    options: commonOptions(1100)
   });
-}  
+}
 </script>
 
 <!-- ADMIN PROTECTION -->
