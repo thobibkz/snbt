@@ -1177,13 +1177,11 @@ function loadTarget() {
       <h3 style="margin-top:0">🎯 Analisis Target Belajar SNBT 2026</h3>
       
       <div style="margin-bottom:20px;">
-        <label style="font-size:12px; color:var(--muted)">Cari Perguruan Tinggi:</label>
         <input list="ptnTargetList" id="filterPtnTarget" placeholder="Ketik nama PTN..." oninput="updateProdiTarget()" style="width:100%; padding:12px; border-radius:12px; border:1px solid #ddd; margin-bottom:10px;">
         <datalist id="ptnTargetList">
           ${ptnList.map(p => `<option value="${p}">`).join("")}
         </datalist>
         
-        <label style="font-size:12px; color:var(--muted); margin-top:10px; display:block;">Cari Program Studi:</label>
         <input list="prodiTargetList" id="filterProdiTarget" placeholder="Ketik nama Prodi..." oninput="hitungTarget()" style="width:100%; padding:12px; border-radius:12px; border:1px solid #ddd;">
         <datalist id="prodiTargetList"></datalist>
       </div>
