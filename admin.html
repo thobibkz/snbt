@@ -1102,19 +1102,19 @@ async function getAiRecommendation(p1, p2) {
   const idealEl = document.getElementById("idealText");
   const safeEl = document.getElementById("safeText");
 
-  const MODEL_NAME = "gemini-3-flash-preview"; 
+  const GAS_URL = "https://script.google.com/macros/s/AKfycbwbzuaonxkmrORq6YiAaKov_c-bDCsfLEXN9vN1cYLwv9gHI2nYMddPhAmxPLhRO1C-/exec"; 
 
   const prompt = `Analisis strategis SNBT 2026 untuk dua pilihan:
-  Pilihan 1: ${p1[2]} di ${p1[1]}
-  Pilihan 2: ${p2[2]} di ${p2[1]}
+  Pilihan 1: ${p1[2]} di ${p1[1]} (Skor Aman: ${p1[8]}, Keketatan: ${p1[6]})
+  Pilihan 2: ${p2[2]} di ${p2[1]} (Skor Aman: ${p2[8]}, Keketatan: ${p2[6]})
 
   Tugas: Berikan dua analisis terpisah yaitu [IDEAL] dan [AMAN].
-  WALAUPUN hasil keputusannya sama (misal prodi yang sama), Anda WAJIB menuliskan keduanya secara lengkap sesuai format.
+  
+  FOKUS [AMAN]: Prioritas peluang lolos (skor & keketatan rendah).
+  FOKUS [IDEAL]: Prioritas kualitas, reputasi, dan karir.
+  (Jika ada prodi baru, sampaikan pengertian jurusan dan jenjang karirnya).
 
-  1. FOKUS [AMAN]: Prioritas peluang lolos (skor & keketatan rendah).
-  2. FOKUS [IDEAL]: Prioritas kualitas, reputasi, dan karir.
-
-  WAJIB GUNAKAN FORMAT INI UNTUK MASING-MASING KATEGORI:
+  WAJIB GUNAKAN FORMAT JAWABAN BERIKUT:
 
   KEPUTUSAN
   PTN : (Nama PTN & Prodinya)
@@ -1122,6 +1122,7 @@ async function getAiRecommendation(p1, p2) {
 
   ALASAN UTAMA
   Alasan 1 : ...
+  Alasan 2 : ...
   ... (maksimal 5 alasan)
 
   JENJANG KARIR
@@ -1129,21 +1130,18 @@ async function getAiRecommendation(p1, p2) {
   Karir Fresh Graduate : ...
   Karir Professional : ...
 
-  PENTING: Awali analisis pertama dengan kata [IDEAL] dan analisis kedua dengan kata [AMAN]. Jangan digabung!`;
+  PENTING: Awali analisis pertama dengan kata [IDEAL] dan analisis kedua dengan kata [AMAN].`;
 
   try {
-    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${MODEL_NAME}:generateContent?key=${GEMINI_API_KEY}`, {
+    const response = await fetch(GAS_URL, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        contents: [{ parts: [{ text: prompt }] }]
-      })
+      body: JSON.stringify({ prompt: prompt })
     });
 
     const result = await response.json();
+    
     const aiResponseText = result.candidates[0].content.parts[0].text;
 
-    // PERBAIKAN LOGIKA SPLIT (Lebih Kuat)
     let idealContent = "";
     let safeContent = "";
 
@@ -1153,7 +1151,6 @@ async function getAiRecommendation(p1, p2) {
       idealContent = splitLagi[0];
       safeContent = splitLagi[1];
     } else {
-      // Jika AI lupa format, tampilkan seluruh teks di kedua kotak sebagai cadangan
       idealContent = aiResponseText;
       safeContent = aiResponseText;
     }
@@ -1166,8 +1163,8 @@ async function getAiRecommendation(p1, p2) {
 
   } catch (e) {
     console.error("AI Error:", e);
-    idealEl.innerText = "Gagal memuat analisis.";
-    safeEl.innerText = "Gagal memuat analisis.";
+    idealEl.innerText = "Gagal memuat analisis melalui server.";
+    safeEl.innerText = "Gagal memuat analisis melalui server.";
   }
 }
 
