@@ -116,24 +116,40 @@ button:active{
 </div>
 
 <script>
-const API="https://script.google.com/macros/s/AKfycbziFgn-WoQzX6CBzjemhSdkcwidvK-Hnx1CjWnTgzsmKoV3QfpkWtkxW8C3OZSokpaE/exec"; // Apps Script API login
+const API="https://script.google.com/macros/s/AKfycbxNlZyE2tyfPNNEWyCpS9zhpBp1IitjzQZpiynaNrDpSrOEda3pQBvsxzh4SmdqPPuTGQ/exec"; // Apps Script API login
 
-function login(){
-  let email=document.getElementById("email").value;
-  let pass=document.getElementById("pass").value;
+function login() {
+  let email = document.getElementById("email").value;
+  let pass = document.getElementById("pass").value;
 
-  fetch(`${API}?action=login&email=${email}&pass=${pass}`)
-  .then(r=>r.json())
-  .then(d=>{
-    if(d.status=="ok"){
-      localStorage.setItem("role",d.role);
-      if(d.role=="admin") location.href="admin.html";
-      else location.href="publik.html";
-    } else {
-      alert("Email atau password salah");
-    }
-  })
-  .catch(()=>alert("Server error"));
+  // Validasi input sederhana sebelum mengirim ke server
+  if (!email || !pass) {
+    alert("Silakan isi email dan password!");
+    return;
+  }
+
+  // REVISI: Menggunakan alias 'auth_req' sebagai pengganti 'login' untuk keamanan
+  fetch(`${API}?action=auth_req&email=${encodeURIComponent(email)}&pass=${encodeURIComponent(pass)}`)
+    .then(r => r.json())
+    .then(d => {
+      if (d.status == "ok") {
+        // Menyimpan data role ke local storage
+        localStorage.setItem("role", d.role);
+        
+        // Pengalihan halaman berdasarkan role
+        if (d.role == "admin") {
+          location.href = "admin.html";
+        } else {
+          location.href = "publik.html";
+        }
+      } else {
+        alert("Email atau password salah");
+      }
+    })
+    .catch((err) => {
+      console.error("Login Error:", err);
+      alert("Gagal terhubung ke server. Pastikan URL API sudah benar.");
+    });
 }
 </script>
 
