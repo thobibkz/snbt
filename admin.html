@@ -1173,6 +1173,7 @@ async function getAiRecommendation(p1, p2) {
 function loadTarget() {
   const ptnList = [...new Set(snbt.map(item => item[1]))].sort();
 
+  // 1. Render HTML-nya dulu
   document.getElementById("content").innerHTML = `
     <div class="card">
       <h3 style="margin-top:0">🎯 Analisis Target Belajar SNBT 2026</h3>
@@ -1203,22 +1204,23 @@ function loadTarget() {
 
       <div id="diagramSection" style="display:none; grid-template-columns: 1fr 1fr; gap:20px;">
         <div>
-          <h4 style="text-align:center; font-size:14px;">Target Soal Yang Harus Dicapai</h4>
+          <h4 style="text-align:center; font-size:14px;">Target Soal</h4>
           <canvas id="chartSoal"></canvas>
         </div>
         <div>
-          <h4 style="text-align:center; font-size:14px;">Target Skor Yang Harus Dicapai</h4>
+          <h4 style="text-align:center; font-size:14px;">Target Skor</h4>
           <canvas id="chartSkor"></canvas>
         </div>
       </div>
     </div>`;
 
-  // INISIALISASI TOM SELECT (Agar bisa diketik)
-  initializeSearchableSelect("filterPtnTarget", "Cari PTN...", (val) => {
+  // 2. AKTIFKAN FITUR SEARCH (Tepat setelah innerHTML)
+  // Menggunakan fungsi yang sudah ada di admin.html Anda
+  initializeSearchableSelect("filterPtnTarget", "Pilih PTN...", (val) => {
     updateProdiTarget(val);
   });
 
-  initializeSearchableSelect("filterProdiTarget", "Cari Prodi...", (val) => {
+  initializeSearchableSelect("filterProdiTarget", "Pilih Prodi...", (val) => {
     hitungTarget(val);
   });
 }
@@ -1241,15 +1243,15 @@ function updateProdiTarget(ptn) {
   }
 }
 
-let chartSoal, chartSkor;
+// Global variable agar bisa di-destroy saat ganti prodi
+let chartSoalInstance, chartSkorInstance;
 
 function hitungTarget(val) {
-  // Nilai 'val' sekarang dikirim langsung oleh Tom Select
   if(!val) {
     document.getElementById("targetCards").style.display = "none";
     document.getElementById("diagramSection").style.display = "none";
     return;
-  };
+  }
   
   const [ptn, prodiName] = val.split("|");
   const data = snbt.find(item => item[1] === ptn && item[2] === prodiName);
@@ -1299,30 +1301,26 @@ function hitungTarget(val) {
     labels.push(s.key);
     dataSoal.push(mud + sed + sus);
     dataSkor.push(Math.round(nSkor));
-    tooltipsSoal.push(`Total Soal: ${mud+sed+sus}, Mudah: ${mud}, Sedang: ${sed}, Susah: ${sus}`);
+    tooltipsSoal.push(`Total: ${mud+sed+sus} Soal (M:${mud}, S:${sed}, H:${sus})`);
   });
 
-  if (chartSoal) chartSoal.destroy();
-  if (chartSkor) chartSkor.destroy();
+  // Reset Chart
+  if (chartSoalInstance) chartSoalInstance.destroy();
+  if (chartSkorInstance) chartSkorInstance.destroy();
 
-  chartSoal = new Chart(document.getElementById("chartSoal"), {
+  const ctxSoal = document.getElementById("chartSoal").getContext('2d');
+  const ctxSkor = document.getElementById("chartSkor").getContext('2d');
+
+  chartSoalInstance = new Chart(ctxSoal, {
     type: 'bar',
     data: { labels: labels, datasets: [{ data: dataSoal, backgroundColor: colorsSoal, borderRadius: 5 }] },
-    options: {
-      indexAxis: 'y',
-      plugins: { legend: { display: false }, tooltip: { callbacks: { label: (ctx) => tooltipsSoal[ctx.dataIndex] } } },
-      scales: { x: { max: 30, beginAtZero: true } }
-    }
+    options: { indexAxis: 'y', plugins: { legend: { display: false } }, scales: { x: { max: 30, beginAtZero: true } } }
   });
 
-  chartSkor = new Chart(document.getElementById("chartSkor"), {
+  chartSkorInstance = new Chart(ctxSkor, {
     type: 'bar',
     data: { labels: labels, datasets: [{ data: dataSkor, backgroundColor: colorsSkor, borderRadius: 5 }] },
-    options: {
-      indexAxis: 'y',
-      plugins: { legend: { display: false } },
-      scales: { x: { max: 1000, beginAtZero: true } }
-    }
+    options: { indexAxis: 'y', plugins: { legend: { display: false } }, scales: { x: { max: 1000, beginAtZero: true } } }
   });
 }
   
