@@ -1169,14 +1169,12 @@ async function getAiRecommendation(p1, p2) {
 
 
 // ================= TARGET BELAJAR ==================
-
 function loadTarget() {
-  // Ambil daftar PTN unik untuk filter
   const ptnList = [...new Set(snbt.map(item => item[1]))].sort();
 
   document.getElementById("content").innerHTML = `
     <div class="card">
-      <h3>🎯 Analisis Target Belajar SNBT 2026</h3>
+      <h3 style="margin-top:0">🎯 Analisis Target Belajar SNBT 2026</h3>
       <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px; margin-bottom:20px;">
         <select id="filterPtnTarget" onchange="updateProdiTarget()">
           <option value="">-- Pilih PTN --</option>
@@ -1188,25 +1186,27 @@ function loadTarget() {
       </div>
 
       <div id="targetCards" style="display:none; grid-template-columns: 1fr 1fr 1fr; gap:15px; margin-bottom:25px;">
-        <div class="card" style="background:#e3f2fd; border-left:5px solid #2196f3; margin:0; padding:15px;">
+        <div class="card" style="background:#e3f2fd; border-left:5px solid #2196f3; margin:0; padding:15px; box-shadow:none; border-top:1px solid #ddd; border-right:1px solid #ddd; border-bottom:1px solid #ddd;">
           <small>Skor Aman Prodi</small>
-          <h2 id="cardSkor" style="margin:5px 0 0 0;">0</h2>
+          <h2 id="cardSkor" style="margin:5px 0 0 0; color:#1565c0;">0</h2>
         </div>
-        <div class="card" style="background:#fff3e0; border-left:5px solid #ff9800; margin:0; padding:15px;">
+        <div class="card" style="background:#fff3e0; border-left:5px solid #ff9800; margin:0; padding:15px; box-shadow:none; border-top:1px solid #ddd; border-right:1px solid #ddd; border-bottom:1px solid #ddd;">
           <small>Materi Utama 1</small>
-          <h4 id="cardMat1" style="margin:5px 0 0 0;">-</h4>
+          <h4 id="cardMat1" style="margin:5px 0 0 0; color:#e65100;">-</h4>
         </div>
-        <div class="card" style="background:#f1f8e9; border-left:5px solid #4caf50; margin:0; padding:15px;">
+        <div class="card" style="background:#f1f8e9; border-left:5px solid #4caf50; margin:0; padding:15px; box-shadow:none; border-top:1px solid #ddd; border-right:1px solid #ddd; border-bottom:1px solid #ddd;">
           <small>Materi Utama 2</small>
-          <h4 id="cardMat2" style="margin:5px 0 0 0;">-</h4>
+          <h4 id="cardMat2" style="margin:5px 0 0 0; color:#1b5e20;">-</h4>
         </div>
       </div>
 
-      <div id="diagramSection" style="display:none; display:grid; grid-template-columns: 1fr 1fr; gap:20px;">
+      <div id="diagramSection" style="display:none; grid-template-columns: 1fr 1fr; gap:20px;">
         <div>
+          <h4 style="text-align:center; font-size:14px;">Target Soal Yang Harus Dicapai</h4>
           <canvas id="chartSoal"></canvas>
         </div>
         <div>
+          <h4 style="text-align:center; font-size:14px;">Target Skor Yang Harus Dicapai</h4>
           <canvas id="chartSkor"></canvas>
         </div>
       </div>
@@ -1218,10 +1218,11 @@ function updateProdiTarget() {
   const prodiSel = document.getElementById("filterProdiTarget");
   prodiSel.innerHTML = '<option value="">-- Pilih Prodi --</option>';
 
+  // Filter berdasarkan nama PTN di indeks 1
   snbt.filter(item => item[1] === ptn).forEach(item => {
     const opt = document.createElement("option");
-    opt.value = item[0]; // ID atau Index
-    opt.innerText = item[2]; // Nama Prodi
+    opt.value = ptn + "|" + item[2]; 
+    opt.innerText = item[2]; 
     prodiSel.appendChild(opt);
   });
 }
@@ -1229,26 +1230,28 @@ function updateProdiTarget() {
 let chartSoal, chartSkor;
 
 function hitungTarget() {
-  const ptn = document.getElementById("filterPtnTarget").value;
-  const prodiName = document.getElementById("filterProdiTarget").options[document.getElementById("filterProdiTarget").selectedIndex].text;
+  const val = document.getElementById("filterProdiTarget").value;
+  if(!val) return;
+  
+  const [ptn, prodiName] = val.split("|");
   const data = snbt.find(item => item[1] === ptn && item[2] === prodiName);
 
   if (!data) return;
 
+  // PEMANGGILAN DATA SESUAI STRUKTUR USER:
+  const skorAman = parseFloat(data[8]) || 0; // Kolom skor (indeks 8)
+  const mat1 = (data[9] || "").toString().toUpperCase().trim(); // Kolom materi1 (indeks 9)
+  const mat2 = (data[10] || "").toString().toUpperCase().trim(); // Kolom materi2 (indeks 10)
+
   document.getElementById("targetCards").style.display = "grid";
   document.getElementById("diagramSection").style.display = "grid";
+  document.getElementById("cardSkor").innerText = skorAman;
+  document.getElementById("cardMat1").innerText = mat1 || "-";
+  document.getElementById("cardMat2").innerText = mat2 || "-";
 
-  const skorAman = parseFloat(data[8]);
-  const mat1 = data[10]; // Materi 1
-  const mat2 = data[11]; // Materi 2
   const ratio = skorAman / 1000;
 
-  document.getElementById("cardSkor").innerText = skorAman;
-  document.getElementById("cardMat1").innerText = mat1;
-  document.getElementById("cardMat2").innerText = mat2;
-
-  // Konfigurasi Subtes
-  const subtes = [
+  const subtesConfig = [
     { key: "PU",  m: 12, s: 14, h: 4,  km: 18, ks: 36, kh: 70 },
     { key: "PPU", m: 7,  s: 11, h: 2,  km: 30, ks: 55, kh: 92 },
     { key: "PBM", m: 12, s: 6,  h: 2,  km: 36, ks: 58, kh: 110 },
@@ -1258,78 +1261,67 @@ function hitungTarget() {
     { key: "PM",  m: 10, s: 7,  h: 3,  km: 34, ks: 58, kh: 84 }
   ];
 
-  const labels = subtes.map(s => s.key);
-  const dataSoal = [];
-  const dataSkor = [];
-  const colorsSoal = [];
-  const colorsSkor = [];
-  const tooltipsSoal = [];
+  const labels = [], dataSoal = [], dataSkor = [], colorsSoal = [], colorsSkor = [], tooltipsSoal = [];
 
-  subtes.forEach(s => {
+  subtesConfig.forEach(s => {
+    // Hitung jumlah soal (dibulatkan bilangan bulat)
     let mud = Math.round(ratio * s.m);
     let sed = Math.round(ratio * s.s);
     let sus = Math.round(ratio * s.h);
-    let nSkor = Math.round((mud * s.km) + (sed * s.ks) + (sus * s.kh));
+    
+    // Logika Skor Dasar
+    let nSkor = (mud * s.km) + (sed * s.ks) + (sus * s.kh);
 
+    // Cek Prioritas Subtes
     const isPriority = (s.key === mat1 || s.key === mat2);
     
     if (isPriority) {
-      sus += 1;
-      nSkor += 100;
-      colorsSoal.push("#f44336");
-      colorsSkor.push("#f44336");
+      sus += 1; // Soal susah bertambah 1
+      nSkor += 100; // Skor bertambah 100
+      colorsSoal.push("#f44336"); // Merah
+      colorsSkor.push("#f44336"); // Merah
     } else {
-      colorsSoal.push("#2196f3");
-      colorsSkor.push("#4caf50");
+      colorsSoal.push("#2196f3"); // Biru
+      colorsSkor.push("#4caf50"); // Hijau
     }
 
     const totalS = mud + sed + sus;
+    labels.push(s.key);
     dataSoal.push(totalS);
-    dataSkor.push(nSkor);
+    dataSkor.push(Math.round(nSkor));
     tooltipsSoal.push(`Total Soal: ${totalS}, Mudah: ${mud}, Sedang: ${sed}, Susah: ${sus}`);
   });
 
-  // Hancurkan chart lama jika ada
   if (chartSoal) chartSoal.destroy();
   if (chartSkor) chartSkor.destroy();
 
-  // Chart Target Soal
+  // Chart Soal (Max 30)
   chartSoal = new Chart(document.getElementById("chartSoal"), {
     type: 'bar',
     data: {
       labels: labels,
-      datasets: [{
-        label: 'Target Soal Yang Harus Dicapai',
-        data: dataSoal,
-        backgroundColor: colorsSoal
-      }]
+      datasets: [{ data: dataSoal, backgroundColor: colorsSoal, borderRadius: 5 }]
     },
     options: {
       indexAxis: 'y',
-      scales: { x: { max: 30, beginAtZero: true } },
-      plugins: {
-        tooltip: {
-          callbacks: {
-            label: (ctx) => tooltipsSoal[ctx.dataIndex]
-          }
-        }
-      }
+      plugins: { 
+        legend: { display: false },
+        tooltip: { callbacks: { label: (ctx) => tooltipsSoal[ctx.dataIndex] } }
+      },
+      scales: { x: { max: 30, beginAtZero: true } }
     }
   });
 
-  // Chart Target Skor
+  // Chart Skor (Max 1000)
   chartSkor = new Chart(document.getElementById("chartSkor"), {
     type: 'bar',
     data: {
       labels: labels,
-      datasets: [{
-        label: 'Target Skor Yang Harus Dicapai',
-        data: dataSkor,
-        backgroundColor: colorsSkor
-      }]
+      datasets: [{ data: dataSkor, backgroundColor: colorsSkor, borderRadius: 5 }]
     },
     options: {
       indexAxis: 'y',
+      plugins: { legend: { display: false } },
       scales: { x: { max: 1000, beginAtZero: true } }
     }
   });
