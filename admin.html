@@ -1169,7 +1169,7 @@ async function getAiRecommendation(p1, p2) {
 
 
 // ================= TARGET BELAJAR ==================
-// ================= TARGET BELAJAR (STRUKTUR FIX) ==================
+// ================= TARGET BELAJAR (SEARCHABLE FIX) ==================
 function loadTarget() {
   const ptnList = [...new Set(snbt.map(item => item[1]))].sort();
 
@@ -1177,25 +1177,25 @@ function loadTarget() {
     <div class="card">
       <h3 style="margin-top:0">🎯 Analisis Target Belajar SNBT 2026</h3>
       <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px; margin-bottom:20px;">
-        <select id="filterPtnTarget" onchange="updateProdiTarget()">
+        <select id="filterPtnTarget" placeholder="Cari PTN...">
           <option value="">-- Pilih PTN --</option>
           ${ptnList.map(p => `<option value="${p}">${p}</option>`).join("")}
         </select>
-        <select id="filterProdiTarget" onchange="hitungTarget()">
+        <select id="filterProdiTarget" placeholder="Cari Prodi...">
           <option value="">-- Pilih Prodi --</option>
         </select>
       </div>
 
       <div id="targetCards" style="display:none; grid-template-columns: 1fr 1fr 1fr; gap:15px; margin-bottom:25px;">
-        <div class="card" style="background:#e3f2fd; border-left:5px solid #2196f3; margin:0; padding:15px; box-shadow:none; border-top:1px solid #ddd; border-right:1px solid #ddd; border-bottom:1px solid #ddd;">
+        <div class="card" style="background:#e3f2fd; border-left:5px solid #2196f3; margin:0; padding:15px; box-shadow:none; border:1px solid #ddd;">
           <small>Skor Aman Prodi</small>
           <h2 id="cardSkor" style="margin:5px 0 0 0; color:#1565c0;">0</h2>
         </div>
-        <div class="card" style="background:#fff3e0; border-left:5px solid #ff9800; margin:0; padding:15px; box-shadow:none; border-top:1px solid #ddd; border-right:1px solid #ddd; border-bottom:1px solid #ddd;">
+        <div class="card" style="background:#fff3e0; border-left:5px solid #ff9800; margin:0; padding:15px; box-shadow:none; border:1px solid #ddd;">
           <small>Materi Utama 1</small>
           <h4 id="cardMat1" style="margin:5px 0 0 0; color:#e65100;">-</h4>
         </div>
-        <div class="card" style="background:#f1f8e9; border-left:5px solid #4caf50; margin:0; padding:15px; box-shadow:none; border-top:1px solid #ddd; border-right:1px solid #ddd; border-bottom:1px solid #ddd;">
+        <div class="card" style="background:#f1f8e9; border-left:5px solid #4caf50; margin:0; padding:15px; box-shadow:none; border:1px solid #ddd;">
           <small>Materi Utama 2</small>
           <h4 id="cardMat2" style="margin:5px 0 0 0; color:#1b5e20;">-</h4>
         </div>
@@ -1212,37 +1212,53 @@ function loadTarget() {
         </div>
       </div>
     </div>`;
+
+  // INISIALISASI TOM SELECT (Agar bisa diketik)
+  initializeSearchableSelect("filterPtnTarget", "Cari PTN...", (val) => {
+    updateProdiTarget(val);
+  });
+
+  initializeSearchableSelect("filterProdiTarget", "Cari Prodi...", (val) => {
+    hitungTarget(val);
+  });
 }
 
-function updateProdiTarget() {
-  const ptn = document.getElementById("filterPtnTarget").value;
-  const prodiSel = document.getElementById("filterProdiTarget");
-  prodiSel.innerHTML = '<option value="">-- Pilih Prodi --</option>';
+function updateProdiTarget(ptn) {
+  const prodiSelect = document.getElementById("filterProdiTarget");
+  if (!prodiSelect || !prodiSelect.tomselect) return;
 
-  // Filter berdasarkan nama PTN di indeks 1
-  snbt.filter(item => item[1] === ptn).forEach(item => {
-    const opt = document.createElement("option");
-    opt.value = ptn + "|" + item[2]; 
-    opt.innerText = item[2]; 
-    prodiSel.appendChild(opt);
-  });
+  const ts = prodiSelect.tomselect;
+  ts.clear();
+  ts.clearOptions();
+
+  if (ptn) {
+    const filtered = snbt.filter(item => item[1] === ptn);
+    const options = filtered.map(item => ({
+      value: ptn + "|" + item[2],
+      text: item[2]
+    }));
+    ts.addOptions(options);
+  }
 }
 
 let chartSoal, chartSkor;
 
-function hitungTarget() {
-  const val = document.getElementById("filterProdiTarget").value;
-  if(!val) return;
+function hitungTarget(val) {
+  // Nilai 'val' sekarang dikirim langsung oleh Tom Select
+  if(!val) {
+    document.getElementById("targetCards").style.display = "none";
+    document.getElementById("diagramSection").style.display = "none";
+    return;
+  };
   
   const [ptn, prodiName] = val.split("|");
   const data = snbt.find(item => item[1] === ptn && item[2] === prodiName);
 
   if (!data) return;
 
-  // PEMANGGILAN DATA SESUAI STRUKTUR USER:
-  const skorAman = parseFloat(data[8]) || 0; // Kolom skor (indeks 8)
-  const mat1 = (data[9] || "").toString().toUpperCase().trim(); // Kolom materi1 (indeks 9)
-  const mat2 = (data[10] || "").toString().toUpperCase().trim(); // Kolom materi2 (indeks 10)
+  const skorAman = parseFloat(data[8]) || 0; 
+  const mat1 = (data[9] || "").toString().toUpperCase().trim(); 
+  const mat2 = (data[10] || "").toString().toUpperCase().trim(); 
 
   document.getElementById("targetCards").style.display = "grid";
   document.getElementById("diagramSection").style.display = "grid";
@@ -1251,7 +1267,6 @@ function hitungTarget() {
   document.getElementById("cardMat2").innerText = mat2 || "-";
 
   const ratio = skorAman / 1000;
-
   const subtesConfig = [
     { key: "PU",  m: 12, s: 14, h: 4,  km: 18, ks: 36, kh: 70 },
     { key: "PPU", m: 7,  s: 11, h: 2,  km: 30, ks: 55, kh: 92 },
@@ -1265,61 +1280,44 @@ function hitungTarget() {
   const labels = [], dataSoal = [], dataSkor = [], colorsSoal = [], colorsSkor = [], tooltipsSoal = [];
 
   subtesConfig.forEach(s => {
-    // Hitung jumlah soal (dibulatkan bilangan bulat)
     let mud = Math.round(ratio * s.m);
     let sed = Math.round(ratio * s.s);
     let sus = Math.round(ratio * s.h);
-    
-    // Logika Skor Dasar
     let nSkor = (mud * s.km) + (sed * s.ks) + (sus * s.kh);
 
-    // Cek Prioritas Subtes
     const isPriority = (s.key === mat1 || s.key === mat2);
-    
     if (isPriority) {
-      sus += 1; // Soal susah bertambah 1
-      nSkor += 100; // Skor bertambah 100
-      colorsSoal.push("#f44336"); // Merah
-      colorsSkor.push("#f44336"); // Merah
+      sus += 1;
+      nSkor += 100;
+      colorsSoal.push("#f44336");
+      colorsSkor.push("#f44336");
     } else {
-      colorsSoal.push("#2196f3"); // Biru
-      colorsSkor.push("#4caf50"); // Hijau
+      colorsSoal.push("#2196f3");
+      colorsSkor.push("#4caf50");
     }
 
-    const totalS = mud + sed + sus;
     labels.push(s.key);
-    dataSoal.push(totalS);
+    dataSoal.push(mud + sed + sus);
     dataSkor.push(Math.round(nSkor));
-    tooltipsSoal.push(`Total Soal: ${totalS}, Mudah: ${mud}, Sedang: ${sed}, Susah: ${sus}`);
+    tooltipsSoal.push(`Total Soal: ${mud+sed+sus}, Mudah: ${mud}, Sedang: ${sed}, Susah: ${sus}`);
   });
 
   if (chartSoal) chartSoal.destroy();
   if (chartSkor) chartSkor.destroy();
 
-  // Chart Soal (Max 30)
   chartSoal = new Chart(document.getElementById("chartSoal"), {
     type: 'bar',
-    data: {
-      labels: labels,
-      datasets: [{ data: dataSoal, backgroundColor: colorsSoal, borderRadius: 5 }]
-    },
+    data: { labels: labels, datasets: [{ data: dataSoal, backgroundColor: colorsSoal, borderRadius: 5 }] },
     options: {
       indexAxis: 'y',
-      plugins: { 
-        legend: { display: false },
-        tooltip: { callbacks: { label: (ctx) => tooltipsSoal[ctx.dataIndex] } }
-      },
+      plugins: { legend: { display: false }, tooltip: { callbacks: { label: (ctx) => tooltipsSoal[ctx.dataIndex] } } },
       scales: { x: { max: 30, beginAtZero: true } }
     }
   });
 
-  // Chart Skor (Max 1000)
   chartSkor = new Chart(document.getElementById("chartSkor"), {
     type: 'bar',
-    data: {
-      labels: labels,
-      datasets: [{ data: dataSkor, backgroundColor: colorsSkor, borderRadius: 5 }]
-    },
+    data: { labels: labels, datasets: [{ data: dataSkor, backgroundColor: colorsSkor, borderRadius: 5 }] },
     options: {
       indexAxis: 'y',
       plugins: { legend: { display: false } },
