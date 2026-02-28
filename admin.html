@@ -1234,12 +1234,12 @@ function loadTarget() {
       <h3 style="margin-top:0">🎯 Analisis Target Belajar SNBT 2026</h3>
       
       <div style="margin-bottom:20px;">
-        <input list="ptnTargetList" id="filterPtnTarget" placeholder="Ketik nama PTN..." oninput="updateProdiTarget()" style="width:100%; padding:12px; border-radius:12px; border:1px solid #ddd; margin-bottom:10px;">
+        <input list="ptnTargetList" id="filterPtnTarget" placeholder="Pilih PTN..." oninput="updateProdiTarget()" style="width:100%; padding:12px; border-radius:12px; border:1px solid #ddd; margin-bottom:10px;">
         <datalist id="ptnTargetList">
           ${ptnList.map(p => `<option value="${p}">`).join("")}
         </datalist>
         
-        <input list="prodiTargetList" id="filterProdiTarget" placeholder="Ketik nama Prodi..." oninput="hitungTarget()" style="width:100%; padding:12px; border-radius:12px; border:1px solid #ddd;">
+        <input list="prodiTargetList" id="filterProdiTarget" placeholder="Pilih Prodi..." oninput="hitungTarget()" style="width:100%; padding:12px; border-radius:12px; border:1px solid #ddd;">
         <datalist id="prodiTargetList"></datalist>
       </div>
 
