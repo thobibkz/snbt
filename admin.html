@@ -1169,19 +1169,174 @@ async function getAiRecommendation(p1, p2) {
 
 
 // ================= TARGET BELAJAR ==================
-function loadTarget(){
-  document.getElementById("content").innerHTML=`
-  <div class="card">
-    <h3>🎯 Target Belajar</h3>
-    <input type="number" id="targetSkor" placeholder="Target skor kamu">
-    <div id="hasilTarget" class="result"></div>
-  </div>`;
 
-  document.getElementById("targetSkor").oninput=function(){
-    document.getElementById("hasilTarget").innerHTML=
-      "Kamu harus fokus meningkatkan latihan agar mencapai skor tersebut.";
-  };
+function loadTarget() {
+  // Ambil daftar PTN unik untuk filter
+  const ptnList = [...new Set(snbt.map(item => item[1]))].sort();
+
+  document.getElementById("content").innerHTML = `
+    <div class="card">
+      <h3>🎯 Analisis Target Belajar SNBT 2026</h3>
+      <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px; margin-bottom:20px;">
+        <select id="filterPtnTarget" onchange="updateProdiTarget()">
+          <option value="">-- Pilih PTN --</option>
+          ${ptnList.map(p => `<option value="${p}">${p}</option>`).join("")}
+        </select>
+        <select id="filterProdiTarget" onchange="hitungTarget()">
+          <option value="">-- Pilih Prodi --</option>
+        </select>
+      </div>
+
+      <div id="targetCards" style="display:none; grid-template-columns: 1fr 1fr 1fr; gap:15px; margin-bottom:25px;">
+        <div class="card" style="background:#e3f2fd; border-left:5px solid #2196f3; margin:0; padding:15px;">
+          <small>Skor Aman Prodi</small>
+          <h2 id="cardSkor" style="margin:5px 0 0 0;">0</h2>
+        </div>
+        <div class="card" style="background:#fff3e0; border-left:5px solid #ff9800; margin:0; padding:15px;">
+          <small>Materi Utama 1</small>
+          <h4 id="cardMat1" style="margin:5px 0 0 0;">-</h4>
+        </div>
+        <div class="card" style="background:#f1f8e9; border-left:5px solid #4caf50; margin:0; padding:15px;">
+          <small>Materi Utama 2</small>
+          <h4 id="cardMat2" style="margin:5px 0 0 0;">-</h4>
+        </div>
+      </div>
+
+      <div id="diagramSection" style="display:none; display:grid; grid-template-columns: 1fr 1fr; gap:20px;">
+        <div>
+          <canvas id="chartSoal"></canvas>
+        </div>
+        <div>
+          <canvas id="chartSkor"></canvas>
+        </div>
+      </div>
+    </div>`;
 }
+
+function updateProdiTarget() {
+  const ptn = document.getElementById("filterPtnTarget").value;
+  const prodiSel = document.getElementById("filterProdiTarget");
+  prodiSel.innerHTML = '<option value="">-- Pilih Prodi --</option>';
+
+  snbt.filter(item => item[1] === ptn).forEach(item => {
+    const opt = document.createElement("option");
+    opt.value = item[0]; // ID atau Index
+    opt.innerText = item[2]; // Nama Prodi
+    prodiSel.appendChild(opt);
+  });
+}
+
+let chartSoal, chartSkor;
+
+function hitungTarget() {
+  const ptn = document.getElementById("filterPtnTarget").value;
+  const prodiName = document.getElementById("filterProdiTarget").options[document.getElementById("filterProdiTarget").selectedIndex].text;
+  const data = snbt.find(item => item[1] === ptn && item[2] === prodiName);
+
+  if (!data) return;
+
+  document.getElementById("targetCards").style.display = "grid";
+  document.getElementById("diagramSection").style.display = "grid";
+
+  const skorAman = parseFloat(data[8]);
+  const mat1 = data[10]; // Materi 1
+  const mat2 = data[11]; // Materi 2
+  const ratio = skorAman / 1000;
+
+  document.getElementById("cardSkor").innerText = skorAman;
+  document.getElementById("cardMat1").innerText = mat1;
+  document.getElementById("cardMat2").innerText = mat2;
+
+  // Konfigurasi Subtes
+  const subtes = [
+    { key: "PU",  m: 12, s: 14, h: 4,  km: 18, ks: 36, kh: 70 },
+    { key: "PPU", m: 7,  s: 11, h: 2,  km: 30, ks: 55, kh: 92 },
+    { key: "PBM", m: 12, s: 6,  h: 2,  km: 36, ks: 58, kh: 110 },
+    { key: "PK",  m: 10, s: 6,  h: 4,  km: 39, ks: 52, kh: 74 },
+    { key: "LBI", m: 14, s: 14, h: 2,  km: 19, ks: 39, kh: 96 },
+    { key: "LBE", m: 7,  s: 10, h: 3,  km: 31, ks: 52, kh: 88 },
+    { key: "PM",  m: 10, s: 7,  h: 3,  km: 34, ks: 58, kh: 84 }
+  ];
+
+  const labels = subtes.map(s => s.key);
+  const dataSoal = [];
+  const dataSkor = [];
+  const colorsSoal = [];
+  const colorsSkor = [];
+  const tooltipsSoal = [];
+
+  subtes.forEach(s => {
+    let mud = Math.round(ratio * s.m);
+    let sed = Math.round(ratio * s.s);
+    let sus = Math.round(ratio * s.h);
+    let nSkor = Math.round((mud * s.km) + (sed * s.ks) + (sus * s.kh));
+
+    const isPriority = (s.key === mat1 || s.key === mat2);
+    
+    if (isPriority) {
+      sus += 1;
+      nSkor += 100;
+      colorsSoal.push("#f44336");
+      colorsSkor.push("#f44336");
+    } else {
+      colorsSoal.push("#2196f3");
+      colorsSkor.push("#4caf50");
+    }
+
+    const totalS = mud + sed + sus;
+    dataSoal.push(totalS);
+    dataSkor.push(nSkor);
+    tooltipsSoal.push(`Total Soal: ${totalS}, Mudah: ${mud}, Sedang: ${sed}, Susah: ${sus}`);
+  });
+
+  // Hancurkan chart lama jika ada
+  if (chartSoal) chartSoal.destroy();
+  if (chartSkor) chartSkor.destroy();
+
+  // Chart Target Soal
+  chartSoal = new Chart(document.getElementById("chartSoal"), {
+    type: 'bar',
+    data: {
+      labels: labels,
+      datasets: [{
+        label: 'Target Soal Yang Harus Dicapai',
+        data: dataSoal,
+        backgroundColor: colorsSoal
+      }]
+    },
+    options: {
+      indexAxis: 'y',
+      scales: { x: { max: 30, beginAtZero: true } },
+      plugins: {
+        tooltip: {
+          callbacks: {
+            label: (ctx) => tooltipsSoal[ctx.dataIndex]
+          }
+        }
+      }
+    }
+  });
+
+  // Chart Target Skor
+  chartSkor = new Chart(document.getElementById("chartSkor"), {
+    type: 'bar',
+    data: {
+      labels: labels,
+      datasets: [{
+        label: 'Target Skor Yang Harus Dicapai',
+        data: dataSkor,
+        backgroundColor: colorsSkor
+      }]
+    },
+    options: {
+      indexAxis: 'y',
+      scales: { x: { max: 1000, beginAtZero: true } }
+    }
+  });
+}
+
+
+    
 </script>
 
 <!-- ADMIN PROTECTION -->
