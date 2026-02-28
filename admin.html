@@ -1178,13 +1178,13 @@ function loadTarget() {
       
       <div style="margin-bottom:20px;">
         <label style="font-size:12px; color:var(--muted)">Cari Perguruan Tinggi:</label>
-        <select id="filterPtnTarget" style="width:100%">
+        <select id="filterPtnTarget" placeholder="Ketik nama PTN...">
           <option value="">-- Pilih PTN --</option>
           ${ptnList.map(p => `<option value="${p}">${p}</option>`).join("")}
         </select>
         
         <label style="font-size:12px; color:var(--muted); margin-top:10px; display:block;">Cari Program Studi:</label>
-        <select id="filterProdiTarget" style="width:100%">
+        <select id="filterProdiTarget" placeholder="Ketik nama Prodi...">
           <option value="">-- Pilih Prodi --</option>
         </select>
       </div>
@@ -1216,44 +1216,43 @@ function loadTarget() {
       </div>
     </div>`;
 
-  // INISIALISASI SELECT2 (Agar Searchable)
-  $(document).ready(function() {
-    $('#filterPtnTarget').select2({
-      placeholder: "Ketik nama PTN...",
-      allowClear: true
-    }).on('change', function() {
-      updateProdiTarget(this.value);
-    });
+  // Inisialisasi Tom Select seperti pada menu lainnya
+  const tsPtn = new TomSelect("#filterPtnTarget", {
+    create: false,
+    sortField: { field: "text", order: "asc" },
+    onChange: function(val) {
+      updateProdiTarget(val);
+    }
+  });
 
-    $('#filterProdiTarget').select2({
-      placeholder: "Ketik nama Prodi...",
-      allowClear: true
-    }).on('change', function() {
-      hitungTarget();
-    });
+  // Inisialisasi Tom Select untuk Prodi (kosong dulu)
+  window.tsProdiTarget = new TomSelect("#filterProdiTarget", {
+    create: false,
+    onChange: function(val) {
+      hitungTarget(val);
+    }
   });
 }
 
 function updateProdiTarget(ptn) {
-  const prodiSel = $('#filterProdiTarget');
-  prodiSel.empty().append('<option value="">-- Pilih Prodi --</option>');
+  if(!window.tsProdiTarget) return;
+  
+  // Hapus opsi lama
+  window.tsProdiTarget.clear();
+  window.tsProdiTarget.clearOptions();
 
   if (ptn) {
     const filtered = snbt.filter(item => item[1] === ptn);
-    filtered.forEach(item => {
-      // Index 2 adalah nama_prodi
-      prodiSel.append(new Option(item[2], ptn + "|" + item[2]));
-    });
+    const options = filtered.map(item => ({
+      value: ptn + "|" + item[2],
+      text: item[2]
+    }));
+    
+    window.tsProdiTarget.addOptions(options);
   }
-
-  // Penting: Trigger change agar Select2 sadar ada data baru
-  prodiSel.trigger('change');
 }
 
-let chartSoal, chartSkor;
-
-function hitungTarget() {
-  const val = $('#filterProdiTarget').val();
+function hitungTarget(val) {
   if (!val) {
     document.getElementById("targetCards").style.display = "none";
     document.getElementById("diagramSection").style.display = "none";
@@ -1265,7 +1264,7 @@ function hitungTarget() {
 
   if (!data) return;
 
-  // Struktur: 8:skor, 9:materi1, 10:materi2
+  // Sesuai struktur Anda (8:skor, 9:materi1, 10:materi2)
   const skorAman = parseFloat(data[8]) || 0;
   const mat1 = (data[9] || "").toString().toUpperCase().trim();
   const mat2 = (data[10] || "").toString().toUpperCase().trim();
@@ -1277,8 +1276,6 @@ function hitungTarget() {
   document.getElementById("cardMat2").innerText = mat2 || "-";
 
   const ratio = skorAman / 1000;
-
-  // Konfigurasi Subtes
   const subtesConfig = [
     { key: "PU",  m: 12, s: 14, h: 4,  km: 18, ks: 36, kh: 70 },
     { key: "PPU", m: 7,  s: 11, h: 2,  km: 30, ks: 55, kh: 92 },
@@ -1298,60 +1295,41 @@ function hitungTarget() {
     let nSkor = (mud * s.km) + (sed * s.ks) + (sus * s.kh);
 
     const isPriority = (s.key === mat1 || s.key === mat2);
-    
     if (isPriority) {
       sus += 1;
       nSkor += 100;
-      colorsSoal.push("#f44336"); // Merah
+      colorsSoal.push("#f44336");
       colorsSkor.push("#f44336");
     } else {
-      colorsSoal.push("#2196f3"); // Biru
-      colorsSkor.push("#4caf50"); // Hijau
+      colorsSoal.push("#2196f3");
+      colorsSkor.push("#4caf50");
     }
-
-    const totalS = mud + sed + sus;
-    labels.push(s.key);
-    dataSoal.push(totalS);
+    dataSoal.push(mud + sed + sus);
     dataSkor.push(Math.round(nSkor));
-    tooltipsSoal.push(`Total Soal: ${totalS}, Mudah: ${mud}, Sedang: ${sed}, Susah: ${sus}`);
+    labels.push(s.key);
+    tooltipsSoal.push(`Total Soal: ${mud+sed+sus}, Mudah: ${mud}, Sedang: ${sed}, Susah: ${sus}`);
   });
 
-  if (chartSoal) chartSoal.destroy();
-  if (chartSkor) chartSkor.destroy();
+  if (window.chartSoal) window.chartSoal.destroy();
+  if (window.chartSkor) window.chartSkor.destroy();
 
-  // Render Charts (Tetap sama seperti sebelumnya)
   renderCharts(labels, dataSoal, dataSkor, colorsSoal, colorsSkor, tooltipsSoal);
 }
 
-// Fungsi bantu untuk merender chart agar kode lebih bersih
 function renderCharts(labels, dataSoal, dataSkor, colorsSoal, colorsSkor, tooltipsSoal) {
-  chartSoal = new Chart(document.getElementById("chartSoal"), {
+  const ctxSoal = document.getElementById("chartSoal");
+  const ctxSkor = document.getElementById("chartSkor");
+  
+  window.chartSoal = new Chart(ctxSoal, {
     type: 'bar',
-    data: {
-      labels: labels,
-      datasets: [{ data: dataSoal, backgroundColor: colorsSoal, borderRadius: 5 }]
-    },
-    options: {
-      indexAxis: 'y',
-      plugins: { 
-        legend: { display: false },
-        tooltip: { callbacks: { label: (ctx) => tooltipsSoal[ctx.dataIndex] } }
-      },
-      scales: { x: { max: 30, beginAtZero: true } }
-    }
+    data: { labels: labels, datasets: [{ data: dataSoal, backgroundColor: colorsSoal, borderRadius: 5 }] },
+    options: { indexAxis: 'y', plugins: { legend: { display: false }, tooltip: { callbacks: { label: (ctx) => tooltipsSoal[ctx.dataIndex] } } }, scales: { x: { max: 30, beginAtZero: true } } }
   });
 
-  chartSkor = new Chart(document.getElementById("chartSkor"), {
+  window.chartSkor = new Chart(ctxSkor, {
     type: 'bar',
-    data: {
-      labels: labels,
-      datasets: [{ data: dataSkor, backgroundColor: colorsSkor, borderRadius: 5 }]
-    },
-    options: {
-      indexAxis: 'y',
-      plugins: { legend: { display: false } },
-      scales: { x: { max: 1000, beginAtZero: true } }
-    }
+    data: { labels: labels, datasets: [{ data: dataSkor, backgroundColor: colorsSkor, borderRadius: 5 }] },
+    options: { indexAxis: 'y', plugins: { legend: { display: false } }, scales: { x: { max: 1000, beginAtZero: true } } }
   });
 }
 
