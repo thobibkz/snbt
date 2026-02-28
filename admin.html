@@ -1216,30 +1216,23 @@ function loadTarget() {
       </div>
     </div>`;
 
-  // Inisialisasi Tom Select seperti pada menu lainnya
-  const tsPtn = new TomSelect("#filterPtnTarget", {
-    create: false,
-    sortField: { field: "text", order: "asc" },
-    onChange: function(val) {
-      updateProdiTarget(val);
-    }
+  // MENGGUNAKAN FUNGSI PEMBANTU YANG SUDAH ADA DI ADMIN.HTML ANDA
+  initializeSearchableSelect("filterPtnTarget", "Pilih PTN...", (val) => {
+    updateProdiTarget(val);
   });
 
-  // Inisialisasi Tom Select untuk Prodi (kosong dulu)
-  window.tsProdiTarget = new TomSelect("#filterProdiTarget", {
-    create: false,
-    onChange: function(val) {
-      hitungTarget(val);
-    }
+  initializeSearchableSelect("filterProdiTarget", "Pilih Prodi...", (val) => {
+    hitungTarget(val);
   });
 }
 
 function updateProdiTarget(ptn) {
-  if(!window.tsProdiTarget) return;
-  
-  // Hapus opsi lama
-  window.tsProdiTarget.clear();
-  window.tsProdiTarget.clearOptions();
+  const prodiSelect = document.getElementById("filterProdiTarget");
+  if (!prodiSelect || !prodiSelect.tomselect) return;
+
+  const ts = prodiSelect.tomselect;
+  ts.clear();
+  ts.clearOptions();
 
   if (ptn) {
     const filtered = snbt.filter(item => item[1] === ptn);
@@ -1247,8 +1240,7 @@ function updateProdiTarget(ptn) {
       value: ptn + "|" + item[2],
       text: item[2]
     }));
-    
-    window.tsProdiTarget.addOptions(options);
+    ts.addOptions(options);
   }
 }
 
@@ -1264,7 +1256,7 @@ function hitungTarget(val) {
 
   if (!data) return;
 
-  // Sesuai struktur Anda (8:skor, 9:materi1, 10:materi2)
+  // Skor ada di indeks 8, Materi1 di 9, Materi2 di 10
   const skorAman = parseFloat(data[8]) || 0;
   const mat1 = (data[9] || "").toString().toUpperCase().trim();
   const mat2 = (data[10] || "").toString().toUpperCase().trim();
@@ -1316,25 +1308,21 @@ function hitungTarget(val) {
   renderCharts(labels, dataSoal, dataSkor, colorsSoal, colorsSkor, tooltipsSoal);
 }
 
+// Gunakan fungsi render yang sudah ada atau buat di bawah hitungTarget
 function renderCharts(labels, dataSoal, dataSkor, colorsSoal, colorsSkor, tooltipsSoal) {
-  const ctxSoal = document.getElementById("chartSoal");
-  const ctxSkor = document.getElementById("chartSkor");
-  
-  window.chartSoal = new Chart(ctxSoal, {
+  window.chartSoal = new Chart(document.getElementById("chartSoal"), {
     type: 'bar',
     data: { labels: labels, datasets: [{ data: dataSoal, backgroundColor: colorsSoal, borderRadius: 5 }] },
     options: { indexAxis: 'y', plugins: { legend: { display: false }, tooltip: { callbacks: { label: (ctx) => tooltipsSoal[ctx.dataIndex] } } }, scales: { x: { max: 30, beginAtZero: true } } }
   });
 
-  window.chartSkor = new Chart(ctxSkor, {
+  window.chartSkor = new Chart(document.getElementById("chartSkor"), {
     type: 'bar',
     data: { labels: labels, datasets: [{ data: dataSkor, backgroundColor: colorsSkor, borderRadius: 5 }] },
     options: { indexAxis: 'y', plugins: { legend: { display: false } }, scales: { x: { max: 1000, beginAtZero: true } } }
   });
 }
-
-
-    
+  
 </script>
 
 <!-- ADMIN PROTECTION -->
