@@ -361,12 +361,12 @@ function animateValue(element, start, end, duration, isPercent=false){
 }
   
 // ================= GLOBAL DATA ==================
-let snbt=[];
-// Objek untuk menyimpan state input di setiap menu
+let snbt = [];
 let inputState = {
-  peluang: { ptn: "", prodi: "", PU: "", PPU: "", PBM: "", PK: "", LBI: "", LBE: "", PM: "", hasil: "" },
-  saran: { PU: "", PPU: "", PBM: "", PK: "", LBI: "", LBE: "", PM: "", hasil: "" },
-  target: { ptn: "", prodi: "" }
+  // Skor disimpan di satu tempat agar sinkron antar menu
+  skor: { PU: "", PPU: "", PBM: "", PK: "", LBI: "", LBE: "", PM: "" },
+  peluang: { ptn: "", prodi: "", hasil: "" },
+  saran: { hasil: "" }
 };
 
     
@@ -545,7 +545,8 @@ function showData(){
 // ================= PELUANG LOLOS ==================
 function loadPeluang(){
   const s = inputState.peluang; // Shortcut agar kode lebih pendek
-  
+  const k = inputState.skor; // Ambil skor global
+    
   document.getElementById("content").innerHTML = `
   <div class="card">
     <h3 style="text-align:left; margin-bottom:20px;">📊 Cek Peluang Lolos</h3>
@@ -600,6 +601,15 @@ function updateProdiList(ptnName) {
     });
 }
 
+function saveSkor(prefix = "") {
+  const ids = ["PU", "PPU", "PBM", "PK", "LBI", "LBE", "PM"];
+  ids.forEach(id => {
+    // prefix "" untuk Peluang, prefix "s" untuk Saran
+    const val = document.getElementById(prefix + id).value;
+    inputState.skor[id] = val;
+  });
+}
+    
 function savePeluangInput() {
   const s = inputState.peluang;
   s.ptn = document.getElementById("ptnPeluang").value;
@@ -641,30 +651,24 @@ function loadProdiPeluang(){
 }
 
 function resetPeluang() {
-  // 1. Bersihkan data di memori global (inputState)
+  // 1. Bersihkan data spesifik peluang (PTN, Prodi, dan Teks Hasil)
   inputState.peluang = { 
     ptn: "", 
     prodi: "", 
-    PU: "", 
-    PPU: "", 
-    PBM: "", 
-    PK: "", 
-    LBI: "", 
-    LBE: "", 
-    PM: "", 
     hasil: "" 
   };
 
-  // 2. Bersihkan tampilan input yang ada di layar saat ini
-  document.getElementById("ptnPeluang").value = "";
-  document.getElementById("prodiPeluang").value = "";
-  document.querySelectorAll(".input-row input").forEach(i => i.value = "");
-  
-  // 3. Bersihkan area hasil (termasuk chart yang mungkin ada)
-  document.getElementById("hasilPeluang").innerHTML = "";
+  // 2. Bersihkan pusat data skor (Global Skor)
+  // Ini akan otomatis membuat skor di menu Saran Prodi juga ikut terhapus
+  inputState.skor = { 
+    PU: "", PPU: "", PBM: "", PK: "", LBI: "", LBE: "", PM: "" 
+  };
 
-  // 4. (Opsional) Panggil ulang load agar datalist kembali ke kondisi awal
+  // 3. Muat ulang menu Peluang agar tampilan kembali kosong bersih
   loadPeluang();
+  
+  // Catatan: Anda tidak perlu lagi manual mengosongkan .value atau .innerHTML 
+  // karena fungsi loadPeluang() akan merender ulang tampilan berdasarkan inputState yang sudah kosong.
 }
 
 function prosesPeluang() {
@@ -884,18 +888,22 @@ function renderChartPie(persen) {
   
 // ================= SARAN PRODI ==================
 function loadSaran(){
+  // Ambil data dari penyimpanan global
+  const k = inputState.skor;
+  const h = inputState.saran.hasil;
+
   document.getElementById("content").innerHTML = `
   <div class="card">
     <h3 style="margin-bottom:20px;">💡 Saran Prodi Berdasarkan Skor</h3>
     
     <div class="input-row">
-      <input type="number" id="sPU" placeholder="PU">
-      <input type="number" id="sPPU" placeholder="PPU">
-      <input type="number" id="sPBM" placeholder="PBM">
-      <input type="number" id="sPK" placeholder="PK">
-      <input type="number" id="sLBI" placeholder="LBI">
-      <input type="number" id="sLBE" placeholder="LBE">
-      <input type="number" id="sPM" placeholder="PM">
+      <input type="number" id="sPU" placeholder="PU" value="${k.PU}" oninput="saveSkor('s')">
+      <input type="number" id="sPPU" placeholder="PPU" value="${k.PPU}" oninput="saveSkor('s')">
+      <input type="number" id="sPBM" placeholder="PBM" value="${k.PBM}" oninput="saveSkor('s')">
+      <input type="number" id="sPK" placeholder="PK" value="${k.PK}" oninput="saveSkor('s')">
+      <input type="number" id="sLBI" placeholder="LBI" value="${k.LBI}" oninput="saveSkor('s')">
+      <input type="number" id="sLBE" placeholder="LBE" value="${k.LBE}" oninput="saveSkor('s')">
+      <input type="number" id="sPM" placeholder="PM" value="${k.PM}" oninput="saveSkor('s')">
     </div>
 
     <div style="margin-top:20px; display:flex; gap:12px; align-items:center; justify-content:center;">
@@ -903,14 +911,18 @@ function loadSaran(){
       <button onclick="resetSaran()" class="btn-3d-reset" style="padding: 8px 15px; font-size:12px; background:linear-gradient(145deg, #fee2e2, #fca5a5); color:#991b1b; border:1px solid #f87171;">Reset</button>
     </div>
 
-    <div id="hasilSaranUtama" style="margin-top:30px;"></div>
+    <div id="hasilSaranUtama" style="margin-top:30px;">${h}</div>
   </div>`;
 }
 
 function resetSaran() {
-  const ids = ["sPU", "sPPU", "sPBM", "sPK", "sLBI", "sLBE", "sPM"];
-  ids.forEach(id => document.getElementById(id).value = "");
-  document.getElementById("hasilSaranUtama").innerHTML = "";
+  // Kosongkan skor di memori global
+  inputState.skor = { PU: "", PPU: "", PBM: "", PK: "", LBI: "", LBE: "", PM: "" };
+  // Kosongkan hasil pencarian saran
+  inputState.saran.hasil = "";
+  
+  // Muat ulang tampilan menu agar kosong
+  loadSaran();
 }
 
 let currentPageRerata = 1;
@@ -926,6 +938,8 @@ function cariSaranProdi() {
     LBI: parseFloat(document.getElementById("sLBI").value) || 0,
     LBE: parseFloat(document.getElementById("sLBE").value) || 0,
     PM: parseFloat(document.getElementById("sPM").value) || 0
+ // Tambahkan di baris terakhir fungsi cariSaranProdi()
+inputState.saran.hasil = document.getElementById("hasilSaranUtama").innerHTML;
   };
 
   // 1. IDENTIFIKASI 2 SUBTES TERTINGGI INPUTAN
