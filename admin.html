@@ -362,7 +362,14 @@ function animateValue(element, start, end, duration, isPercent=false){
   
 // ================= GLOBAL DATA ==================
 let snbt=[];
+// Objek untuk menyimpan state input di setiap menu
+let inputState = {
+  peluang: { ptn: "", prodi: "", PU: "", PPU: "", PBM: "", PK: "", LBI: "", LBE: "", PM: "", hasil: "" },
+  saran: { PU: "", PPU: "", PBM: "", PK: "", LBI: "", LBE: "", PM: "", hasil: "" },
+  target: { ptn: "", prodi: "" }
+};
 
+    
 fetch(API)
 .then(r=>r.json())
 .then(d=>{
@@ -537,28 +544,32 @@ function showData(){
 
 // ================= PELUANG LOLOS ==================
 function loadPeluang(){
+  const s = inputState.peluang; // Shortcut agar kode lebih pendek
+  
   document.getElementById("content").innerHTML = `
   <div class="card">
     <h3 style="text-align:left; margin-bottom:20px;">📊 Cek Peluang Lolos</h3>
 
     <div style="margin-bottom:20px;">
-      <input list="ptnListPeluang" id="ptnPeluang" placeholder="Pilih PTN...">
+      <input list="ptnListPeluang" id="ptnPeluang" placeholder="Pilih PTN..." 
+             value="${s.ptn}" oninput="savePeluangInput(); updateProdiList(this.value)">
       <datalist id="ptnListPeluang"></datalist>
 
-      <input list="prodiListPeluang" id="prodiPeluang" placeholder="Pilih Prodi...">
+      <input list="prodiListPeluang" id="prodiPeluang" placeholder="Pilih Prodi..." 
+             value="${s.prodi}" oninput="savePeluangInput()">
       <datalist id="prodiListPeluang"></datalist>
     </div>
 
     <h3 style="text-align:center; margin:20px 0 10px">Masukkan Perkiraan Skor UTBK</h3>
 
     <div class="input-row">
-      <div><input type="number" id="PU" placeholder="PU"></div>
-      <div><input type="number" id="PPU" placeholder="PPU"></div>
-      <div><input type="number" id="PBM" placeholder="PBM"></div>
-      <div><input type="number" id="PK" placeholder="PK"></div>
-      <div><input type="number" id="LBI" placeholder="LBI"></div>
-      <div><input type="number" id="LBE" placeholder="LBE"></div>
-      <div><input type="number" id="PM" placeholder="PM"></div>
+      <div><input type="number" id="PU" placeholder="PU" value="${s.PU}" oninput="savePeluangInput()"></div>
+      <div><input type="number" id="PPU" placeholder="PPU" value="${s.PPU}" oninput="savePeluangInput()"></div>
+      <div><input type="number" id="PBM" placeholder="PBM" value="${s.PBM}" oninput="savePeluangInput()"></div>
+      <div><input type="number" id="PK" placeholder="PK" value="${s.PK}" oninput="savePeluangInput()"></div>
+      <div><input type="number" id="LBI" placeholder="LBI" value="${s.LBI}" oninput="savePeluangInput()"></div>
+      <div><input type="number" id="LBE" placeholder="LBE" value="${s.LBE}" oninput="savePeluangInput()"></div>
+      <div><input type="number" id="PM" placeholder="PM" value="${s.PM}" oninput="savePeluangInput()"></div>
     </div>
 
     <div style="margin-top:25px; display:flex; gap:12px; justify-content:center; align-items:center;">
@@ -566,25 +577,42 @@ function loadPeluang(){
       <button onclick="resetPeluang()" class="btn-3d-reset" style="padding: 8px 15px; font-size:12px;">Reset</button>
     </div>
 
-    <div id="hasilPeluang"></div>
+    <div id="hasilPeluang">${s.hasil}</div>
   </div>
   `;
 
-  // Inisialisasi Datalist
+  // Inisialisasi PTN Datalist
   const ptnSet = [...new Set(snbt.map(r => r[1]))];
   const pList = document.getElementById("ptnListPeluang");
   ptnSet.forEach(x => pList.innerHTML += `<option value="${x}">`);
-
-  document.getElementById("ptnPeluang").oninput = function(){
-    const p = this.value;
-    const prList = document.getElementById("prodiListPeluang");
-    prList.innerHTML = "";
-    snbt.filter(r => r[1] == p).forEach(r => {
-      prList.innerHTML += `<option value="${r[2]}">`;
-    });
-  };
+  
+  // Jika sebelumnya sudah ada PTN terpilih, langsung munculkan daftar prodinya
+  if(s.ptn) updateProdiList(s.ptn);
 }
 
+// Fungsi pembantu untuk update list prodi
+function updateProdiList(ptnName) {
+    const prList = document.getElementById("prodiListPeluang");
+    if(!prList) return;
+    prList.innerHTML = "";
+    snbt.filter(r => r[1] == ptnName).forEach(r => {
+      prList.innerHTML += `<option value="${r[2]}">`;
+    });
+}
+
+function savePeluangInput() {
+  const s = inputState.peluang;
+  s.ptn = document.getElementById("ptnPeluang").value;
+  s.prodi = document.getElementById("prodiPeluang").value;
+  s.PU = document.getElementById("PU").value;
+  s.PPU = document.getElementById("PPU").value;
+  s.PBM = document.getElementById("PBM").value;
+  s.PK = document.getElementById("PK").value;
+  s.LBI = document.getElementById("LBI").value;
+  s.LBE = document.getElementById("LBE").value;
+  s.PM = document.getElementById("PM").value;
+}
+    
 function loadPTNPeluang(){
 
   const ptnList = [...new Set(snbt.map(x => x[1]))];
@@ -612,12 +640,31 @@ function loadProdiPeluang(){
   });
 }
 
-function resetPeluang(){
+function resetPeluang() {
+  // 1. Bersihkan data di memori global (inputState)
+  inputState.peluang = { 
+    ptn: "", 
+    prodi: "", 
+    PU: "", 
+    PPU: "", 
+    PBM: "", 
+    PK: "", 
+    LBI: "", 
+    LBE: "", 
+    PM: "", 
+    hasil: "" 
+  };
 
-  document.querySelectorAll(".input-row input")
-    .forEach(i => i.value = "");
-
+  // 2. Bersihkan tampilan input yang ada di layar saat ini
+  document.getElementById("ptnPeluang").value = "";
+  document.getElementById("prodiPeluang").value = "";
+  document.querySelectorAll(".input-row input").forEach(i => i.value = "");
+  
+  // 3. Bersihkan area hasil (termasuk chart yang mungkin ada)
   document.getElementById("hasilPeluang").innerHTML = "";
+
+  // 4. (Opsional) Panggil ulang load agar datalist kembali ke kondisi awal
+  loadPeluang();
 }
 
 function prosesPeluang() {
