@@ -16,6 +16,13 @@
   --text:#1f2d3d;
   --muted:#6b7a90;
   --shadow:0 8px 25px rgba(0,0,0,.08);
+  /* New Colors for Minimalist Buttons */
+  --primary-btn: #2563eb;
+  --primary-btn-hover: #1d4ed8;
+  --primary-btn-active: #1e40af;
+  --reset-btn: #ef4444;
+  --reset-btn-hover: #dc2626;
+  --reset-btn-active: #b91c1c;
 }
 
 *{box-sizing:border-box;font-family:Segoe UI,Arial,sans-serif;}
@@ -38,7 +45,9 @@ body{
 .header h1{margin:0;font-size:20px;font-weight:700;}
 .header p{margin-top:6px;font-size:13px;opacity:.9}
 
-/* MENU BUTTONS */
+/* ============================================================
+   MENU BUTTONS (Update: Minimalis, Elegan, Beranimasi)
+   ============================================================ */
 .menu-bar{
   display:flex;
   gap:8px;
@@ -46,18 +55,50 @@ body{
   flex-wrap:wrap;
   padding:12px;
 }
+
+/* Base style untuk tombol menu (Gaya Utama) */
 .menu-bar button{
-  background:white;
-  border:1px solid #dbe7ff;
-  padding:8px 12px;
-  border-radius:20px;
-  font-size:13px;
-  cursor:pointer;
+  background-color: white;
+  color: var(--blue);
+  border: 1px solid #dbe7ff;
+  padding: 8px 16px;
+  border-radius: 50px; /* Lebih rounded/kapsul */
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  /* Transisi halus untuk animasi */
+  transition: all 0.2s ease-out;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+  outline: none;
 }
+
+/* Animasi Hover (Saat kursor di atas tombol) */
+.menu-bar button:hover{
+  background-color: #f0f7ff;
+  transform: translateY(-2px); /* Melayang sedikit ke atas */
+  box-shadow: 0 4px 8px rgba(31, 111, 235, 0.1);
+  border-color: #bbd7ff;
+}
+
+/* Tombol Aktif (Menu terpilih) */
 .menu-bar button.active{
-  background:var(--blue);
-  color:white;
-  border:none;
+  background-color: var(--blue);
+  color: white;
+  border: none;
+  font-weight: 600;
+  box-shadow: 0 3px 10px rgba(31, 111, 235, 0.3);
+}
+
+/* Menimpa hover saat sudah aktif */
+.menu-bar button.active:hover{
+  background-color: #1a64d6;
+  transform: translateY(-2px);
+}
+
+/* Animasi Pressed (Saat dipencet) */
+.menu-bar button:active{
+  transform: translateY(1px); /* Sedikit tertekan ke bawah */
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
 }
 
 /* CARD */
@@ -221,64 +262,98 @@ select,input{
   }
 }
 
-/* ===== PRIMARY 3D BUTTON ===== */
-.btn-3d-primary{
-  background: linear-gradient(145deg, #2563eb, #1e40af);
+/* ============================================================
+   ACTION BUTTONS (Gaya Minimalis Seragam, Beranimasi)
+   ============================================================ */
+
+/* Basis Tombol Aksi (Minimalis, Seragam) */
+.btn-minimalist {
+  border: none;
+  padding: 12px 24px;
+  font-size: 15px;
+  font-weight: 600;
+  border-radius: 12px; /* Minimalist rounded corners */
+  cursor: pointer;
+  /* Transisi halus */
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  outline: none;
+}
+
+/* Animasi Hover (Seragam untuk semua tombol aksi) */
+.btn-minimalist:hover {
+  transform: translateY(-3px); /* Melayang sedikit lebih tinggi */
+  box-shadow: 0 6px 15px rgba(0,0,0,0.15); /* Bayangan lebih dalam */
+}
+
+/* Animasi Pressed (Seragam) */
+.btn-minimalist:active {
+  transform: translateY(1px); /* Sedikit tertekan ke bawah */
+  box-shadow: 0 1px 2px rgba(0,0,0,0.1); /* Bayangan tipis */
+}
+
+/* ===== PRIMARY ACTION BUTTON (Minimalist Blue) ===== */
+/* Mengubah .btn-3d-primary lama menjadi seragam minimalist */
+.btn-3d-primary {
+  /* Inherit dari basis .btn-minimalist */
+  @extend .btn-minimalist;
+  
+  /* Aturan CSS Spesifik (Blue) */
+  background-color: var(--primary-btn);
   color: white;
   border: none;
-  padding: 12px 22px;
+  padding: 12px 24px;
   font-size: 15px;
   font-weight: 600;
   border-radius: 12px;
   cursor: pointer;
-  box-shadow:
-    0 6px 0 #1e3a8a,
-    0 10px 18px rgba(0,0,0,0.25);
-  transition: all 0.15s ease;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 2px 4px rgba(37, 99, 235, 0.2);
+  outline: none;
 }
 
-.btn-3d-primary:hover{
-  transform: translateY(-2px);
-  box-shadow:
-    0 8px 0 #1e3a8a,
-    0 14px 22px rgba(0,0,0,0.3);
+.btn-3d-primary:hover {
+  background-color: var(--primary-btn-hover);
+  transform: translateY(-3px);
+  box-shadow: 0 6px 15px rgba(37, 99, 235, 0.3);
 }
 
-.btn-3d-primary:active{
-  transform: translateY(4px);
-  box-shadow:
-    0 2px 0 #1e3a8a,
-    0 5px 10px rgba(0,0,0,0.2);
+.btn-3d-primary:active {
+  background-color: var(--primary-btn-active);
+  transform: translateY(1px);
+  box-shadow: 0 1px 2px rgba(0,0,0,0.1);
 }
 
-/* ===== RESET BUTTON (SOFT 3D) ===== */
-.btn-3d-reset{
-  background: linear-gradient(145deg, #f3f4f6, #d1d5db);
-  color: #111827;
+/* ===== RESET BUTTON (Minimalist Red) ===== */
+/* Mengubah .btn-3d-reset lama menjadi minimalist merah cerah */
+.btn-3d-reset {
+  /* Inherit dari basis .btn-minimalist */
+  @extend .btn-minimalist;
+  
+  /* Aturan CSS Spesifik (Red) */
+  background-color: var(--reset-btn);
+  color: white; /* Mengubah warna teks menjadi putih agar kontras */
   border: none;
-  padding: 10px 18px;
-  font-size: 14px;
+  padding: 12px 24px; /* Padding seragam dengan tombol utama */
+  font-size: 15px; /* Font size seragam dengan tombol utama */
   font-weight: 600;
-  border-radius: 10px;
+  border-radius: 12px; /* Radius seragam dengan tombol utama */
   cursor: pointer;
-  box-shadow:
-    0 4px 0 #9ca3af,
-    0 6px 12px rgba(0,0,0,0.15);
-  transition: all 0.15s ease;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 2px 4px rgba(239, 68, 68, 0.2);
+  outline: none;
 }
 
-.btn-3d-reset:hover{
-  transform: translateY(-2px);
-  box-shadow:
-    0 6px 0 #9ca3af,
-    0 10px 16px rgba(0,0,0,0.2);
+.btn-3d-reset:hover {
+  background-color: var(--reset-btn-hover);
+  transform: translateY(-3px);
+  box-shadow: 0 6px 15px rgba(239, 68, 68, 0.3);
 }
 
-.btn-3d-reset:active{
-  transform: translateY(3px);
-  box-shadow:
-    0 1px 0 #9ca3af,
-    0 3px 6px rgba(0,0,0,0.15);
+.btn-3d-reset:active {
+  background-color: var(--reset-btn-active);
+  transform: translateY(1px);
+  box-shadow: 0 1px 2px rgba(0,0,0,0.1);
 }
 
 .card-red {
@@ -308,13 +383,11 @@ select,input{
 
 <body>
 
-<!-- HEADER -->
 <div class="header">
   <h1>APLIKASI RASIONALISASI SNBT 2026</h1>
   <p>Sistem Analisis Peluang & Rasionalisasi Jurusan SNBT 2026</p>
 </div>
 
-<!-- MENU UTAMA -->
 <div class="menu-bar">
   <button class="active" onclick="showMenu('rasionalisasi')">Rasionalisasi Prodi</button>
   <button onclick="showMenu('peluang')">Peluang Lolos</button>
@@ -323,7 +396,6 @@ select,input{
   <button onclick="showMenu('target')">Target Belajar</button>
 </div>
 
-<!-- CONTENT AREA -->
 <div id="content"></div>
 
 <script>
@@ -470,55 +542,46 @@ function showData(){
 
   <div class="result-grid">
 
-    <!-- SKOR -->
     <div class="info-card blue span-2 skor">
       <small>SKOR AMAN</small>
       <div id="skorVal" style="font-size:32px">0</div>
     </div>
 
-    <!-- KEKETATAN -->
     <div class="info-card ${katClass} keketatan">
       <small>Keketatan</small>
       <div id="keketatanVal" style="font-size:22px">0%</div>
     </div>
 
-    <!-- MATERI 1 -->
     <div class="info-card gray materi1">
       <small>Materi 1</small>
       <div style="font-size:18px">${r[9]}</div>
     </div>
 
-    <!-- PORTOFOLIO -->
     <div class="info-card gray portofolio">
       <small>Portofolio</small>
       <div style="font-size:18px">${r[3]}</div>
     </div>
 
-    <!-- KUOTA -->
     <div class="info-card green kuota">
       <small>Kuota</small>
       <div id="kuotaVal" style="font-size:26px">0</div>
     </div>
 
-    <!-- PEMINAT -->
     <div class="info-card orange peminat">
       <small>Peminat</small>
       <div id="peminatVal" style="font-size:22px">0</div>
     </div>
 
-    <!-- KATEGORI -->
     <div class="info-card ${katClass} kategori">
       <small>Kategori</small>
       <div style="font-size:20px">${r[7]}</div>
     </div>
 
-    <!-- MATERI 2 -->
     <div class="info-card gray materi2">
       <small>Materi 2</small>
       <div style="font-size:18px">${r[10]}</div>
     </div>
 
-    <!-- SARAN -->
     <div class="info-card gray saran">
       <small>Saran</small>
       <div style="font-size:16px">${r[11]}</div>
@@ -905,7 +968,7 @@ function loadSaran(){
 
     <div style="margin-top:20px; display:flex; gap:12px; align-items:center; justify-content:center;">
       <button onclick="cariSaranProdi()" class="btn-3d-primary">🚀 Cek Saran Prodi</button>
-      <button onclick="resetSaran()" class="btn-3d-reset" style="padding: 8px 15px; font-size:12px; background:linear-gradient(145deg, #fee2e2, #fca5a5); color:#991b1b; border:1px solid #f87171;">Reset</button>
+      <button onclick="resetSaran()" class="btn-3d-reset">Reset</button>
     </div>
 
     <div id="hasilSaranUtama" style="margin-top:30px;">${h}</div>
@@ -1386,7 +1449,6 @@ function hitungTarget() {
 }
 </script>
 
-<!-- ADMIN PROTECTION -->
 <script>
 if(localStorage.getItem("role")!="admin"){
   alert("Akses ditolak");
