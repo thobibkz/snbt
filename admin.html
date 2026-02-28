@@ -1168,7 +1168,7 @@ async function getAiRecommendation(p1, p2) {
 }
 
 
-// ================= TARGET BELAJAR (SEARCHABLE VIA DATALIST) ==================
+// ================= TARGET BELAJAR ==================
 function loadTarget() {
   const ptnList = [...new Set(snbt.map(item => item[1]))].sort();
 
@@ -1188,7 +1188,7 @@ function loadTarget() {
         <datalist id="prodiTargetList"></datalist>
       </div>
 
-      <div id="targetCards" style="display:none; grid-template-columns: 1fr 1fr 1fr; gap:10px; margin-bottom:25px;">
+      <div id="targetCards" style="display:none; grid-template-columns: repeat(auto-fit, minmax(100px, 1fr)); gap:10px; margin-bottom:25px;">
         <div class="card" style="background:#e3f2fd; border-left:5px solid #2196f3; margin:0; padding:12px; box-shadow:none; border:1px solid #ddd;">
           <small>Skor Aman</small>
           <h2 id="cardSkor" style="margin:5px 0 0 0; color:#1565c0; font-size:20px;">0</h2>
@@ -1203,7 +1203,7 @@ function loadTarget() {
         </div>
       </div>
 
-      <div id="diagramSection" style="display:none; grid-template-columns: 1fr 1fr; gap:20px;">
+      <div id="diagramSection" style="display:none; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap:20px;">
         <div>
           <h4 style="text-align:center; font-size:13px;">Target Soal</h4>
           <canvas id="chartSoal"></canvas>
@@ -1221,7 +1221,6 @@ function updateProdiTarget() {
   const prodiDataList = document.getElementById("prodiTargetList");
   const prodiInput = document.getElementById("filterProdiTarget");
   
-  // Kosongkan input prodi dan listnya saat PTN berubah
   prodiDataList.innerHTML = "";
   prodiInput.value = "";
 
@@ -1229,7 +1228,7 @@ function updateProdiTarget() {
     const filtered = snbt.filter(item => item[1] === ptn);
     filtered.forEach(item => {
       const opt = document.createElement("option");
-      opt.value = item[2]; // Nama Prodi
+      opt.value = item[2]; 
       prodiDataList.appendChild(opt);
     });
   }
@@ -1240,8 +1239,6 @@ let chartSoal, chartSkor;
 function hitungTarget() {
   const ptn = document.getElementById("filterPtnTarget").value;
   const prodiName = document.getElementById("filterProdiTarget").value;
-  
-  // Cari data berdasarkan PTN dan Prodi
   const data = snbt.find(item => item[1] === ptn && item[2] === prodiName);
 
   if (!data) {
@@ -1250,7 +1247,6 @@ function hitungTarget() {
     return;
   }
 
-  // Sesuai struktur: 8:skor, 9:materi1, 10:materi2
   const skorAman = parseFloat(data[8]) || 0;
   const mat1 = (data[9] || "").toString().toUpperCase().trim();
   const mat2 = (data[10] || "").toString().toUpperCase().trim();
@@ -1284,11 +1280,11 @@ function hitungTarget() {
     if (isPriority) {
       sus += 1;
       nSkor += 100;
-      colorsSoal.push("#f44336"); // Merah
+      colorsSoal.push("#f44336"); 
       colorsSkor.push("#f44336");
     } else {
-      colorsSoal.push("#2196f3"); // Biru
-      colorsSkor.push("#4caf50"); // Hijau
+      colorsSoal.push("#2196f3"); 
+      colorsSkor.push("#4caf50");
     }
 
     labels.push(s.key);
@@ -1300,16 +1296,37 @@ function hitungTarget() {
   if (chartSoal) chartSoal.destroy();
   if (chartSkor) chartSkor.destroy();
 
+  // MODIFIKASI: Menambahkan plugin datalabels untuk menampilkan angka
+  const commonOptions = (maxLimit) => ({
+    indexAxis: 'y',
+    plugins: {
+      legend: { display: false },
+      tooltip: { callbacks: { label: (ctx) => tooltipsSoal[ctx.dataIndex] } },
+      // Pengaturan angka di samping bar
+      datalabels: {
+        anchor: 'end',
+        align: 'right',
+        offset: 4,
+        color: '#444',
+        font: { size: 10, weight: 'bold' }
+      }
+    },
+    layout: { padding: { right: 30 } }, // Ruang agar angka tidak terpotong
+    scales: { x: { max: maxLimit, beginAtZero: true } }
+  });
+
   chartSoal = new Chart(document.getElementById("chartSoal"), {
     type: 'bar',
     data: { labels: labels, datasets: [{ data: dataSoal, backgroundColor: colorsSoal, borderRadius: 5 }] },
-    options: { indexAxis: 'y', plugins: { legend: { display: false }, tooltip: { callbacks: { label: (ctx) => tooltipsSoal[ctx.dataIndex] } } }, scales: { x: { max: 30, beginAtZero: true } } }
+    options: commonOptions(35),
+    plugins: [ChartDataLabels] // Pastikan library chartjs-plugin-datalabels sudah terpasang
   });
 
   chartSkor = new Chart(document.getElementById("chartSkor"), {
     type: 'bar',
     data: { labels: labels, datasets: [{ data: dataSkor, backgroundColor: colorsSkor, borderRadius: 5 }] },
-    options: { indexAxis: 'y', plugins: { legend: { display: false } }, scales: { x: { max: 1000, beginAtZero: true } } }
+    options: commonOptions(1100),
+    plugins: [ChartDataLabels]
   });
 }
 </script>
