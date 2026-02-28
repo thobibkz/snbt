@@ -1169,98 +1169,91 @@ async function getAiRecommendation(p1, p2) {
 
 
 // ================= TARGET BELAJAR ==================
-// ================= TARGET BELAJAR (SEARCHABLE FIX) ==================
 function loadTarget() {
   const ptnList = [...new Set(snbt.map(item => item[1]))].sort();
 
-  // 1. Render HTML-nya dulu
   document.getElementById("content").innerHTML = `
     <div class="card">
       <h3 style="margin-top:0">🎯 Analisis Target Belajar SNBT 2026</h3>
-      <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px; margin-bottom:20px;">
-        <select id="filterPtnTarget" placeholder="Cari PTN...">
-          <option value="">-- Pilih PTN --</option>
-          ${ptnList.map(p => `<option value="${p}">${p}</option>`).join("")}
-        </select>
-        <select id="filterProdiTarget" placeholder="Cari Prodi...">
-          <option value="">-- Pilih Prodi --</option>
-        </select>
+      
+      <div style="margin-bottom:20px;">
+        <label style="font-size:12px; color:var(--muted)">Cari Perguruan Tinggi:</label>
+        <input list="ptnTargetList" id="filterPtnTarget" placeholder="Ketik nama PTN..." oninput="updateProdiTarget()" style="width:100%; padding:12px; border-radius:12px; border:1px solid #ddd; margin-bottom:10px;">
+        <datalist id="ptnTargetList">
+          ${ptnList.map(p => `<option value="${p}">`).join("")}
+        </datalist>
+        
+        <label style="font-size:12px; color:var(--muted); margin-top:10px; display:block;">Cari Program Studi:</label>
+        <input list="prodiTargetList" id="filterProdiTarget" placeholder="Ketik nama Prodi..." oninput="hitungTarget()" style="width:100%; padding:12px; border-radius:12px; border:1px solid #ddd;">
+        <datalist id="prodiTargetList"></datalist>
       </div>
 
-      <div id="targetCards" style="display:none; grid-template-columns: 1fr 1fr 1fr; gap:15px; margin-bottom:25px;">
-        <div class="card" style="background:#e3f2fd; border-left:5px solid #2196f3; margin:0; padding:15px; box-shadow:none; border:1px solid #ddd;">
-          <small>Skor Aman Prodi</small>
-          <h2 id="cardSkor" style="margin:5px 0 0 0; color:#1565c0;">0</h2>
+      <div id="targetCards" style="display:none; grid-template-columns: 1fr 1fr 1fr; gap:10px; margin-bottom:25px;">
+        <div class="card" style="background:#e3f2fd; border-left:5px solid #2196f3; margin:0; padding:12px; box-shadow:none; border:1px solid #ddd;">
+          <small>Skor Aman</small>
+          <h2 id="cardSkor" style="margin:5px 0 0 0; color:#1565c0; font-size:20px;">0</h2>
         </div>
-        <div class="card" style="background:#fff3e0; border-left:5px solid #ff9800; margin:0; padding:15px; box-shadow:none; border:1px solid #ddd;">
-          <small>Materi Utama 1</small>
-          <h4 id="cardMat1" style="margin:5px 0 0 0; color:#e65100;">-</h4>
+        <div class="card" style="background:#fff3e0; border-left:5px solid #ff9800; margin:0; padding:12px; box-shadow:none; border:1px solid #ddd;">
+          <small>Materi 1</small>
+          <h4 id="cardMat1" style="margin:5px 0 0 0; color:#e65100; font-size:14px;">-</h4>
         </div>
-        <div class="card" style="background:#f1f8e9; border-left:5px solid #4caf50; margin:0; padding:15px; box-shadow:none; border:1px solid #ddd;">
-          <small>Materi Utama 2</small>
-          <h4 id="cardMat2" style="margin:5px 0 0 0; color:#1b5e20;">-</h4>
+        <div class="card" style="background:#f1f8e9; border-left:5px solid #4caf50; margin:0; padding:12px; box-shadow:none; border:1px solid #ddd;">
+          <small>Materi 2</small>
+          <h4 id="cardMat2" style="margin:5px 0 0 0; color:#1b5e20; font-size:14px;">-</h4>
         </div>
       </div>
 
       <div id="diagramSection" style="display:none; grid-template-columns: 1fr 1fr; gap:20px;">
         <div>
-          <h4 style="text-align:center; font-size:14px;">Target Soal</h4>
+          <h4 style="text-align:center; font-size:13px;">Target Soal</h4>
           <canvas id="chartSoal"></canvas>
         </div>
         <div>
-          <h4 style="text-align:center; font-size:14px;">Target Skor</h4>
+          <h4 style="text-align:center; font-size:13px;">Target Skor</h4>
           <canvas id="chartSkor"></canvas>
         </div>
       </div>
     </div>`;
-
-  // 2. AKTIFKAN FITUR SEARCH (Tepat setelah innerHTML)
-  // Menggunakan fungsi yang sudah ada di admin.html Anda
-  initializeSearchableSelect("filterPtnTarget", "Pilih PTN...", (val) => {
-    updateProdiTarget(val);
-  });
-
-  initializeSearchableSelect("filterProdiTarget", "Pilih Prodi...", (val) => {
-    hitungTarget(val);
-  });
 }
 
-function updateProdiTarget(ptn) {
-  const prodiSelect = document.getElementById("filterProdiTarget");
-  if (!prodiSelect || !prodiSelect.tomselect) return;
-
-  const ts = prodiSelect.tomselect;
-  ts.clear();
-  ts.clearOptions();
+function updateProdiTarget() {
+  const ptn = document.getElementById("filterPtnTarget").value;
+  const prodiDataList = document.getElementById("prodiTargetList");
+  const prodiInput = document.getElementById("filterProdiTarget");
+  
+  // Kosongkan input prodi dan listnya saat PTN berubah
+  prodiDataList.innerHTML = "";
+  prodiInput.value = "";
 
   if (ptn) {
     const filtered = snbt.filter(item => item[1] === ptn);
-    const options = filtered.map(item => ({
-      value: ptn + "|" + item[2],
-      text: item[2]
-    }));
-    ts.addOptions(options);
+    filtered.forEach(item => {
+      const opt = document.createElement("option");
+      opt.value = item[2]; // Nama Prodi
+      prodiDataList.appendChild(opt);
+    });
   }
 }
 
-// Global variable agar bisa di-destroy saat ganti prodi
-let chartSoalInstance, chartSkorInstance;
+let chartSoal, chartSkor;
 
-function hitungTarget(val) {
-  if(!val) {
+function hitungTarget() {
+  const ptn = document.getElementById("filterPtnTarget").value;
+  const prodiName = document.getElementById("filterProdiTarget").value;
+  
+  // Cari data berdasarkan PTN dan Prodi
+  const data = snbt.find(item => item[1] === ptn && item[2] === prodiName);
+
+  if (!data) {
     document.getElementById("targetCards").style.display = "none";
     document.getElementById("diagramSection").style.display = "none";
     return;
   }
-  
-  const [ptn, prodiName] = val.split("|");
-  const data = snbt.find(item => item[1] === ptn && item[2] === prodiName);
 
-  if (!data) return;
-
-  const skorAman = parseFloat(data[8]) || 0; 
-  const mat1 = (data[9] || "").toString().toUpperCase().trim(); 
-  const mat2 = (data[10] || "").toString().toUpperCase().trim(); 
+  // Sesuai struktur: 8:skor, 9:materi1, 10:materi2
+  const skorAman = parseFloat(data[8]) || 0;
+  const mat1 = (data[9] || "").toString().toUpperCase().trim();
+  const mat2 = (data[10] || "").toString().toUpperCase().trim();
 
   document.getElementById("targetCards").style.display = "grid";
   document.getElementById("diagramSection").style.display = "grid";
@@ -1291,39 +1284,34 @@ function hitungTarget(val) {
     if (isPriority) {
       sus += 1;
       nSkor += 100;
-      colorsSoal.push("#f44336");
+      colorsSoal.push("#f44336"); // Merah
       colorsSkor.push("#f44336");
     } else {
-      colorsSoal.push("#2196f3");
-      colorsSkor.push("#4caf50");
+      colorsSoal.push("#2196f3"); // Biru
+      colorsSkor.push("#4caf50"); // Hijau
     }
 
     labels.push(s.key);
     dataSoal.push(mud + sed + sus);
     dataSkor.push(Math.round(nSkor));
-    tooltipsSoal.push(`Total: ${mud+sed+sus} Soal (M:${mud}, S:${sed}, H:${sus})`);
+    tooltipsSoal.push(`Total Soal: ${mud+sed+sus}, Mudah: ${mud}, Sedang: ${sed}, Susah: ${sus}`);
   });
 
-  // Reset Chart
-  if (chartSoalInstance) chartSoalInstance.destroy();
-  if (chartSkorInstance) chartSkorInstance.destroy();
+  if (chartSoal) chartSoal.destroy();
+  if (chartSkor) chartSkor.destroy();
 
-  const ctxSoal = document.getElementById("chartSoal").getContext('2d');
-  const ctxSkor = document.getElementById("chartSkor").getContext('2d');
-
-  chartSoalInstance = new Chart(ctxSoal, {
+  chartSoal = new Chart(document.getElementById("chartSoal"), {
     type: 'bar',
     data: { labels: labels, datasets: [{ data: dataSoal, backgroundColor: colorsSoal, borderRadius: 5 }] },
-    options: { indexAxis: 'y', plugins: { legend: { display: false } }, scales: { x: { max: 30, beginAtZero: true } } }
+    options: { indexAxis: 'y', plugins: { legend: { display: false }, tooltip: { callbacks: { label: (ctx) => tooltipsSoal[ctx.dataIndex] } } }, scales: { x: { max: 30, beginAtZero: true } } }
   });
 
-  chartSkorInstance = new Chart(ctxSkor, {
+  chartSkor = new Chart(document.getElementById("chartSkor"), {
     type: 'bar',
     data: { labels: labels, datasets: [{ data: dataSkor, backgroundColor: colorsSkor, borderRadius: 5 }] },
     options: { indexAxis: 'y', plugins: { legend: { display: false } }, scales: { x: { max: 1000, beginAtZero: true } } }
   });
-}
-  
+}  
 </script>
 
 <!-- ADMIN PROTECTION -->
