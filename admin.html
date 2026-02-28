@@ -563,15 +563,15 @@ function loadPeluang(){
 
     <h3 style="text-align:center; margin:20px 0 10px">Masukkan Perkiraan Skor UTBK</h3>
 
-    <div class="input-row">
-      <div><input type="number" id="PU" placeholder="PU" value="${k.PU}" oninput="savePeluangInput()"></div>
-      <div><input type="number" id="PPU" placeholder="PPU" value="${k.PPU}" oninput="savePeluangInput()"></div>
-      <div><input type="number" id="PBM" placeholder="PBM" value="${k.PBM}" oninput="savePeluangInput()"></div>
-      <div><input type="number" id="PK" placeholder="PK" value="${k.PK}" oninput="savePeluangInput()"></div>
-      <div><input type="number" id="LBI" placeholder="LBI" value="${k.LBI}" oninput="savePeluangInput()"></div>
-      <div><input type="number" id="LBE" placeholder="LBE" value="${k.LBE}" oninput="savePeluangInput()"></div>
-      <div><input type="number" id="PM" placeholder="PM" value="${k.PM}" oninput="savePeluangInput()"></div>
-    </div>
+<div class="input-row">
+  <div><input type="number" id="PU" placeholder="PU" value="${k.PU}" oninput="saveSkor(); savePeluangInput()"></div>
+  <div><input type="number" id="PPU" placeholder="PPU" value="${k.PPU}" oninput="saveSkor(); savePeluangInput()"></div>
+  <div><input type="number" id="PBM" placeholder="PBM" value="${k.PBM}" oninput="saveSkor(); savePeluangInput()"></div>
+  <div><input type="number" id="PK" placeholder="PK" value="${k.PK}" oninput="saveSkor(); savePeluangInput()"></div>
+  <div><input type="number" id="LBI" placeholder="LBI" value="${k.LBI}" oninput="saveSkor(); savePeluangInput()"></div>
+  <div><input type="number" id="LBE" placeholder="LBE" value="${k.LBE}" oninput="saveSkor(); savePeluangInput()"></div>
+  <div><input type="number" id="PM" placeholder="PM" value="${k.PM}" oninput="saveSkor(); savePeluangInput()"></div>
+</div>
 
     <div style="margin-top:25px; display:flex; gap:12px; justify-content:center; align-items:center;">
       <button onclick="prosesPeluang()" class="btn-3d-primary">🚀 Proses Peluang Lolos</button>
@@ -604,23 +604,20 @@ function updateProdiList(ptnName) {
 function saveSkor(prefix = "") {
   const ids = ["PU", "PPU", "PBM", "PK", "LBI", "LBE", "PM"];
   ids.forEach(id => {
-    // prefix "" untuk Peluang, prefix "s" untuk Saran
-    const val = document.getElementById(prefix + id).value;
-    inputState.skor[id] = val;
+    const el = document.getElementById(prefix + id);
+    if (el) {
+      inputState.skor[id] = el.value;
+    }
   });
 }
     
 function savePeluangInput() {
   const s = inputState.peluang;
-  s.ptn = document.getElementById("ptnPeluang").value;
-  s.prodi = document.getElementById("prodiPeluang").value;
-  s.PU = document.getElementById("PU").value;
-  s.PPU = document.getElementById("PPU").value;
-  s.PBM = document.getElementById("PBM").value;
-  s.PK = document.getElementById("PK").value;
-  s.LBI = document.getElementById("LBI").value;
-  s.LBE = document.getElementById("LBE").value;
-  s.PM = document.getElementById("PM").value;
+  const ptnEl = document.getElementById("ptnPeluang");
+  const prodiEl = document.getElementById("prodiPeluang");
+  
+  if (ptnEl) s.ptn = ptnEl.value;
+  if (prodiEl) s.prodi = prodiEl.value;
 }
     
 function loadPTNPeluang(){
