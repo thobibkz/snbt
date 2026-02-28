@@ -1318,14 +1318,14 @@ function hitungTarget() {
   chartSoal = new Chart(document.getElementById("chartSoal"), {
     type: 'bar',
     data: { labels: labels, datasets: [{ data: dataSoal, backgroundColor: colorsSoal, borderRadius: 5 }] },
-    options: commonOptions(35),
+    options: commonOptions(30),
     plugins: [ChartDataLabels] // Pastikan library chartjs-plugin-datalabels sudah terpasang
   });
 
   chartSkor = new Chart(document.getElementById("chartSkor"), {
     type: 'bar',
     data: { labels: labels, datasets: [{ data: dataSkor, backgroundColor: colorsSkor, borderRadius: 5 }] },
-    options: commonOptions(1100),
+    options: commonOptions(1000),
     plugins: [ChartDataLabels]
   });
 }
