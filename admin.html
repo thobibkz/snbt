@@ -57,7 +57,7 @@ body{
   font-weight: 400;
 }
 
-/* FOOTER - Ramping & Fixed */
+/* FOOTER - Versi Lebih Besar & Jelas */
 .footer {
   position: fixed;
   bottom: 0;
@@ -65,40 +65,45 @@ body{
   width: 100%;
   background: linear-gradient(135deg, var(--blue), var(--blue2));
   color: white;
-  padding: 8px 16px;
+  padding: 12px 10px; /* Padding sedikit ditambah untuk ruang teks besar */
   display: grid;
-  grid-template-columns: 1fr 1fr 1fr; /* Membagi 3 bagian sama besar */
+  grid-template-columns: 1fr 1fr 1fr;
   align-items: center;
-  box-shadow: 0 -4px 12px rgba(0,0,0,0.15);
+  box-shadow: 0 -4px 15px rgba(0,0,0,0.2);
   z-index: 1000;
-  font-size: 11px;
+  font-size: 14px; /* Teks lebih besar (sebelumnya 11px) */
+  font-weight: 600; /* Teks lebih tebal agar mudah dibaca */
 }
 
 .footer-item {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 6px;
+  gap: 10px; /* Jarak antara logo dan teks diperlebar */
 }
 
 .footer-item img {
-  width: 14px;
-  height: 14px;
+  width: 20px; /* Logo lebih besar (sebelumnya 14px) */
+  height: 20px;
 }
 
-/* Tambahkan padding di body agar konten utama tidak tertutup footer */
+/* Jarak body ditambah agar konten tidak tertutup footer yang lebih besar */
 body {
-  padding-bottom: 50px; 
+  padding-bottom: 65px; 
 }
 
-/* Responsif untuk HP agar tidak terlalu rapat */
+/* Penyesuaian Responsif untuk HP */
 @media (max-width: 480px) {
   .footer {
-    font-size: 9px;
-    padding: 8px 5px;
+    font-size: 11px; /* Tetap terbaca jelas di layar kecil */
+    padding: 10px 5px;
+  }
+  .footer-item img {
+    width: 16px;
+    height: 16px;
   }
   .footer-item {
-    gap: 4px;
+    gap: 6px;
   }
 }
 
