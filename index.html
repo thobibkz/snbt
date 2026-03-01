@@ -142,6 +142,8 @@ function login() {
         localStorage.setItem("role", d.role);
         // Simpan lastOpen sebagai 'ID Sesi' unik untuk deteksi 2 device
         localStorage.setItem("lastOpen", d.lastOpen); 
+
+        localStorage.setItem("masaAktif", d.masaAktif);
         
         // Pengalihan halaman berdasarkan role
         if (d.role == "admin") {
