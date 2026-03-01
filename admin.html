@@ -1622,6 +1622,40 @@ if(localStorage.getItem("role")!="admin"){
     <span>apluscourse1</span>
   </div>
 </div>
- 
+
+<script>
+const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbwXPz6mTwn9augGNV5Aa6UHUtQ1c7GbfbcPSxPFdy8RSamtc31IVCZVZhU_-cNSg-uv9Q/exec"; // Ganti dengan URL deployment terbaru
+
+function startPing() {
+  const email = localStorage.getItem("email");
+  const lastOpenClient = localStorage.getItem("lastOpen");
+
+  setInterval(() => {
+    fetch(WEB_APP_URL, {
+      method: "POST",
+      body: JSON.stringify({
+        action: "ping",
+        email: email,
+        lastOpenClient: lastOpenClient
+      })
+    })
+    .then(r => r.json())
+    .then(d => {
+      if (d.status === "multi_device") {
+        alert("Peringatan: Anda terdeteksi menggunakan 2 device bersamaan! Anda akan dikeluarkan.");
+        localStorage.clear();
+        location.href = "index.html";
+      }
+    })
+    .catch(err => console.log("Ping failed"));
+  }, 10000); // 10 Detik
+}
+
+// Jalankan ping jika sudah login
+if (localStorage.getItem("email")) {
+  startPing();
+}
+</script>
+    
 </body>
 </html>
