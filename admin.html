@@ -646,9 +646,7 @@ function loadRasionalisasi(){
   <div class="card">
 
       <h3 style="margin-bottom:0;">🎓 Rasionalisasi Prodi</h3>
-      <span class="watermark-lisensi" id="wm-prodi"></span>
-
-
+      
     <input list="ptnList" id="ptn" placeholder="Pilih PTN...">
     <datalist id="ptnList"></datalist>
     <input list="prodiList" id="prodi" placeholder="Pilih Prodi...">
@@ -795,9 +793,7 @@ function loadPeluang(){
   document.getElementById("content").innerHTML = `
   <div class="card">
     <h3 style="margin-bottom:0;">📊 Cek Peluang Lolos</h3>
-    <span class="watermark-lisensi" id="wm-prodi"></span>
-
-
+    
     <div style="margin-bottom:20px;">
       <input list="ptnListPeluang" id="ptnPeluang" placeholder="Pilih PTN..." 
              value="${s.ptn}" oninput="savePeluangInput(); updateProdiList(this.value)">
@@ -1102,8 +1098,7 @@ function loadSaran(){
   document.getElementById("content").innerHTML = `
   <div class="card">
     <h3 style="margin-bottom:0;">💡 Saran Prodi Berdasarkan Skor</h3>
-      <span class="watermark-lisensi" id="wm-prodi"></span>
-      
+            
     <div class="input-row">
       <input type="number" id="sPU" placeholder="PU" value="${k.PU}" oninput="saveSkor('s')">
       <input type="number" id="sPPU" placeholder="PPU" value="${k.PPU}" oninput="saveSkor('s')">
@@ -1259,8 +1254,7 @@ function loadPerbandingan(){
   document.getElementById("content").innerHTML = `
   <div class="card">
     <h3 style="margin-bottom:0;">⚖ Perbandingan Prodi</h3>
-      <span class="watermark-lisensi" id="wm-prodi"></span>
-  
+        
     <div style="margin-bottom:15px">
       <input list="ptnListBanding" id="ptnBanding" placeholder="Pilih PTN...">
       <datalist id="ptnListBanding"></datalist>
@@ -1447,8 +1441,7 @@ function loadTarget() {
   document.getElementById("content").innerHTML = `
     <div class="card">
       <h3 style="margin-bottom:0;">🎯 Analisis Target Belajar SNBT 2026</h3>
-        <span class="watermark-lisensi" id="wm-prodi"></span>
-        
+                
       <div style="margin-bottom:20px;">
         <input list="ptnTargetList" id="filterPtnTarget" placeholder="Pilih PTN..." oninput="updateProdiTarget()" style="width:100%; padding:12px; border-radius:12px; border:1px solid #ddd; margin-bottom:10px;">
         <datalist id="ptnTargetList">
@@ -1717,8 +1710,6 @@ if (localStorage.getItem("email")) {
     <span>apluscourse1</span>
   </div>
 </div>
-
-<div id="badgeMasaAktif"></div>
 
 <script>
 function tampilkanInfoAkun() {
