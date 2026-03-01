@@ -113,10 +113,10 @@ body{
   background: linear-gradient(135deg, var(--blue), var(--blue2));
   color: white;
   display: grid;
-  /* 3 Kolom: Kiri agak lebar untuk teks promo, Tengah & Kanan mengikuti konten */
-  grid-template-columns: 1.2fr 1fr 1fr; 
+  /* Kolom kiri & tengah dominan, kanan sisa kecil saja */
+  grid-template-columns: 1.2fr 1.5fr 0.3fr; 
   align-items: center;
-  padding: 15px 10px;
+  padding: 18px 10px; /* Footer tetap gendut dan kokoh */
   border-radius: 18px 18px 0 0;
   box-shadow: 0 -4px 15px rgba(0,0,0,0.2);
   z-index: 9999;
@@ -125,63 +125,60 @@ body{
 .footer-part {
   display: flex;
   flex-direction: column;
-  padding: 0 10px;
+  justify-content: center;
+  /* Garis partisi dihapus sesuai permintaan */
+  border: none; 
 }
 
-/* Partisi Kiri: Rapat Kanan */
+/* Partisi Kiri: Tetap Align Right agar mepet ke tengah */
 .part-left {
-  align-items: flex-end; 
+  align-items: flex-end;
   text-align: right;
-  border-right: 1px solid rgba(255, 255, 255, 0.3);
+  padding-right: 15px;
 }
 
-/* Partisi Tengah & Kanan: Rapat Kiri */
-.part-center, .part-right {
+/* Partisi Tengah: Menggabungkan TikTok & IG (Align Left) */
+.part-center {
   align-items: flex-start;
   text-align: left;
+  gap: 5px; /* Jarak antar baris sosmed */
 }
 
-.part-center {
-  border-right: 1px solid rgba(255, 255, 255, 0.3);
-}
-
+/* Row Styling */
 .footer-row {
   display: flex;
   align-items: center;
   gap: 8px;
-  font-size: 16px;
+  font-size: 16px; /* Ukuran teks sosmed */
   font-weight: 700;
   cursor: pointer;
 }
 
 .footer-row img {
-  width: 22px;
-  height: 22px;
-  /* Filter dihapus agar ikon kembali ke warna original */
+  width: 20px;
+  height: 20px;
 }
 
-/* Teks Promo diperbesar lagi */
+/* Teks Promo: Dibuat Ekstra Besar */
 .text-promo {
-  font-size: 18px; /* Lebih besar dari sebelumnya */
+  font-size: 22px; /* Diperbesar signifikan */
   font-weight: 900;
-  color: #ffeb3b; /* Kuning terang agar kontras */
-  letter-spacing: 0.5px;
-  margin-bottom: 2px;
+  color: #ffeb3b; 
+  line-height: 1.1;
+  margin-bottom: 4px;
+  text-transform: uppercase;
 }
 
 @media (max-width: 480px) {
   .footer {
+    grid-template-columns: 1.1fr 1.2fr 0.1fr;
     padding: 12px 5px;
   }
   .text-promo {
-    font-size: 13px;
+    font-size: 15px;
   }
   .footer-row {
     font-size: 11px;
-  }
-  .footer-row img {
-    width: 16px;
-    height: 16px;
   }
 }
 
@@ -1763,19 +1760,18 @@ if (localStorage.getItem("email")) {
     </div>
   </div>
 
-  <div class="footer-part part-center" onclick="window.open('https://www.tiktok.com/@aplus.course')">
-    <div class="footer-row">
+  <div class="footer-part part-center">
+    <div class="footer-row" onclick="window.open('https://www.tiktok.com/@aplus.course')">
       <img src="https://cdn-icons-png.flaticon.com/512/3046/3046121.png" alt="TikTok">
       <span>aplus.course</span>
     </div>
-  </div>
-
-  <div class="footer-part part-right" onclick="window.open('https://www.instagram.com/apluscourse1')">
-    <div class="footer-row">
+    <div class="footer-row" onclick="window.open('https://www.instagram.com/apluscourse1')">
       <img src="https://cdn-icons-png.flaticon.com/512/2111/2111463.png" alt="IG">
       <span>apluscourse1</span>
     </div>
   </div>
+
+  <div class="footer-part part-right"></div>
 </div>
 
 <div id="badgeMasaAktif"></div>
