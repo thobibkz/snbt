@@ -110,75 +110,79 @@ body{
   bottom: 0;
   left: 0;
   width: 100%;
+  /* Gradien biru sesuai header */
   background: linear-gradient(135deg, var(--blue), var(--blue2));
   color: white;
   display: grid;
-  /* Kolom kiri & tengah dominan, kanan sisa kecil saja */
-  grid-template-columns: 1.2fr 1.5fr 0.3fr; 
+  /* Kolom kiri & tengah dominan, kanan dibiarkan kosong */
+  grid-template-columns: 1.3fr 1fr 0.2fr; 
   align-items: center;
-  padding: 18px 10px; /* Footer tetap gendut dan kokoh */
+  padding: 15px 10px;
   border-radius: 18px 18px 0 0;
-  box-shadow: 0 -4px 15px rgba(0,0,0,0.2);
+  box-shadow: 0 -5px 20px rgba(0,0,0,0.2);
   z-index: 9999;
 }
 
 .footer-part {
   display: flex;
   flex-direction: column;
-  justify-content: center;
-  /* Garis partisi dihapus sesuai permintaan */
-  border: none; 
 }
 
-/* Partisi Kiri: Tetap Align Right agar mepet ke tengah */
+/* Partisi Kiri: Rapat Kanan agar mepet ke tengah */
 .part-left {
   align-items: flex-end;
   text-align: right;
   padding-right: 15px;
 }
 
-/* Partisi Tengah: Menggabungkan TikTok & IG (Align Left) */
+/* Partisi Tengah: TikTok & IG (Align Left) */
 .part-center {
   align-items: flex-start;
   text-align: left;
-  gap: 5px; /* Jarak antar baris sosmed */
+  gap: 4px;
 }
 
-/* Row Styling */
+/* Teks Promo: Dibuat sangat besar dan tebal */
+.text-promo {
+  font-size: 26px; /* Ukuran sangat besar */
+  font-weight: 900;
+  color: #ffeb3b; /* Kuning terang */
+  line-height: 1;
+  margin-bottom: 5px;
+  text-transform: uppercase;
+  letter-spacing: -0.5px;
+}
+
 .footer-row {
   display: flex;
   align-items: center;
   gap: 8px;
-  font-size: 16px; /* Ukuran teks sosmed */
+  font-size: 15px;
   font-weight: 700;
   cursor: pointer;
 }
 
 .footer-row img {
-  width: 20px;
-  height: 20px;
+  width: 18px;
+  height: 18px;
 }
 
-/* Teks Promo: Dibuat Ekstra Besar */
-.text-promo {
-  font-size: 22px; /* Diperbesar signifikan */
-  font-weight: 900;
-  color: #ffeb3b; 
-  line-height: 1.1;
-  margin-bottom: 4px;
-  text-transform: uppercase;
-}
-
+/* Responsif untuk layar HP */
 @media (max-width: 480px) {
   .footer {
-    grid-template-columns: 1.1fr 1.2fr 0.1fr;
-    padding: 12px 5px;
+    grid-template-columns: 1.3fr 1fr 0.1fr;
+    padding: 10px 5px;
   }
   .text-promo {
-    font-size: 15px;
+    font-size: 18px;
   }
   .footer-row {
-    font-size: 11px;
+    font-size: 10px;
+    gap: 5px;
+  }
+  .footer-row img {
+    width: 14px;
+    height: 14px;
   }
 }
 
@@ -1755,8 +1759,9 @@ if (localStorage.getItem("email")) {
   <div class="footer-part part-left">
     <div class="text-promo">BELI SNBT HANYA 25K</div>
     <div class="footer-row" onclick="window.open('https://wa.me/62895423024582')">
-      <span>0895423024582</span>
+      <span>Hubungi</span>
       <img src="https://cdn-icons-png.flaticon.com/512/733/733585.png" alt="WA">
+      <span>0895423024582</span>
     </div>
   </div>
 
@@ -1771,7 +1776,7 @@ if (localStorage.getItem("email")) {
     </div>
   </div>
 
-  <div class="footer-part part-right"></div>
+  <div class="footer-part"></div>
 </div>
 
 <div id="badgeMasaAktif"></div>
