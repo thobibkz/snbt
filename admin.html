@@ -6,6 +6,7 @@
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2"></script>
+
     
 <style>
 :root{
@@ -545,9 +546,9 @@ select,input{
     <img src="https://i.imgur.com/MiEDgnn.png" alt="Logo Left">
   </div>
 
-<div class="settings-icon" onclick="location.href='setting.html'">
-  <img src="https://cdn-icons-png.flaticon.com/512/3953/3953226.png" alt="Settings">
-</div>
+<div class="settings-icon" onclick="logout()" title="Logout Akun">
+    <img src="https://cdn-icons-png.flaticon.com/512/1828/1828407.png" alt="Logout">
+  </div>
 
   <div class="header-text">
     <h1>APLIKASI RASIONALISASI SNBT 2026</h1>
@@ -1639,6 +1640,18 @@ if(localStorage.getItem("role")!="admin"){
   alert("Akses ditolak");
   location.href="index.html";
 }
+
+function logout() {
+  // Memberikan konfirmasi sebelum keluar
+  if (confirm("Apakah Anda yakin ingin keluar dari aplikasi?")) {
+    // Menghapus semua data sesi (Email, Role, Masa Aktif, dll)
+    localStorage.clear();
+    
+    // Mengarahkan kembali ke halaman login
+    window.location.href = "index.html";
+  }
+}
+    
 </script>
 
     <script>
@@ -1758,6 +1771,8 @@ function tampilkanInfoAkun() {
 // Jalankan saat pertama kali buka admin
 document.addEventListener("DOMContentLoaded", tampilkanInfoAkun);
 </script>
+
+
     
 </body>
 </html>
