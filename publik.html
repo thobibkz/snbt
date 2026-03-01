@@ -110,67 +110,74 @@ body{
   bottom: 0;
   left: 0;
   width: 100%;
-  background: white;
+  /* Tema Biru Gradien mengikuti Header */
+  background: linear-gradient(135deg, var(--blue), var(--blue2));
+  color: white;
   display: grid;
-  grid-template-columns: 1.5fr 1fr 1fr; /* Membagi 3 partisi (kiri lebih lebar sedikit) */
+  /* 3 Kolom yang saling berdempetan */
+  grid-template-columns: 1.2fr 1fr 1fr; 
   align-items: center;
-  padding: 10px 15px;
-  border-top: 2px solid #dbe7ff;
-  box-shadow: 0 -4px 15px rgba(0,0,0,0.05);
-  z-index: 9999; /* Agar selalu on top */
+  padding: 20px 10px; /* Padding lebih besar agar footer lebih 'gendut' */
+  border-radius: 18px 18px 0 0; /* Kebalikan dari header */
+  box-shadow: 0 -4px 15px rgba(0,0,0,0.2);
+  z-index: 9999;
 }
 
-/* Base style untuk setiap partisi */
 .footer-part {
   display: flex;
   flex-direction: column;
-  align-items: center;
   justify-content: center;
-  text-align: center;
-  font-size: 13px;
-  font-weight: 600;
-  color: var(--text);
+  align-items: center;
+  gap: 8px;
+  border-right: 1px solid rgba(255, 255, 255, 0.2); /* Garis pemisah tipis */
 }
 
-/* Khusus Partisi Kiri (2 Baris) */
-.part-left {
-  align-items: flex-start; /* Teks rata kiri di dalam partisinya */
-  text-align: left;
+/* Hilangkan garis pemisah di kolom terakhir */
+.footer-part:last-child {
+  border-right: none;
 }
 
-.part-left .row-1 {
-  font-size: 14px;
-  color: var(--blue);
-  margin-bottom: 2px;
-}
-
-.part-left .row-2 {
+/* Styling Baris Teks & Ikon */
+.footer-row {
   display: flex;
   align-items: center;
-  gap: 5px;
+  gap: 10px; /* Jarak antara logo dan teks */
+  font-size: 16px; /* Teks diperbesar */
+  font-weight: 700;
+  white-space: nowrap;
+  cursor: pointer;
 }
 
-/* Partisi Tengah & Kanan */
-.footer-part img {
-  width: 22px;
-  height: 22px;
-  margin-bottom: 3px; /* Jarak antara logo dan teks */
+.footer-row img {
+  width: 24px; /* Ukuran logo diperbesar */
+  height: 24px;
+  filter: brightness(0) invert(1); /* Membuat ikon flaticon jadi putih agar masuk ke tema biru */
 }
 
-/* Responsif untuk HP Kecil */
+.text-promo {
+  font-size: 14px;
+  font-weight: 800;
+  color: #ffd700; /* Warna kuning emas agar promo terlihat menonjol */
+  margin-bottom: 5px;
+  text-align: center;
+}
+
+/* Responsif untuk HP */
 @media (max-width: 480px) {
   .footer {
-    padding: 8px 5px;
+    grid-template-columns: 1fr 1fr 1fr;
+    padding: 15px 5px;
   }
-  .footer-part {
-    font-size: 10px;
-  }
-  .part-left .row-1 {
+  .footer-row {
     font-size: 11px;
+    gap: 5px;
   }
-  .footer-part img {
+  .footer-row img {
     width: 18px;
     height: 18px;
+  }
+  .text-promo {
+    font-size: 10px;
   }
 }
 
@@ -1744,21 +1751,26 @@ if (localStorage.getItem("email")) {
 </script>
 
 <div class="footer">
-  <div class="footer-part part-left">
-    <div class="row-1">Beli Aplikasi SNBT hanya 25K</div>
-    <div class="row-2" onclick="window.open('https://wa.me/62895423024582')">
-      Hubungi <img src="https://cdn-icons-png.flaticon.com/512/733/733585.png" style="width:16px; height:16px; margin:0"> 0895423024582
+  <div class="footer-part">
+    <div class="text-promo">BELI SNBT HANYA 25K</div>
+    <div class="footer-row" onclick="window.open('https://wa.me/62895423024582')">
+      <img src="https://cdn-icons-png.flaticon.com/512/733/733585.png" alt="WA">
+      <span>0895423024582</span>
     </div>
   </div>
 
   <div class="footer-part" onclick="window.open('https://www.tiktok.com/@aplus.course')">
-    <img src="https://cdn-icons-png.flaticon.com/512/3046/3046121.png" alt="TikTok">
-    <span>aplus.course</span>
+    <div class="footer-row">
+      <img src="https://cdn-icons-png.flaticon.com/512/3046/3046121.png" alt="TikTok">
+      <span>aplus.course</span>
+    </div>
   </div>
 
   <div class="footer-part" onclick="window.open('https://www.instagram.com/apluscourse1')">
-    <img src="https://cdn-icons-png.flaticon.com/512/2111/2111463.png" alt="IG">
-    <span>apluscourse1</span>
+    <div class="footer-row">
+      <img src="https://cdn-icons-png.flaticon.com/512/2111/2111463.png" alt="IG">
+      <span>apluscourse1</span>
+    </div>
   </div>
 </div>
 
