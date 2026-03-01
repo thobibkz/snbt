@@ -106,51 +106,48 @@ body{
 
 /* FOOTER - Versi Lebih Besar & Jelas */
 .footer {
-  position: fixed;
-  bottom: 0;
-  left: 0;
+  display: flex;
+  flex-direction: row;        /* Memastikan berjejer ke samping */
+  justify-content: center;    /* Posisi di tengah layar */
+  align-items: center;        /* Sejajar secara vertikal */
+  gap: 25px;                  /* Jarak antar item (WA, TikTok, IG) */
+  padding: 20px;
+  background: white;          /* Tetap putih sesuai desain */
   width: 100%;
-  background: linear-gradient(135deg, var(--blue), var(--blue2));
-  color: white;
-  padding: 12px 10px; /* Padding sedikit ditambah untuk ruang teks besar */
-  display: grid;
-  grid-template-columns: 1fr 1fr 1fr;
-  align-items: center;
-  box-shadow: 0 -4px 15px rgba(0,0,0,0.2);
-  z-index: 1000;
-  font-size: 14px; /* Teks lebih besar (sebelumnya 11px) */
-  font-weight: 600; /* Teks lebih tebal agar mudah dibaca */
+  border-top: 1px solid #dbe7ff;
+  flex-wrap: wrap;            /* Agar tidak pecah saat dibuka di HP layar kecil */
 }
 
 .footer-item {
   display: flex;
   align-items: center;
-  justify-content: center;
-  gap: 10px; /* Jarak antara logo dan teks diperlebar */
+  gap: 8px;                   /* Jarak antara ikon dan teks */
+  transition: transform 0.2s;
+  cursor: pointer;
 }
 
 .footer-item img {
-  width: 20px; /* Logo lebih besar (sebelumnya 14px) */
+  width: 20px;                /* Ukuran ikon tetap proporsional */
   height: 20px;
 }
 
-/* Jarak body ditambah agar konten tidak tertutup footer yang lebih besar */
-body {
-  padding-bottom: 65px; 
+.footer-item span {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text);         /* Menggunakan variabel warna teks Anda */
 }
 
-/* Penyesuaian Responsif untuk HP */
-@media (max-width: 480px) {
+.footer-item:hover {
+  transform: translateY(-3px); /* Efek sedikit naik saat disentuh */
+}
+
+/* Responsif untuk HP Sangat Kecil */
+@media (max-width: 400px) {
   .footer {
-    font-size: 11px; /* Tetap terbaca jelas di layar kecil */
-    padding: 10px 5px;
+    gap: 15px;
   }
-  .footer-item img {
-    width: 16px;
-    height: 16px;
-  }
-  .footer-item {
-    gap: 6px;
+  .footer-item span {
+    font-size: 12px;
   }
 }
 
@@ -1724,17 +1721,17 @@ if (localStorage.getItem("email")) {
 </script>
 
 <div class="footer">
-  <div class="footer-item">
+  <div class="footer-item" onclick="window.open('https://wa.me/62895423024582')">
     <img src="https://cdn-icons-png.flaticon.com/512/733/733585.png" alt="WA">
     <span>0895423024582</span>
   </div>
 
-  <div class="footer-item">
+  <div class="footer-item" onclick="window.open('https://www.tiktok.com/@aplus.course')">
     <img src="https://cdn-icons-png.flaticon.com/512/3046/3046121.png" alt="TikTok">
     <span>aplus.course</span>
   </div>
 
-  <div class="footer-item">
+  <div class="footer-item" onclick="window.open('https://www.instagram.com/apluscourse1')">
     <img src="https://cdn-icons-png.flaticon.com/512/2111/2111463.png" alt="IG">
     <span>apluscourse1</span>
   </div>
