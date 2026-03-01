@@ -517,7 +517,7 @@ select,input{
 .watermark-lisensi {
   font-size: 11px;
   color: var(--muted);
-  opacity: 0.6;
+  opacity: 0.8;
   font-weight: 500;
   display: block;
   margin-top: 2px;
@@ -527,7 +527,7 @@ select,input{
 #badgeMasaAktif {
   position: fixed;
   right: 15px;
-  bottom: 85px; /* Tinggi di atas footer agar tidak tabrakan */
+  bottom: 40px; /* Tinggi di atas footer agar tidak tabrakan */
   background: white;
   color: #ef4444;
   padding: 6px 12px;
@@ -640,7 +640,7 @@ function showMenu(menu){
 function loadRasionalisasi(){
   document.getElementById("content").innerHTML=`
   <div class="card">
-    <div style="text-align:center; margin-bottom:15px;">
+    <div style="text-align:left; margin-bottom:15px;">
       <h3 style="margin-bottom:0;">🎓 Rasionalisasi Prodi</h3>
       <span class="watermark-lisensi" id="wm-prodi"></span>
     </div>
@@ -791,7 +791,8 @@ function loadPeluang(){
   document.getElementById("content").innerHTML = `
   <div class="card">
     <h3 style="text-align:left; margin-bottom:20px;">📊 Cek Peluang Lolos</h3>
-    <div class="license-display"></div>
+    <span class="watermark-lisensi" id="wm-prodi"></span>
+
 
     <div style="margin-bottom:20px;">
       <input list="ptnListPeluang" id="ptnPeluang" placeholder="Pilih PTN..." 
@@ -823,7 +824,8 @@ function loadPeluang(){
     <div id="hasilPeluang">${s.hasil}</div>
   </div>
   `;
-
+  
+  tampilkanInfoAkun(); // Panggil pengisi teks
   // Inisialisasi PTN Datalist
   const ptnSet = [...new Set(snbt.map(r => r[1]))];
   const pList = document.getElementById("ptnListPeluang");
@@ -1134,8 +1136,8 @@ function loadSaran(){
   document.getElementById("content").innerHTML = `
   <div class="card">
     <h3 style="margin-bottom:20px;">💡 Saran Prodi Berdasarkan Skor</h3>
-    <div class="license-display"></div>
-    
+      <span class="watermark-lisensi" id="wm-prodi"></span>
+      
     <div class="input-row">
       <input type="number" id="sPU" placeholder="PU" value="${k.PU}" oninput="saveSkor('s')">
       <input type="number" id="sPPU" placeholder="PPU" value="${k.PPU}" oninput="saveSkor('s')">
@@ -1153,6 +1155,7 @@ function loadSaran(){
 
     <div id="hasilSaranUtama" style="margin-top:30px;">${h}</div>
   </div>`;
+  tampilkanInfoAkun(); // Panggil pengisi teks
 }
 
 function resetSaran() {
@@ -1290,7 +1293,8 @@ function loadPerbandingan(){
   document.getElementById("content").innerHTML = `
   <div class="card">
     <h3 style="margin-bottom:20px;">⚖ Perbandingan Prodi</h3>
-    <div class="license-display"></div>
+      <span class="watermark-lisensi" id="wm-prodi"></span>
+  
     <div style="margin-bottom:15px">
       <input list="ptnListBanding" id="ptnBanding" placeholder="Pilih PTN...">
       <datalist id="ptnListBanding"></datalist>
@@ -1305,7 +1309,8 @@ function loadPerbandingan(){
     <div id="previewBanding" class="partisi-2" style="margin-top:25px;"></div>
     <div id="hasilBandingUtama" style="margin-top:30px;"></div>
   </div>`;
-
+    
+  tampilkanInfoAkun(); // Panggil pengisi teks
   const ptnSet = [...new Set(snbt.map(r => r[1]))];
   const list = document.getElementById("ptnListBanding");
   ptnSet.forEach(x => list.innerHTML += `<option value="${x}">`);
@@ -1476,8 +1481,8 @@ function loadTarget() {
   document.getElementById("content").innerHTML = `
     <div class="card">
       <h3 style="margin-top:0">🎯 Analisis Target Belajar SNBT 2026</h3>
-      <div class="license-display"></div>
-      
+        <span class="watermark-lisensi" id="wm-prodi"></span>
+        
       <div style="margin-bottom:20px;">
         <input list="ptnTargetList" id="filterPtnTarget" placeholder="Pilih PTN..." oninput="updateProdiTarget()" style="width:100%; padding:12px; border-radius:12px; border:1px solid #ddd; margin-bottom:10px;">
         <datalist id="ptnTargetList">
@@ -1514,6 +1519,8 @@ function loadTarget() {
         </div>
       </div>
     </div>`;
+  
+  tampilkanInfoAkun(); // Panggil pengisi teks
 }
 
 function updateProdiTarget() {
