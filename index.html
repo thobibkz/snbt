@@ -203,6 +203,7 @@ function login() {
         localStorage.setItem("role", d.role);
         localStorage.setItem("lastOpen", d.lastOpen); 
         localStorage.setItem("masaAktif", d.masaAktif);
+        localStorage.setItem("user_api_key", d.apiKey || "");
         
         location.href = (d.role == "admin") ? "admin.html" : "publik.html";
       } 
