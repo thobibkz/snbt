@@ -106,48 +106,71 @@ body{
 
 /* FOOTER - Versi Lebih Besar & Jelas */
 .footer {
-  display: flex;
-  flex-direction: row;        /* Memastikan berjejer ke samping */
-  justify-content: center;    /* Posisi di tengah layar */
-  align-items: center;        /* Sejajar secara vertikal */
-  gap: 25px;                  /* Jarak antar item (WA, TikTok, IG) */
-  padding: 20px;
-  background: white;          /* Tetap putih sesuai desain */
+  position: fixed;
+  bottom: 0;
+  left: 0;
   width: 100%;
-  border-top: 1px solid #dbe7ff;
-  flex-wrap: wrap;            /* Agar tidak pecah saat dibuka di HP layar kecil */
+  background: white;
+  display: grid;
+  grid-template-columns: 1.5fr 1fr 1fr; /* Membagi 3 partisi (kiri lebih lebar sedikit) */
+  align-items: center;
+  padding: 10px 15px;
+  border-top: 2px solid #dbe7ff;
+  box-shadow: 0 -4px 15px rgba(0,0,0,0.05);
+  z-index: 9999; /* Agar selalu on top */
 }
 
-.footer-item {
+/* Base style untuk setiap partisi */
+.footer-part {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text);
+}
+
+/* Khusus Partisi Kiri (2 Baris) */
+.part-left {
+  align-items: flex-start; /* Teks rata kiri di dalam partisinya */
+  text-align: left;
+}
+
+.part-left .row-1 {
+  font-size: 14px;
+  color: var(--blue);
+  margin-bottom: 2px;
+}
+
+.part-left .row-2 {
   display: flex;
   align-items: center;
-  gap: 8px;                   /* Jarak antara ikon dan teks */
-  transition: transform 0.2s;
-  cursor: pointer;
+  gap: 5px;
 }
 
-.footer-item img {
-  width: 20px;                /* Ukuran ikon tetap proporsional */
-  height: 20px;
+/* Partisi Tengah & Kanan */
+.footer-part img {
+  width: 22px;
+  height: 22px;
+  margin-bottom: 3px; /* Jarak antara logo dan teks */
 }
 
-.footer-item span {
-  font-size: 14px;
-  font-weight: 600;
-  color: var(--text);         /* Menggunakan variabel warna teks Anda */
-}
-
-.footer-item:hover {
-  transform: translateY(-3px); /* Efek sedikit naik saat disentuh */
-}
-
-/* Responsif untuk HP Sangat Kecil */
-@media (max-width: 400px) {
+/* Responsif untuk HP Kecil */
+@media (max-width: 480px) {
   .footer {
-    gap: 15px;
+    padding: 8px 5px;
   }
-  .footer-item span {
-    font-size: 12px;
+  .footer-part {
+    font-size: 10px;
+  }
+  .part-left .row-1 {
+    font-size: 11px;
+  }
+  .footer-part img {
+    width: 18px;
+    height: 18px;
   }
 }
 
@@ -525,7 +548,7 @@ select,input{
 #badgeMasaAktif {
   position: fixed;
   right: 20px;
-  bottom: 45px; /* Sesuai permintaan: 45px dari bawah */
+  bottom: 80px; /* Sesuai permintaan: 45px dari bawah */
   color: #000000; /* Warna hitam */
   font-size: 11px;
   font-weight: 400; /* Tidak bold */
@@ -1721,17 +1744,19 @@ if (localStorage.getItem("email")) {
 </script>
 
 <div class="footer">
-  <div class="footer-item" onclick="window.open('https://wa.me/62895423024582')">
-    <img src="https://cdn-icons-png.flaticon.com/512/733/733585.png" alt="WA">
-    <span>0895423024582</span>
+  <div class="footer-part part-left">
+    <div class="row-1">Beli Aplikasi SNBT hanya 25K</div>
+    <div class="row-2" onclick="window.open('https://wa.me/62895423024582')">
+      Hubungi <img src="https://cdn-icons-png.flaticon.com/512/733/733585.png" style="width:16px; height:16px; margin:0"> 0895423024582
+    </div>
   </div>
 
-  <div class="footer-item" onclick="window.open('https://www.tiktok.com/@aplus.course')">
+  <div class="footer-part" onclick="window.open('https://www.tiktok.com/@aplus.course')">
     <img src="https://cdn-icons-png.flaticon.com/512/3046/3046121.png" alt="TikTok">
     <span>aplus.course</span>
   </div>
 
-  <div class="footer-item" onclick="window.open('https://www.instagram.com/apluscourse1')">
+  <div class="footer-part" onclick="window.open('https://www.instagram.com/apluscourse1')">
     <img src="https://cdn-icons-png.flaticon.com/512/2111/2111463.png" alt="IG">
     <span>apluscourse1</span>
   </div>
