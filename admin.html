@@ -570,7 +570,7 @@ select,input{
 
 <script>
 // ================= API ==================
-const API="https://script.google.com/macros/s/AKfycbwXPz6mTwn9augGNV5Aa6UHUtQ1c7GbfbcPSxPFdy8RSamtc31IVCZVZhU_-cNSg-uv9Q/exec?action=data_fetch";
+const API="https://script.google.com/macros/s/AKfycby_V1-FEAH540G9Ur9iSi8gwh5h2XihuoAuEgZOryHk-3wjtJii_AEiih8oadwHplRmLg/exec?action=data_fetch";
   
   // ================= ANIMASI ANGKA NAIK ==================
 function animateValue(element, start, end, duration, isPercent=false){
@@ -1395,7 +1395,7 @@ async function getAiRecommendation(p1, p2) {
   const idealEl = document.getElementById("idealText");
   const safeEl = document.getElementById("safeText");
 
-  const GAS_URL = "https://script.google.com/macros/s/AKfycbwDcicJB50hogksank6y-U0CIeCKEiysMpSZfN24oaL9qZ7f3FRY_m2rCnSpcZyYWKAAA/exec"; 
+  const GAS_URL = "https://script.google.com/macros/s/AKfycby_V1-FEAH540G9Ur9iSi8gwh5h2XihuoAuEgZOryHk-3wjtJii_AEiih8oadwHplRmLg/exec"; 
 
   const prompt = `Analisis strategis SNBT 2026 untuk dua pilihan:
   Pilihan 1: ${p1[2]} di ${p1[1]} (Skor Aman: ${p1[8]}, Keketatan: ${p1[6]})
@@ -1646,7 +1646,7 @@ if(localStorage.getItem("role")!="admin"){
 </script>
 
 <script>
-const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbwXPz6mTwn9augGNV5Aa6UHUtQ1c7GbfbcPSxPFdy8RSamtc31IVCZVZhU_-cNSg-uv9Q/exec"; // Ganti dengan URL deployment terbaru
+const WEB_APP_URL = "https://script.google.com/macros/s/AKfycby_V1-FEAH540G9Ur9iSi8gwh5h2XihuoAuEgZOryHk-3wjtJii_AEiih8oadwHplRmLg/exec"; // Ganti dengan URL deployment terbaru
 
 function startPing() {
   const email = localStorage.getItem("email");
@@ -1663,14 +1663,44 @@ function startPing() {
     })
     .then(r => r.json())
     .then(d => {
+      // 1. Deteksi Multi-Device
       if (d.status === "multi_device") {
-        alert("Peringatan: Anda terdeteksi menggunakan 2 device bersamaan! Anda akan dikeluarkan.");
+        alert("Peringatan: Anda terdeteksi menggunakan 2 device bersamaan!");
         localStorage.clear();
         location.href = "index.html";
+      } 
+      // 2. Deteksi Pelanggaran (Email dihapus dari spreadsheet)
+      else if (d.status === "not_found") {
+        triggerBlockScreen();
       }
     })
-    .catch(err => console.log("Ping failed"));
-  }, 10000); // 10 Detik
+    .catch(err => console.log("Ping error"));
+  }, 10000); 
+}
+
+// FUNGSI UNTUK MEMBLOKIR TAMPILAN TOTAL
+function triggerBlockScreen() {
+  // Hapus semua isi body dan ganti dengan tampilan blokir
+  document.body.innerHTML = `
+    <div style="
+      position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+      background: #8b0000; color: white; display: flex; flex-direction: column;
+      justify-content: center; align-items: center; z-index: 99999;
+      font-family: 'Segoe UI', Arial, sans-serif; text-align: center; padding: 20px;
+    ">
+      <div style="font-size: 80px; margin-bottom: 20px;">🚫</div>
+      <h1 style="font-size: 30px; font-weight: 800; margin: 0;">AKUN ANDA TERBLOKIR</h1>
+      <p style="font-size: 18px; margin-top: 15px; opacity: 0.9;">
+        Terdeteksi pelanggaran pada lisensi akun Anda.<br>
+        Akses ke aplikasi telah dicabut secara permanen.
+      </p>
+      <div style="margin-top: 30px; padding: 10px 20px; border: 2px solid white; border-radius: 10px; font-weight: bold;">
+        HUBUNGI ADMIN UNTUK KLARIFIKASI
+      </div>
+    </div>
+  `;
+  // Hapus data agar tidak bisa login lagi tanpa izin admin
+  localStorage.clear();
 }
 
 // Jalankan ping jika sudah login
