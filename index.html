@@ -3,6 +3,7 @@
 <head>
 <title>Login Rasionalisasi SNBT</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 
 <style>
 :root{
@@ -22,9 +23,19 @@ body{
   background:var(--bg);
   color:var(--text);
   display:flex;
+  flex-direction: column;
   justify-content:center;
   align-items:center;
-  height:100vh;
+  min-height:100vh;
+  padding: 20px 0;
+}
+
+/* LOGO DI ATAS BOX */
+.main-logo {
+  width: 120px;
+  height: auto;
+  margin-bottom: 20px;
+  filter: drop-shadow(0 4px 8px rgba(0,0,0,0.1));
 }
 
 /* LOGIN CARD */
@@ -37,7 +48,6 @@ body{
   box-shadow:var(--shadow);
 }
 
-/* HEADER */
 .login-header{
   text-align:center;
   margin-bottom:18px;
@@ -51,13 +61,6 @@ body{
   color:transparent;
 }
 
-.login-header p{
-  margin-top:6px;
-  font-size:13px;
-  color:var(--muted);
-}
-
-/* INPUT */
 input{
   width:100%;
   padding:12px;
@@ -65,9 +68,9 @@ input{
   border:1px solid #dbe7ff;
   margin-bottom:12px;
   font-size:14px;
+  outline: none;
 }
 
-/* BUTTON */
 button{
   width:100%;
   padding:12px;
@@ -79,26 +82,75 @@ button{
   font-size:15px;
   box-shadow:0 4px 12px rgba(31,111,235,.3);
   cursor:pointer;
+  transition: 0.3s;
 }
 
-button:active{
-  transform:scale(.98);
+button:disabled {
+  background: #ccc;
+  box-shadow: none;
+  cursor: not-allowed;
 }
 
-/* FOOTER */
-.footer{
+/* LOADING TEXT ANIMATION */
+#loading-text {
+  display: none;
+  text-align: center;
+  font-size: 13px;
+  color: var(--blue);
+  margin-top: 10px;
+  font-weight: 500;
+}
+
+.dots::after {
+  content: '';
+  animation: blink 1.5s infinite;
+}
+
+@keyframes blink {
+  0% { content: '.'; }
+  33% { content: '..'; }
+  66% { content: '...'; }
+}
+
+/* CONTACT ADMIN SECTION */
+.contact-section {
   text-align:center;
-  margin-top:12px;
-  font-size:12px;
-  color:var(--muted);
+  margin-top:20px;
+}
+
+.contact-section p {
+  font-size: 12px;
+  color: var(--muted);
+  margin-bottom: 10px;
+}
+
+.wa-link {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+  color: #25d366; /* WhatsApp Green */
+  font-size: 14px;
+  font-weight: 600;
+  margin-bottom: 5px;
+  transition: 0.2s;
+}
+
+.wa-link i {
+  margin-right: 8px;
+  font-size: 18px;
+}
+
+.wa-link:hover {
+  transform: translateY(-2px);
 }
 </style>
 </head>
-
 <body>
 
-<div class="login-card">
+<img src="https://i.imgur.com/vHqQpXy.png" alt="Logo" class="main-logo">
 
+<div class="login-card">
   <div class="login-header">
     <h2>Rasionalisasi SNBT</h2>
     <p>Login untuk analisis peluang masuk PTN</p>
@@ -107,12 +159,19 @@ button:active{
   <input id="email" placeholder="Email">
   <input id="pass" type="password" placeholder="Password">
 
-  <button onclick="login()">LOGIN</button>
+  <button id="loginBtn" onclick="login()">LOGIN</button>
+  
+  <div id="loading-text">Sedang mencoba login<span class="dots"></span></div>
+</div>
 
-  <div class="footer">
-    Sistem Analisis SNBT © 2026
-  </div>
-
+<div class="contact-section">
+  <p>Untuk Pembelian Aplikasi Hubungi Admin:</p>
+  <a href="https://wa.me/6285815023510" class="wa-link" target="_blank">
+    <i class="fab fa-whatsapp"></i> Admin 1 : 085815023510
+  </a>
+  <a href="https://wa.me/62895423024582" class="wa-link" target="_blank">
+    <i class="fab fa-whatsapp"></i> Admin 2 : 0895423024582
+  </a>
 </div>
 
 <script>
@@ -121,44 +180,50 @@ const API="https://script.google.com/macros/s/AKfycbxQdAXA39uD4bz_ZpePTnXiOl5xeK
 function login() {
   let email = document.getElementById("email").value;
   let pass = document.getElementById("pass").value;
+  let btn = document.getElementById("loginBtn");
+  let loadTxt = document.getElementById("loading-text");
 
   if (!email || !pass) {
     alert("Silakan isi email dan password!");
     return;
   }
 
-  // Hapus sisa-sisa login sebelumnya agar bersih
+  // Tampilkan Loading & Disable Tombol
+  btn.disabled = true;
+  loadTxt.style.display = "block";
   localStorage.clear();
-
-  console.log("Mencoba login...");
 
   fetch(`${API}?action=auth_req&email=${encodeURIComponent(email)}&pass=${encodeURIComponent(pass)}`)
     .then(r => r.json())
     .then(d => {
       if (d.status == "ok") {
-        // Simpan semua data yang diperlukan
         localStorage.setItem("email", email); 
         localStorage.setItem("role", d.role);
         localStorage.setItem("lastOpen", d.lastOpen); 
-        localStorage.setItem("masaAktif", d.masaAktif); // Data sisa hari dari kolom E
+        localStorage.setItem("masaAktif", d.masaAktif);
         
-        // Pengalihan halaman
         location.href = (d.role == "admin") ? "admin.html" : "publik.html";
       } 
       else if (d.status == "expired") {
         alert("⚠️ Masa aktif akun anda sudah habis, silahkan hubungi admin");
+        resetUI();
       } 
       else {
         alert("❌ Email atau password salah");
+        resetUI();
       }
     })
     .catch((err) => {
-      console.error("Login Error:", err);
-      alert("Gagal terhubung ke server. Pastikan URL API sudah benar dan sudah di-Deploy sebagai 'Anyone'.");
+      alert("Gagal terhubung ke server.");
+      resetUI();
     });
 }
 
-// Tambahan: Tekan Enter untuk Login
+function resetUI() {
+  document.getElementById("loginBtn").disabled = false;
+  document.getElementById("loading-text").style.display = "none";
+}
+
 document.addEventListener("keypress", function(e) {
   if (e.key === "Enter") {
     login();
