@@ -99,10 +99,8 @@ function savePassword() {
   if(!newPass) { alert("Masukkan kata sandi baru!"); return; }
 
   const btn = document.querySelector(".btn-save");
-  btn.innerText = "⏳...";
+  btn.innerText = "⏳ Menyimpan...";
   btn.disabled = true;
-
-  const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzyPZYlzSJ9ZPCMGuJ70-Lf96IJiZWVlDV02sCFj2oRVUhCJMICWljVnT4TA70xT0fWxA/exec";
 
   fetch(WEB_APP_URL, {
     method: "POST",
@@ -112,15 +110,21 @@ function savePassword() {
       newPass: newPass
     })
   })
-  .then(() => {
-    document.getElementById("msg").style.display = "block";
+  .then(response => response.json()) // Kita ingin membaca balasan JSON dari server
+  .then(result => {
+    if(result.status === "success") {
+       document.getElementById("msg").style.display = "block";
+       document.getElementById("newPass").value = "";
+    } else {
+       alert("Gagal: " + result.status);
+    }
     btn.innerText = "Simpan";
     btn.disabled = false;
-    document.getElementById("newPass").value = "";
-    setTimeout(() => { document.getElementById("msg").style.display = "none"; }, 3000);
   })
   .catch(err => {
-    alert("Koneksi gagal!");
+    console.error(err);
+    // Jika masih gagal, biasanya karena masalah Deployment di Google Script
+    alert("Pastikan Anda sudah Re-Deploy (New Version) di Google Script!");
     btn.disabled = false;
     btn.innerText = "Simpan";
   });
