@@ -95,6 +95,10 @@ function goBack() {
 }
 
 function savePassword() {
+  // --- BARIS INI YANG TADI HILANG ---
+  const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbyreyOf5DdYp6d5xcKP0FUl7w_HpZ2VQ7bYdFGTpZXrcEZbAu7lJKcEI65enSH2W5ohxQ/exec";
+  // ----------------------------------
+
   const newPass = document.getElementById("newPass").value;
   if(!newPass) { alert("Masukkan kata sandi baru!"); return; }
 
@@ -110,11 +114,12 @@ function savePassword() {
       newPass: newPass
     })
   })
-  .then(response => response.json()) // Kita ingin membaca balasan JSON dari server
+  .then(response => response.json())
   .then(result => {
     if(result.status === "success") {
        document.getElementById("msg").style.display = "block";
        document.getElementById("newPass").value = "";
+       setTimeout(() => { document.getElementById("msg").style.display = "none"; }, 3000);
     } else {
        alert("Gagal: " + result.status);
     }
@@ -123,7 +128,6 @@ function savePassword() {
   })
   .catch(err => {
     console.error(err);
-    // Jika masih gagal, biasanya karena masalah Deployment di Google Script
     alert("Pastikan Anda sudah Re-Deploy (New Version) di Google Script!");
     btn.disabled = false;
     btn.innerText = "Simpan";
