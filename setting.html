@@ -14,15 +14,16 @@ body {
   margin:0; background:var(--bg); font-family:Segoe UI,Arial; 
   display:flex; justify-content:center; align-items:center; min-height:100vh;
 }
-/* UKURAN DISAMAKAN DENGAN .login-card index.html */
+
 .setting-card {
-  background:var(--card); 
-  width:92%; 
-  max-width:360px; /* Sama dengan index.html */
-  padding:22px; 
-  border-radius:22px; 
-  box-shadow:var(--shadow);
-  text-align:center;
+  background: var(--card); 
+  width: 92%; 
+  max-width: 360px; /* Ukuran lebar maksimal sama dengan login */
+  padding: 22px;    /* Padding disamakan dengan login-card */
+  border-radius: 22px; 
+  box-shadow: var(--shadow);
+  text-align: center;
+  box-sizing: border-box; /* Memastikan padding tidak memperlebar box */
 }
 h2 { 
   margin:0 0 18px 0; 
@@ -30,14 +31,23 @@ h2 {
   background:linear-gradient(135deg,var(--blue),var(--blue2));
   -webkit-background-clip:text; color:transparent;
 }
-.form-group { text-align:left; margin-bottom:12px; }
-label { display:block; font-size:13px; font-weight:600; margin-bottom:5px; color:var(--muted); }
-input {
-  width:100%; padding:12px; border-radius:12px; border:1px solid #dbe7ff;
-  font-size:14px; outline:none; box-sizing:border-box;
+.form-group { 
+  text-align: left; 
+  margin-bottom: 12px; 
+  width: 100%;
 }
 input:disabled { background:#f1f5f9; color:#94a3b8; cursor:not-allowed; }
 
+input {
+  width: 100%; 
+  padding: 12px; 
+  border-radius: 12px; 
+  border: 1px solid #dbe7ff;
+  font-size: 14px; 
+  outline: none; 
+  box-sizing: border-box; /* Sangat penting agar input tidak lebih lebar dari box */
+}
+  
 .btn-group { display:flex; gap:10px; margin-top:20px; }
 button {
   flex:1; padding:12px; border-radius:14px; border:none; cursor:pointer;
