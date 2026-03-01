@@ -512,6 +512,27 @@ select,input{
   width: 24px;
   height: 24px;
 }
+
+/* Style untuk Label Lisensi/Watermark */
+.license-badge {
+  display: inline-block;
+  background: rgba(31, 111, 235, 0.1); /* Biru sangat transparan */
+  color: var(--blue);
+  font-size: 11px;
+  font-weight: 600;
+  padding: 4px 12px;
+  border-radius: 50px;
+  margin-top: 5px;
+  margin-bottom: 15px;
+  border: 1px solid rgba(31, 111, 235, 0.2);
+  text-transform: lowercase;
+}
+
+/* Memastikan teks berada di tengah bawah judul */
+.menu-section-header {
+  text-align: left;
+  margin-bottom: 10px;
+}
     
 </style>
 </head>
@@ -615,6 +636,7 @@ function loadRasionalisasi(){
   document.getElementById("content").innerHTML=`
   <div class="card">
     <h3>🎓 Rasionalisasi Prodi</h3>
+    <div class="license-display"></div>
     <input list="ptnList" id="ptn" placeholder="Pilih PTN...">
     <datalist id="ptnList"></datalist>
 
@@ -762,6 +784,7 @@ function loadPeluang(){
   document.getElementById("content").innerHTML = `
   <div class="card">
     <h3 style="text-align:left; margin-bottom:20px;">📊 Cek Peluang Lolos</h3>
+    <div class="license-display"></div>
 
     <div style="margin-bottom:20px;">
       <input list="ptnListPeluang" id="ptnPeluang" placeholder="Pilih PTN..." 
@@ -1104,6 +1127,7 @@ function loadSaran(){
   document.getElementById("content").innerHTML = `
   <div class="card">
     <h3 style="margin-bottom:20px;">💡 Saran Prodi Berdasarkan Skor</h3>
+    <div class="license-display"></div>
     
     <div class="input-row">
       <input type="number" id="sPU" placeholder="PU" value="${k.PU}" oninput="saveSkor('s')">
@@ -1259,6 +1283,7 @@ function loadPerbandingan(){
   document.getElementById("content").innerHTML = `
   <div class="card">
     <h3 style="margin-bottom:20px;">⚖ Perbandingan Prodi</h3>
+    <div class="license-display"></div>
     <div style="margin-bottom:15px">
       <input list="ptnListBanding" id="ptnBanding" placeholder="Pilih PTN...">
       <datalist id="ptnListBanding"></datalist>
@@ -1444,6 +1469,7 @@ function loadTarget() {
   document.getElementById("content").innerHTML = `
     <div class="card">
       <h3 style="margin-top:0">🎯 Analisis Target Belajar SNBT 2026</h3>
+      <div class="license-display"></div>
       
       <div style="margin-bottom:20px;">
         <input list="ptnTargetList" id="filterPtnTarget" placeholder="Pilih PTN..." oninput="updateProdiTarget()" style="width:100%; padding:12px; border-radius:12px; border:1px solid #ddd; margin-bottom:10px;">
