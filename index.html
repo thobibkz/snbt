@@ -30,12 +30,12 @@ body{
   padding: 20px 0;
 }
 
-/* LOGO DI ATAS BOX */
+/* LOGO - Diperbesar */
 .main-logo {
-  width: 120px;
+  width: 180px; /* Ukuran diperbesar dari sebelumnya */
   height: auto;
-  margin-bottom: 20px;
-  filter: drop-shadow(0 4px 8px rgba(0,0,0,0.1));
+  margin-bottom: 25px;
+  filter: drop-shadow(0 4px 10px rgba(0,0,0,0.12));
 }
 
 /* LOGIN CARD */
@@ -43,19 +43,19 @@ body{
   background:var(--card);
   width:92%;
   max-width:360px;
-  padding:22px;
+  padding:25px;
   border-radius:22px;
   box-shadow:var(--shadow);
 }
 
 .login-header{
   text-align:center;
-  margin-bottom:18px;
+  margin-bottom:20px;
 }
 
 .login-header h2{
   margin:0;
-  font-size:22px;
+  font-size:24px;
   background:linear-gradient(135deg,var(--blue),var(--blue2));
   -webkit-background-clip:text;
   color:transparent;
@@ -63,23 +63,23 @@ body{
 
 input{
   width:100%;
-  padding:12px;
+  padding:14px;
   border-radius:12px;
   border:1px solid #dbe7ff;
   margin-bottom:12px;
-  font-size:14px;
+  font-size:15px;
   outline: none;
 }
 
 button{
   width:100%;
-  padding:12px;
+  padding:14px;
   border-radius:14px;
   border:none;
   background:linear-gradient(135deg,var(--blue),var(--blue2));
   color:white;
-  font-weight:600;
-  font-size:15px;
+  font-weight:700;
+  font-size:16px;
   box-shadow:0 4px 12px rgba(31,111,235,.3);
   cursor:pointer;
   transition: 0.3s;
@@ -91,14 +91,14 @@ button:disabled {
   cursor: not-allowed;
 }
 
-/* LOADING TEXT ANIMATION */
+/* LOADING TEXT */
 #loading-text {
   display: none;
   text-align: center;
-  font-size: 13px;
+  font-size: 14px;
   color: var(--blue);
-  margin-top: 10px;
-  font-weight: 500;
+  margin-top: 12px;
+  font-weight: 600;
 }
 
 .dots::after {
@@ -112,16 +112,17 @@ button:disabled {
   66% { content: '...'; }
 }
 
-/* CONTACT ADMIN SECTION */
+/* CONTACT ADMIN SECTION - Perbesar Teks */
 .contact-section {
   text-align:center;
-  margin-top:20px;
+  margin-top:30px;
 }
 
 .contact-section p {
-  font-size: 12px;
-  color: var(--muted);
-  margin-bottom: 10px;
+  font-size: 16px; /* Teks Hubungi Admin Diperbesar */
+  font-weight: 700;
+  color: var(--text);
+  margin-bottom: 12px;
 }
 
 .wa-link {
@@ -129,26 +130,28 @@ button:disabled {
   align-items: center;
   justify-content: center;
   text-decoration: none;
-  color: #25d366; /* WhatsApp Green */
-  font-size: 14px;
+  color: #000000; /* Warna Nomor HP Hitam */
+  font-size: 16px; /* Ukuran Nomor Diperbesar */
   font-weight: 600;
-  margin-bottom: 5px;
+  margin-bottom: 8px;
   transition: 0.2s;
 }
 
 .wa-link i {
-  margin-right: 8px;
-  font-size: 18px;
+  margin-right: 10px;
+  font-size: 20px;
+  color: #25d366; /* Icon tetap hijau agar familiar sebagai WA */
 }
 
 .wa-link:hover {
-  transform: translateY(-2px);
+  transform: scale(1.05);
+  color: var(--blue);
 }
 </style>
 </head>
 <body>
 
-<img src="https://i.imgur.com/vHqQpXy.png" alt="Logo" class="main-logo">
+<img src="https://i.imgur.com/zyRxiIM.png" alt="Logo" class="main-logo">
 
 <div class="login-card">
   <div class="login-header">
@@ -188,7 +191,6 @@ function login() {
     return;
   }
 
-  // Tampilkan Loading & Disable Tombol
   btn.disabled = true;
   loadTxt.style.display = "block";
   localStorage.clear();
