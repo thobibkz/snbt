@@ -787,8 +787,8 @@ function showData(){
 
 // ================= PELUANG LOLOS ==================
 function loadPeluang(){
-  const s = inputState.peluang; // Shortcut agar kode lebih pendek
-  const k = inputState.skor; // Ambil skor global
+  const s = inputState.peluang; 
+  const k = inputState.skor; 
     
   document.getElementById("content").innerHTML = `
   <div class="card">
@@ -804,17 +804,24 @@ function loadPeluang(){
       <datalist id="prodiListPeluang"></datalist>
     </div>
 
-    <h3 style="text-align:center; margin:20px 0 10px">Masukkan Perkiraan Skor UTBK</h3>
+    <div style="display: flex; justify-content: space-between; align-items: center; margin: 20px 0 10px;">
+      <div style="flex: 1;"></div> <h3 style="margin: 0; flex: 2; text-align: center; font-size: 16px;">Masukkan Perkiraan Skor UTBK</h3>
+      <div style="flex: 1; text-align: right;">
+        <button onclick="acakSkor()" style="background: #28a745; color: white; border: none; padding: 5px 10px; border-radius: 8px; font-size: 11px; cursor: pointer; font-weight: bold; box-shadow: 0 2px 5px rgba(0,0,0,0.1);">
+          <i class="fas fa-dice"></i> Acak Skor
+        </button>
+      </div>
+    </div>
 
-<div class="input-row">
-  <div><input type="number" id="PU" placeholder="PU" value="${k.PU}" oninput="saveSkor(); savePeluangInput()"></div>
-  <div><input type="number" id="PPU" placeholder="PPU" value="${k.PPU}" oninput="saveSkor(); savePeluangInput()"></div>
-  <div><input type="number" id="PBM" placeholder="PBM" value="${k.PBM}" oninput="saveSkor(); savePeluangInput()"></div>
-  <div><input type="number" id="PK" placeholder="PK" value="${k.PK}" oninput="saveSkor(); savePeluangInput()"></div>
-  <div><input type="number" id="LBI" placeholder="LBI" value="${k.LBI}" oninput="saveSkor(); savePeluangInput()"></div>
-  <div><input type="number" id="LBE" placeholder="LBE" value="${k.LBE}" oninput="saveSkor(); savePeluangInput()"></div>
-  <div><input type="number" id="PM" placeholder="PM" value="${k.PM}" oninput="saveSkor(); savePeluangInput()"></div>
-</div>
+    <div class="input-row">
+      <div><input type="number" id="PU" placeholder="PU" value="${k.PU}" oninput="saveSkor(); savePeluangInput()"></div>
+      <div><input type="number" id="PPU" placeholder="PPU" value="${k.PPU}" oninput="saveSkor(); savePeluangInput()"></div>
+      <div><input type="number" id="PBM" placeholder="PBM" value="${k.PBM}" oninput="saveSkor(); savePeluangInput()"></div>
+      <div><input type="number" id="PK" placeholder="PK" value="${k.PK}" oninput="saveSkor(); savePeluangInput()"></div>
+      <div><input type="number" id="LBI" placeholder="LBI" value="${k.LBI}" oninput="saveSkor(); savePeluangInput()"></div>
+      <div><input type="number" id="LBE" placeholder="LBE" value="${k.LBE}" oninput="saveSkor(); savePeluangInput()"></div>
+      <div><input type="number" id="PM" placeholder="PM" value="${k.PM}" oninput="saveSkor(); savePeluangInput()"></div>
+    </div>
 
     <div style="margin-top:25px; display:flex; gap:12px; justify-content:center; align-items:center;">
       <button onclick="prosesPeluang()" class="btn-3d-primary">🚀 Proses Peluang Lolos</button>
@@ -825,14 +832,30 @@ function loadPeluang(){
   </div>
   `;
   
-  tampilkanInfoAkun(); // Panggil pengisi teks
-  // Inisialisasi PTN Datalist
+  tampilkanInfoAkun(); 
   const ptnSet = [...new Set(snbt.map(r => r[1]))];
   const pList = document.getElementById("ptnListPeluang");
+  pList.innerHTML = ""; // Bersihkan dulu agar tidak duplikat
   ptnSet.forEach(x => pList.innerHTML += `<option value="${x}">`);
   
-  // Jika sebelumnya sudah ada PTN terpilih, langsung munculkan daftar prodinya
   if(s.ptn) updateProdiList(s.ptn);
+}
+
+function acakSkor() {
+  const ids = ["PU", "PPU", "PBM", "PK", "LBI", "LBE", "PM"];
+  
+  ids.forEach(id => {
+    // Menghasilkan angka acak antara 500 sampai 850
+    const randomVal = Math.floor(Math.random() * (850 - 500 + 1)) + 500;
+    document.getElementById(id).value = randomVal;
+  });
+
+  // Simpan perubahan ke state agar tidak hilang saat menu berpindah
+  saveSkor();
+  savePeluangInput();
+  
+  // Berikan sedikit feedback visual (opsional)
+  console.log("Skor berhasil diacak!");
 }
 
 // Fungsi pembantu untuk update list prodi
