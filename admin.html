@@ -56,6 +56,54 @@ body{
   opacity: 0.9;
   font-weight: 400;
 }
+
+/* FOOTER - Ramping & Fixed */
+.footer {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  background: linear-gradient(135deg, var(--blue), var(--blue2));
+  color: white;
+  padding: 8px 16px;
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr; /* Membagi 3 bagian sama besar */
+  align-items: center;
+  box-shadow: 0 -4px 12px rgba(0,0,0,0.15);
+  z-index: 1000;
+  font-size: 11px;
+}
+
+.footer-item {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+
+.footer-item img {
+  width: 14px;
+  height: 14px;
+  filter: brightness(0) invert(1); /* Membuat logo menjadi putih agar senada */
+}
+
+/* Tambahkan padding di body agar konten utama tidak tertutup footer */
+body {
+  padding-bottom: 50px; 
+}
+
+/* Responsif untuk HP agar tidak terlalu rapat */
+@media (max-width: 480px) {
+  .footer {
+    font-size: 9px;
+    padding: 8px 5px;
+  }
+  .footer-item {
+    gap: 4px;
+  }
+}
+
+    
 /* ============================================================
    MENU BUTTONS (Update: Minimalis, Elegan, Beranimasi)
    ============================================================ */
@@ -1467,5 +1515,23 @@ if(localStorage.getItem("role")!="admin"){
 }
 </script>
 
+
+<div class="footer">
+  <div class="footer-item">
+    <img src="https://cdn-icons-png.flaticon.com/512/733/733585.png" alt="WA">
+    <span>0895423024582</span>
+  </div>
+
+  <div class="footer-item">
+    <img src="https://cdn-icons-png.flaticon.com/512/3046/3046121.png" alt="TikTok">
+    <span>aplus.course</span>
+  </div>
+
+  <div class="footer-item">
+    <img src="https://cdn-icons-png.flaticon.com/512/2111/2111463.png" alt="IG">
+    <span>apluscourse1</span>
+  </div>
+</div>
+ 
 </body>
 </html>
