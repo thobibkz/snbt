@@ -491,37 +491,38 @@ select,input{
 .settings-icon {
   position: absolute;
   right: 20px;
-  top: 90px; /* Menyesuaikan agar tepat di bawah header */
+  top: 90px; 
   background: white;
-  width: 25px;
-  height: 25px;
+  width: 35px; /* Sedikit diperbesar agar ikon 24px tidak terlalu sesak */
+  height: 35px;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
   box-shadow: var(--shadow);
   cursor: pointer;
-  transition: all 0.3s ease;
+  transition: all 0.3s ease; /* Transisi halus */
   z-index: 99;
   border: 1px solid #dbe7ff;
 }
+
+/* BAGIAN YANG DIUBAH: Efek menyala tanpa berputar */
 .settings-icon:hover {
-  transform: rotate(90deg);
-  background: #f0f7ff;
-}
-.settings-icon img {
-  width: 24px;
-  height: 24px;
+  background: #fffafa; /* Warna putih kemerahan tipis */
+  /* Efek menyala merah karena ini tombol logout/off */
+  filter: drop-shadow(0 0 8px rgba(239, 68, 68, 0.8)); 
+  border-color: #ffbaba;
 }
 
-/* Watermark Transparan */
-.watermark-lisensi {
-  font-size: 11px;
-  color: var(--muted);
-  opacity: 0.8;
-  font-weight: 500;
-  display: block;
-  margin-top: 2px;
+.settings-icon img {
+  width: 20px; /* Ukuran ikon disesuaikan */
+  height: 20px;
+  transition: transform 0.2s;
+}
+
+/* Tambahan: Efek klik agar terasa seperti tombol asli */
+.settings-icon:active {
+  transform: scale(0.9);
 }
 
 /* Badge Masa Aktif Pojok Kanan Bawah */
