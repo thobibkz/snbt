@@ -526,17 +526,13 @@ select,input{
 /* Badge Masa Aktif Pojok Kanan Bawah */
 #badgeMasaAktif {
   position: fixed;
-  right: 15px;
-  bottom: 40px; /* Tinggi di atas footer agar tidak tabrakan */
-  background: white;
-  color: #ef4444;
-  padding: 6px 12px;
-  border-radius: 8px;
+  right: 20px;
+  bottom: 45px; /* Sesuai permintaan: 45px dari bawah */
+  color: #000000; /* Warna hitam */
   font-size: 11px;
-  font-weight: 800;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-  border: 1px solid #fee2e2;
+  font-weight: 400; /* Tidak bold */
   z-index: 9999;
+  pointer-events: none; /* Agar tidak mengganggu klik menu di bawahnya */
 }
     
 </style>
@@ -575,7 +571,7 @@ select,input{
 
 <script>
 // ================= API ==================
-const API="https://script.google.com/macros/s/AKfycby_V1-FEAH540G9Ur9iSi8gwh5h2XihuoAuEgZOryHk-3wjtJii_AEiih8oadwHplRmLg/exec?action=data_fetch";
+const API="https://script.google.com/macros/s/AKfycbx7ppUM70BdCrOVORQeL7JEtcQl1amvwvxJwPrzZgz3AKWQygxc79f8ItHzJBF8UMcOjA/exec?action=data_fetch";
   
   // ================= ANIMASI ANGKA NAIK ==================
 function animateValue(element, start, end, duration, isPercent=false){
@@ -1407,7 +1403,7 @@ async function getAiRecommendation(p1, p2) {
   const idealEl = document.getElementById("idealText");
   const safeEl = document.getElementById("safeText");
 
-  const GAS_URL = "https://script.google.com/macros/s/AKfycby_V1-FEAH540G9Ur9iSi8gwh5h2XihuoAuEgZOryHk-3wjtJii_AEiih8oadwHplRmLg/exec"; 
+  const GAS_URL = "https://script.google.com/macros/s/AKfycbx7ppUM70BdCrOVORQeL7JEtcQl1amvwvxJwPrzZgz3AKWQygxc79f8ItHzJBF8UMcOjA/exec"; 
 
   const prompt = `Analisis strategis SNBT 2026 untuk dua pilihan:
   Pilihan 1: ${p1[2]} di ${p1[1]} (Skor Aman: ${p1[8]}, Keketatan: ${p1[6]})
@@ -1745,16 +1741,17 @@ if (localStorage.getItem("email")) {
 <script>
 function tampilkanInfoAkun() {
   const email = localStorage.getItem("email") || "User";
-  const masa = localStorage.getItem("masaAktif") || "0";
+  // Ambil angka masaAktif, jika kosong tampilkan 0
+  const sisaHari = localStorage.getItem("masaAktif") || "0";
   
-  // Isi watermark jika elemennya ada di layar
+  // Update Watermark Lisensi
   const wm = document.getElementById("wm-prodi");
   if(wm) wm.innerText = "Lisensi: " + email;
 
-  // Isi badge masa aktif
+  // Update Teks Masa Aktif
   const badge = document.getElementById("badgeMasaAktif");
   if(badge) {
-    badge.innerText = "⏳ " + masa + " Hari Lagi";
+    badge.innerText = "Masa aktif " + sisaHari + " hari lagi";
   }
 }
 
