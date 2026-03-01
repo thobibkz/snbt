@@ -1373,7 +1373,14 @@ async function getAiRecommendation(p1, p2) {
   const idealEl = document.getElementById("idealText");
   const safeEl = document.getElementById("safeText");
 
-  const GAS_URL = "https://script.google.com/macros/s/AKfycbwDcicJB50hogksank6y-U0CIeCKEiysMpSZfN24oaL9qZ7f3FRY_m2rCnSpcZyYWKAAA/exec"; 
+  // AMBIL API KEY MILIK USER DARI LOCALSTORAGE
+  const userApiKey = localStorage.getItem("user_api_key");
+
+  if (!userApiKey) {
+    idealEl.innerText = "API Key tidak ditemukan. Silakan login ulang.";
+    safeEl.innerText = "API Key tidak ditemukan. Silakan login ulang.";
+    return;
+  }
 
   const prompt = `Analisis strategis SNBT 2026 untuk dua pilihan:
   Pilihan 1: ${p1[2]} di ${p1[1]} (Skor Aman: ${p1[8]}, Keketatan: ${p1[6]})
@@ -1403,14 +1410,29 @@ async function getAiRecommendation(p1, p2) {
 
   PENTING: Awali analisis pertama dengan kata [IDEAL] dan analisis kedua dengan kata [AMAN].`;
 
+  // URL API Gemini Langsung (Cara Baru)
+  const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent?key=${userApiKey}`;
+
   try {
-    const response = await fetch(GAS_URL, {
+    const response = await fetch(API_URL, {
       method: "POST",
-      body: JSON.stringify({ prompt: prompt })
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        contents: [{
+          parts: [{ text: prompt }]
+        }]
+      })
     });
 
     const result = await response.json();
     
+    // Cek jika ada error dari API
+    if (result.error) {
+        throw new Error(result.error.message);
+    }
+
     const aiResponseText = result.candidates[0].content.parts[0].text;
 
     let idealContent = "";
@@ -1434,8 +1456,8 @@ async function getAiRecommendation(p1, p2) {
 
   } catch (e) {
     console.error("AI Error:", e);
-    idealEl.innerText = "Gagal memuat analisis melalui server.";
-    safeEl.innerText = "Gagal memuat analisis melalui server.";
+    idealEl.innerText = "Gagal memuat analisis. Pastikan API Key valid atau kuota masih tersedia.";
+    safeEl.innerText = "Gagal memuat analisis. Pastikan API Key valid atau kuota masih tersedia.";
   }
 }
 
