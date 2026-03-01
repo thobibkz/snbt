@@ -133,6 +133,8 @@ function login() {
     .then(r => r.json())
     .then(d => {
       if (d.status == "ok") {
+        // SIMPAN EMAIL & ROLE KE LOCAL STORAGE
+        localStorage.setItem("email", email); // Baris ini sangat penting
         // Menyimpan data role ke local storage
         localStorage.setItem("role", d.role);
         
