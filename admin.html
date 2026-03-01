@@ -513,24 +513,7 @@ select,input{
   height: 24px;
 }
 
-/* Badge Masa Aktif Melayang - Pojok Kanan Bawah */
-.expiry-badge {
-  position: fixed;
-  right: 20px;
-  bottom: 85px; /* Di atas footer */
-  background: linear-gradient(135deg, #ff4b2b, #ff416c);
-  color: white;
-  padding: 8px 15px;
-  border-radius: 12px;
-  font-size: 12px;
-  font-weight: 700;
-  box-shadow: 0 4px 15px rgba(255, 75, 43, 0.3);
-  z-index: 999;
-  border: 1px solid rgba(255,255,255,0.2);
-  display: none; /* Muncul via JS */
-}
-
-/* Style Watermark Lisensi */
+/* Watermark di bawah judul menu */
 .license-badge {
   display: inline-block;
   background: rgba(31, 111, 235, 0.1);
@@ -543,9 +526,27 @@ select,input{
   border: 1px solid rgba(31, 111, 235, 0.2);
 }
 
-.menu-section-header {
-  text-align: center;
-  width: 100%;
+/* Kotak Masa Aktif - Fix di atas footer */
+#expiryBadge {
+  position: fixed;
+  right: 20px;
+  bottom: 80px; /* Jarak aman di atas footer agar tidak tumpang tindih */
+  background: white;
+  color: #ef4444; /* Warna merah agar mencolok */
+  padding: 8px 15px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 800;
+  box-shadow: var(--shadow);
+  z-index: 1000;
+  border: 1px solid #fee2e2;
+  display: none; /* Muncul jika data ada */
+}
+
+/* Pastikan footer memiliki z-index lebih rendah dari badge */
+.footer {
+  position: relative;
+  z-index: 10;
 }
     
 </style>
@@ -666,6 +667,9 @@ function loadRasionalisasi(){
     <div id="hasil" class="result">Silakan pilih PTN dan Prodi</div>
   </div>`;
 
+// PANGGIL ULANG fungsi watermark agar teks email muncul di div .license-display yang baru dibuat
+  initAccountInfo();
+    
   loadPTN();
   document.getElementById("ptn").oninput=loadProdi;
   document.getElementById("prodi").oninput=showData;
@@ -1652,34 +1656,31 @@ if(localStorage.getItem("role")!="admin"){
 </script>
 
 <script>
-// Fungsi untuk memunculkan watermark dan masa aktif
-function loadAccountInfo() {
+function initAccountInfo() {
   const email = localStorage.getItem("email") || "User";
-  const displays = document.querySelectorAll(".license-display");
+  const masaAktif = localStorage.getItem("masaAktif") || "0";
   
-  // Tampilkan Watermark
+  // Mengisi semua kontainer watermark yang ada di halaman (termasuk yang baru di-load via innerHTML)
+  const displays = document.querySelectorAll(".license-display");
   displays.forEach(el => {
     el.innerHTML = `<span class="license-badge">🔒 Lisensi: ${email}</span>`;
   });
 
-  // Ambil Masa Aktif dari Spreadsheet (melalui fetch data SNBT atau buat action baru)
-  // Untuk sementara kita asumsikan Anda ingin menampilkannya saat halaman dimuat
-  fetch(`${API}?action=data_fetch`) // Sesuaikan jika Anda punya action khusus ambil profil
-    .then(r => r.json())
-    .then(data => {
-       // Cari data user ini di antara data (jika data_fetch mengembalikan semua)
-       // Atau lebih simpel, simpan masaAktif di localStorage saat login
-       const savedMasaAktif = localStorage.getItem("masaAktif") || "0"; 
-       const badge = document.getElementById("expiryBadge");
-       badge.innerHTML = `⏳ Masa aktif ${savedMasaAktif} hari lagi`;
-       badge.style.display = "block";
-    });
+  // Tampilkan Badge Masa Aktif (Badge ini harus ada di struktur HTML tetap admin.html)
+  const badge = document.getElementById("expiryBadge");
+  if (badge) {
+    badge.innerText = `⏳ Masa Aktif: ${masaAktif} Hari Lagi`;
+    badge.style.display = "block";
+  }
+}
 }
 
-// Tambahkan ini di dalam fetch login di index.html sebelumnya agar data tersimpan:
-// localStorage.setItem("masaAktif", d.masaAktif);
+// Jalankan saat halaman siap
+document.addEventListener("DOMContentLoaded", initAccountInfo);
 
-window.addEventListener("DOMContentLoaded", loadAccountInfo);
+// --- PENTING ---
+// Agar angka muncul, pastikan di index.html (fungsi login) 
+// Anda sudah menambahkan: localStorage.setItem("masaAktif", d.masaAktif);
 </script>
 
 <script>
