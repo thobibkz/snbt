@@ -110,15 +110,14 @@ body{
   bottom: 0;
   left: 0;
   width: 100%;
-  /* Tema Biru Gradien mengikuti Header */
   background: linear-gradient(135deg, var(--blue), var(--blue2));
   color: white;
   display: grid;
-  /* 3 Kolom yang saling berdempetan */
+  /* 3 Kolom: Kiri agak lebar untuk teks promo, Tengah & Kanan mengikuti konten */
   grid-template-columns: 1.2fr 1fr 1fr; 
   align-items: center;
-  padding: 20px 10px; /* Padding lebih besar agar footer lebih 'gendut' */
-  border-radius: 18px 18px 0 0; /* Kebalikan dari header */
+  padding: 15px 10px;
+  border-radius: 18px 18px 0 0;
   box-shadow: 0 -4px 15px rgba(0,0,0,0.2);
   z-index: 9999;
 }
@@ -126,58 +125,63 @@ body{
 .footer-part {
   display: flex;
   flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  gap: 8px;
-  border-right: 1px solid rgba(255, 255, 255, 0.2); /* Garis pemisah tipis */
+  padding: 0 10px;
 }
 
-/* Hilangkan garis pemisah di kolom terakhir */
-.footer-part:last-child {
-  border-right: none;
+/* Partisi Kiri: Rapat Kanan */
+.part-left {
+  align-items: flex-end; 
+  text-align: right;
+  border-right: 1px solid rgba(255, 255, 255, 0.3);
 }
 
-/* Styling Baris Teks & Ikon */
+/* Partisi Tengah & Kanan: Rapat Kiri */
+.part-center, .part-right {
+  align-items: flex-start;
+  text-align: left;
+}
+
+.part-center {
+  border-right: 1px solid rgba(255, 255, 255, 0.3);
+}
+
 .footer-row {
   display: flex;
   align-items: center;
-  gap: 10px; /* Jarak antara logo dan teks */
-  font-size: 16px; /* Teks diperbesar */
+  gap: 8px;
+  font-size: 16px;
   font-weight: 700;
-  white-space: nowrap;
   cursor: pointer;
 }
 
 .footer-row img {
-  width: 24px; /* Ukuran logo diperbesar */
-  height: 24px;
-  filter: brightness(0) invert(1); /* Membuat ikon flaticon jadi putih agar masuk ke tema biru */
+  width: 22px;
+  height: 22px;
+  /* Filter dihapus agar ikon kembali ke warna original */
 }
 
+/* Teks Promo diperbesar lagi */
 .text-promo {
-  font-size: 14px;
-  font-weight: 800;
-  color: #ffd700; /* Warna kuning emas agar promo terlihat menonjol */
-  margin-bottom: 5px;
-  text-align: center;
+  font-size: 18px; /* Lebih besar dari sebelumnya */
+  font-weight: 900;
+  color: #ffeb3b; /* Kuning terang agar kontras */
+  letter-spacing: 0.5px;
+  margin-bottom: 2px;
 }
 
-/* Responsif untuk HP */
 @media (max-width: 480px) {
   .footer {
-    grid-template-columns: 1fr 1fr 1fr;
-    padding: 15px 5px;
+    padding: 12px 5px;
+  }
+  .text-promo {
+    font-size: 13px;
   }
   .footer-row {
     font-size: 11px;
-    gap: 5px;
   }
   .footer-row img {
-    width: 18px;
-    height: 18px;
-  }
-  .text-promo {
-    font-size: 10px;
+    width: 16px;
+    height: 16px;
   }
 }
 
@@ -1751,22 +1755,22 @@ if (localStorage.getItem("email")) {
 </script>
 
 <div class="footer">
-  <div class="footer-part">
+  <div class="footer-part part-left">
     <div class="text-promo">BELI SNBT HANYA 25K</div>
     <div class="footer-row" onclick="window.open('https://wa.me/62895423024582')">
-      <img src="https://cdn-icons-png.flaticon.com/512/733/733585.png" alt="WA">
       <span>0895423024582</span>
+      <img src="https://cdn-icons-png.flaticon.com/512/733/733585.png" alt="WA">
     </div>
   </div>
 
-  <div class="footer-part" onclick="window.open('https://www.tiktok.com/@aplus.course')">
+  <div class="footer-part part-center" onclick="window.open('https://www.tiktok.com/@aplus.course')">
     <div class="footer-row">
       <img src="https://cdn-icons-png.flaticon.com/512/3046/3046121.png" alt="TikTok">
       <span>aplus.course</span>
     </div>
   </div>
 
-  <div class="footer-part" onclick="window.open('https://www.instagram.com/apluscourse1')">
+  <div class="footer-part part-right" onclick="window.open('https://www.instagram.com/apluscourse1')">
     <div class="footer-row">
       <img src="https://cdn-icons-png.flaticon.com/512/2111/2111463.png" alt="IG">
       <span>apluscourse1</span>
