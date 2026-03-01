@@ -513,25 +513,30 @@ select,input{
   height: 24px;
 }
 
-/* Style untuk Label Lisensi/Watermark */
-.license-badge {
-  display: inline-block;
-  background: rgba(31, 111, 235, 0.1); /* Biru sangat transparan */
-  color: var(--blue);
+/* Watermark Transparan */
+.watermark-lisensi {
   font-size: 11px;
-  font-weight: 600;
-  padding: 4px 12px;
-  border-radius: 50px;
-  margin-top: 5px;
-  margin-bottom: 15px;
-  border: 1px solid rgba(31, 111, 235, 0.2);
-  text-transform: lowercase;
+  color: var(--muted);
+  opacity: 0.6;
+  font-weight: 500;
+  display: block;
+  margin-top: 2px;
 }
 
-/* Memastikan teks berada di tengah bawah judul */
-.menu-section-header {
-  text-align: left;
-  margin-bottom: 10px;
+/* Badge Masa Aktif Pojok Kanan Bawah */
+#badgeMasaAktif {
+  position: fixed;
+  right: 15px;
+  bottom: 85px; /* Tinggi di atas footer agar tidak tabrakan */
+  background: white;
+  color: #ef4444;
+  padding: 6px 12px;
+  border-radius: 8px;
+  font-size: 11px;
+  font-weight: 800;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  border: 1px solid #fee2e2;
+  z-index: 9999;
 }
     
 </style>
@@ -635,17 +640,19 @@ function showMenu(menu){
 function loadRasionalisasi(){
   document.getElementById("content").innerHTML=`
   <div class="card">
-    <h3>🎓 Rasionalisasi Prodi</h3>
-    <div class="license-display"></div>
+    <div style="text-align:center; margin-bottom:15px;">
+      <h3 style="margin-bottom:0;">🎓 Rasionalisasi Prodi</h3>
+      <span class="watermark-lisensi" id="wm-prodi"></span>
+    </div>
+
     <input list="ptnList" id="ptn" placeholder="Pilih PTN...">
     <datalist id="ptnList"></datalist>
-
     <input list="prodiList" id="prodi" placeholder="Pilih Prodi...">
     <datalist id="prodiList"></datalist>
-
     <div id="hasil" class="result">Silakan pilih PTN dan Prodi</div>
   </div>`;
 
+  tampilkanInfoAkun(); // Panggil pengisi teks
   loadPTN();
   document.getElementById("ptn").oninput=loadProdi;
   document.getElementById("prodi").oninput=showData;
@@ -1725,6 +1732,28 @@ if (localStorage.getItem("email")) {
     <span>apluscourse1</span>
   </div>
 </div>
+
+<div id="badgeMasaAktif"></div>
+
+<script>
+function tampilkanInfoAkun() {
+  const email = localStorage.getItem("email") || "User";
+  const masa = localStorage.getItem("masaAktif") || "0";
+  
+  // Isi watermark jika elemennya ada di layar
+  const wm = document.getElementById("wm-prodi");
+  if(wm) wm.innerText = "Lisensi: " + email;
+
+  // Isi badge masa aktif
+  const badge = document.getElementById("badgeMasaAktif");
+  if(badge) {
+    badge.innerText = "⏳ " + masa + " Hari Lagi";
+  }
+}
+
+// Jalankan saat pertama kali buka admin
+document.addEventListener("DOMContentLoaded", tampilkanInfoAkun);
+</script>
     
 </body>
 </html>
