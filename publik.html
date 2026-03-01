@@ -110,14 +110,13 @@ body{
   bottom: 0;
   left: 0;
   width: 100%;
-  /* Gradien biru sesuai header */
   background: linear-gradient(135deg, var(--blue), var(--blue2));
   color: white;
   display: grid;
-  /* Kolom kiri & tengah dominan, kanan dibiarkan kosong */
-  grid-template-columns: 1.3fr 1fr 0.2fr; 
+  /* 3 Kolom sesuai permintaan */
+  grid-template-columns: 1.5fr 1.5fr 0.5fr; 
   align-items: center;
-  padding: 15px 10px;
+  padding: 18px 10px;
   border-radius: 18px 18px 0 0;
   box-shadow: 0 -5px 20px rgba(0,0,0,0.2);
   z-index: 9999;
@@ -128,61 +127,70 @@ body{
   flex-direction: column;
 }
 
-/* Partisi Kiri: Rapat Kanan agar mepet ke tengah */
+/* Partisi Kiri: Rapat Kanan */
 .part-left {
   align-items: flex-end;
   text-align: right;
-  padding-right: 15px;
+  padding-right: 20px;
 }
 
-/* Partisi Tengah: TikTok & IG (Align Left) */
+/* Partisi Tengah: Rapat Kiri */
 .part-center {
   align-items: flex-start;
   text-align: left;
-  gap: 4px;
 }
 
-/* Teks Promo: Dibuat sangat besar dan tebal */
-.text-promo {
-  font-size: 26px; /* Ukuran sangat besar */
-  font-weight: 900;
-  color: #ffeb3b; /* Kuning terang */
-  line-height: 1;
-  margin-bottom: 5px;
-  text-transform: uppercase;
-  letter-spacing: -0.5px;
+/* Container Horizontal untuk TikTok & IG di Partisi Tengah */
+.social-row {
+  display: flex;
+  flex-direction: row; /* Berdampingan horizontal */
+  gap: 20px; /* Jarak antar sosmed */
+  margin-top: 5px;
 }
 
 .footer-row {
   display: flex;
   align-items: center;
   gap: 8px;
-  font-size: 15px;
+  font-size: 16px;
   font-weight: 700;
   cursor: pointer;
+  white-space: nowrap;
 }
 
 .footer-row img {
-  width: 18px;
-  height: 18px;
+  width: 22px;
+  height: 22px;
 }
 
-/* Responsif untuk layar HP */
+/* Teks Promo: Ekstra Besar */
+.text-promo {
+  font-size: 28px; /* Dibuat sangat menonjol */
+  font-weight: 900;
+  color: white; 
+  line-height: 1;
+  margin-bottom: 5px;
+  text-transform: uppercase;
+}
+
 @media (max-width: 480px) {
   .footer {
-    grid-template-columns: 1.3fr 1fr 0.1fr;
-    padding: 10px 5px;
+    grid-template-columns: 1.5fr 1.5fr 0.1fr;
+    padding: 12px 5px;
   }
   .text-promo {
-    font-size: 18px;
+    font-size: 16px;
   }
   .footer-row {
-    font-size: 10px;
+    font-size: 11px;
     gap: 5px;
   }
+  .social-row {
+    gap: 10px;
+  }
   .footer-row img {
-    width: 14px;
-    height: 14px;
+    width: 16px;
+    height: 16px;
   }
 }
 
@@ -1759,20 +1767,21 @@ if (localStorage.getItem("email")) {
   <div class="footer-part part-left">
     <div class="text-promo">BELI SNBT HANYA 25K</div>
     <div class="footer-row" onclick="window.open('https://wa.me/62895423024582')">
-      <span>Hubungi</span>
-      <img src="https://cdn-icons-png.flaticon.com/512/733/733585.png" alt="WA">
       <span>0895423024582</span>
+      <img src="https://cdn-icons-png.flaticon.com/512/733/733585.png" alt="WA">
     </div>
   </div>
 
   <div class="footer-part part-center">
-    <div class="footer-row" onclick="window.open('https://www.tiktok.com/@aplus.course')">
-      <img src="https://cdn-icons-png.flaticon.com/512/3046/3046121.png" alt="TikTok">
-      <span>aplus.course</span>
-    </div>
-    <div class="footer-row" onclick="window.open('https://www.instagram.com/apluscourse1')">
-      <img src="https://cdn-icons-png.flaticon.com/512/2111/2111463.png" alt="IG">
-      <span>apluscourse1</span>
+    <div class="social-row">
+      <div class="footer-row" onclick="window.open('https://www.tiktok.com/@aplus.course')">
+        <img src="https://cdn-icons-png.flaticon.com/512/3046/3046121.png" alt="TikTok">
+        <span>aplus.course</span>
+      </div>
+      <div class="footer-row" onclick="window.open('https://www.instagram.com/apluscourse1')">
+        <img src="https://cdn-icons-png.flaticon.com/512/2111/2111463.png" alt="IG">
+        <span>apluscourse1</span>
+      </div>
     </div>
   </div>
 
