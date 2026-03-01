@@ -255,7 +255,7 @@ select,input{
 }
 
 .info-card{
-  padding:18px;
+  padding:10px;
   border-radius:16px;
   color:white;
   font-weight:600;
@@ -265,7 +265,7 @@ select,input{
 .info-card small{
   display:block;
   font-size:20px;
-  margin-bottom:6px;
+  margin-bottom:0px;
   font-weight:500;
 }
 
@@ -717,7 +717,7 @@ function showData(){
   // ================= RENDER =================
   document.getElementById("hasil").innerHTML = `
   
-  <div style="margin-bottom:12px">
+  <div style="margin-bottom:5px">
     <h3 style="margin:0">${r[2]}</h3>
     <small>${r[1]}</small>
   </div>
@@ -731,7 +731,7 @@ function showData(){
 
     <div class="info-card ${katClass} keketatan">
       <small>Keketatan</small>
-      <div id="keketatanVal" style="font-size:32px">0%</div>
+      <div id="keketatanVal" style="font-size:22px">0%</div>
     </div>
 
     <div class="info-card gray materi1">
@@ -746,17 +746,17 @@ function showData(){
 
     <div class="info-card green kuota">
       <small>Kuota</small>
-      <div id="kuotaVal" style="font-size:32px">0</div>
+      <div id="kuotaVal" style="font-size:22px">0</div>
     </div>
 
     <div class="info-card orange peminat">
       <small>Peminat</small>
-      <div id="peminatVal" style="font-size:32px">0</div>
+      <div id="peminatVal" style="font-size:22px">0</div>
     </div>
 
     <div class="info-card ${katClass} kategori">
       <small>Kategori</small>
-      <div style="font-size:32px">${r[7]}</div>
+      <div style="font-size:22px">${r[7]}</div>
     </div>
 
     <div class="info-card gray materi2">
