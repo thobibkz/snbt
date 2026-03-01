@@ -486,7 +486,33 @@ select,input{
 .card-red { background: #dc2626; color: white; padding: 15px; border-radius: 10px; text-align: center; }
 .card-kuning { background: #f4c430; color: #1f2d3d; padding: 15px; border-radius: 10px; text-align: center; }
 /* .card-green sudah ada di file Anda */
-  
+
+.settings-icon {
+  position: absolute;
+  right: 20px;
+  top: 85px; /* Menyesuaikan agar tepat di bawah header */
+  background: white;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: var(--shadow);
+  cursor: pointer;
+  transition: all 0.3s ease;
+  z-index: 99;
+  border: 1px solid #dbe7ff;
+}
+.settings-icon:hover {
+  transform: rotate(90deg);
+  background: #f0f7ff;
+}
+.settings-icon img {
+  width: 24px;
+  height: 24px;
+}
+    
 </style>
 </head>
 
@@ -496,6 +522,10 @@ select,input{
   <div class="header-logo-left">
     <img src="https://i.imgur.com/MiEDgnn.png" alt="Logo Left">
   </div>
+
+<div class="settings-icon" onclick="location.href='setting.html'">
+  <img src="https://cdn-icons-png.flaticon.com/512/3953/3953226.png" alt="Settings">
+</div>
 
   <div class="header-text">
     <h1>APLIKASI RASIONALISASI SNBT 2026</h1>
@@ -519,7 +549,7 @@ select,input{
 
 <script>
 // ================= API ==================
-const API="https://script.google.com/macros/s/AKfycbwDcicJB50hogksank6y-U0CIeCKEiysMpSZfN24oaL9qZ7f3FRY_m2rCnSpcZyYWKAAA/exec?action=data_fetch";
+const API="https://script.google.com/macros/s/AKfycbzyPZYlzSJ9ZPCMGuJ70-Lf96IJiZWVlDV02sCFj2oRVUhCJMICWljVnT4TA70xT0fWxA/exec?action=data_fetch";
   
   // ================= ANIMASI ANGKA NAIK ==================
 function animateValue(element, start, end, duration, isPercent=false){
