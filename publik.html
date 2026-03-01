@@ -491,37 +491,38 @@ select,input{
 .settings-icon {
   position: absolute;
   right: 20px;
-  top: 90px; /* Menyesuaikan agar tepat di bawah header */
+  top: 90px; 
   background: white;
-  width: 25px;
-  height: 25px;
+  width: 35px; /* Sedikit diperbesar agar ikon 24px tidak terlalu sesak */
+  height: 35px;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
   box-shadow: var(--shadow);
   cursor: pointer;
-  transition: all 0.3s ease;
+  transition: all 0.3s ease; /* Transisi halus */
   z-index: 99;
   border: 1px solid #dbe7ff;
 }
+
+/* BAGIAN YANG DIUBAH: Efek menyala tanpa berputar */
 .settings-icon:hover {
-  transform: rotate(90deg);
-  background: #f0f7ff;
-}
-.settings-icon img {
-  width: 24px;
-  height: 24px;
+  background: #fffafa; /* Warna putih kemerahan tipis */
+  /* Efek menyala merah karena ini tombol logout/off */
+  filter: drop-shadow(0 0 8px rgba(239, 68, 68, 0.8)); 
+  border-color: #ffbaba;
 }
 
-/* Watermark Transparan */
-.watermark-lisensi {
-  font-size: 11px;
-  color: var(--muted);
-  opacity: 0.8;
-  font-weight: 500;
-  display: block;
-  margin-top: 2px;
+.settings-icon img {
+  width: 20px; /* Ukuran ikon disesuaikan */
+  height: 20px;
+  transition: transform 0.2s;
+}
+
+/* Tambahan: Efek klik agar terasa seperti tombol asli */
+.settings-icon:active {
+  transform: scale(0.9);
 }
 
 /* Badge Masa Aktif Pojok Kanan Bawah */
@@ -547,8 +548,8 @@ select,input{
   </div>
 
 <div class="settings-icon" onclick="logout()" title="Logout Akun">
-    <img src="https://cdn-icons-png.flaticon.com/512/1828/1828407.png" alt="Logout">
-  </div>
+  <img src="https://i.imgur.com/eTGR7ej.png" alt="Logout">
+</div>
 
   <div class="header-text">
     <h1>APLIKASI RASIONALISASI SNBT 2026</h1>
@@ -1052,44 +1053,7 @@ function renderChartPie(persen) {
 
   if (chartPieInstance) chartPieInstance.destroy();
 
-  // Plugin khusus untuk membuat efek ketebalan silinder 3D
-  const plugin3D = {
-    id: 'pie3D',
-    beforeDraw: (chart) => {
-      const { ctx, config } = chart;
-      const { data } = config;
-      const centerX = chart.getDatasetMeta(0).data[0].x;
-      const centerY = chart.getDatasetMeta(0).data[0].y;
-      const radius = chart.getDatasetMeta(0).data[0].outerRadius;
-      const thickness = 15; // Mengatur ketebalan silinder
-
-      // Gambar "Sisi Samping" untuk efek 3D
-      ctx.save();
-      ctx.translate(centerX, centerY);
-      ctx.scale(1, 0.75); // Membuat bentuk elips/perspektif
-
-      for (let i = 0; i < thickness; i++) {
-        ctx.translate(0, 1); // Geser kebawah sedikit demi sedikit
-        
-        let startAngle = -0.5 * Math.PI;
-        data.datasets[0].data.forEach((value, index) => {
-          const sliceAngle = (value / 100) * 2 * Math.PI;
-          
-          // Warna sisi samping dibuat lebih gelap dari warna utama
-          ctx.fillStyle = index === 0 ? "#115e2e" : "#7f1d1d"; 
-          
-          ctx.beginPath();
-          ctx.moveTo(0, 0);
-          ctx.arc(0, 0, radius, startAngle, startAngle + sliceAngle);
-          ctx.closePath();
-          ctx.fill();
-          
-          startAngle += sliceAngle;
-        });
-      }
-      ctx.restore();
-    }
-  };
+  // Modifikasi: Plugin 3D dihapus untuk tampilan standar 2D
 
   chartPieInstance = new Chart(ctx, {
     type: 'pie',
@@ -1097,8 +1061,9 @@ function renderChartPie(persen) {
       labels: ["Peluang", "Risiko"],
       datasets: [{
         data: [persen, 100 - persen],
-        backgroundColor: ["#16a34a", "#dc2626"], // Warna atas yang cerah
-        borderWidth: 0
+        backgroundColor: ["#16a34a", "#dc2626"], // Hijau & Merah standar
+        borderWidth: 1, // Beri border tipis agar rapi
+        borderColor: "#ffffff"
       }]
     },
     options: {
@@ -1108,14 +1073,12 @@ function renderChartPie(persen) {
         legend: { display: false },
         tooltip: { enabled: true }
       },
-      // Mengatur rotasi agar terlihat dari sudut pandang miring
-      rotation: -90,
-      layout: { padding: { bottom: 20 } }
-    },
-    plugins: [plugin3D]
+      // Modifikasi: Rotasi dikembalikan ke standar (0) dan tanpa layout miring
+      rotation: 0,
+    }
   });
 
-  // Teks Persentase
+  // Teks Persentase tetap dipertahankan
   document.getElementById("persenText").innerHTML = `
     <div style="display:flex; justify-content:center; gap:15px; margin-top:10px; font-weight:bold;">
        <span style="color:#16a34a">Peluang: ${persen.toFixed(1)}%</span>
