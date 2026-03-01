@@ -72,22 +72,32 @@ body{
 
 .header h1 {
   margin: 0;
-  font-size: 16px; /* Ukuran pas untuk satu baris ramping */
-  font-weight: 700;
-  line-height: 1.2;
+  font-size: 24px; /* Ukuran diperbesar secara signifikan */
+  font-weight: 800; /* Dibuat ekstra tebal (Extra Bold) */
+  line-height: 1.1;
+  letter-spacing: -0.5px; /* Sedikit dirapatkan agar terlihat modern */
+  text-transform: uppercase; /* Membuat judul huruf besar semua agar lebih tegas */
 }
 
 .header p {
-  margin: 2px 0 0 0;
-  font-size: 10px;
-  opacity: 0.9;
+  margin: 5px 0 0 0;
+  font-size: 12px; /* Subtitle juga sedikit diperbesar agar seimbang */
+  opacity: 0.95;
+  font-weight: 500;
+  letter-spacing: 0.3px;
 }
 
 /* Responsif untuk layar sangat kecil */
-@media (max-width: 400px) {
-  .header { gap: 5px; }
-  .header img { height: 30px; }
-  .header h1 { font-size: 14px; }
+@media (max-width: 480px) {
+  .header h1 {
+    font-size: 18px; /* Ukuran optimal untuk layar ponsel */
+  }
+  .header p {
+    font-size: 10px;
+  }
+  .header img {
+    height: 35px; /* Logo sedikit mengecil di HP agar teks punya ruang */
+  }
 }
 
 /* FOOTER - Versi Lebih Besar & Jelas */
