@@ -122,21 +122,26 @@ function login() {
   let email = document.getElementById("email").value;
   let pass = document.getElementById("pass").value;
 
-  // Validasi input sederhana sebelum mengirim ke server
+  // 1. Validasi input kosong
   if (!email || !pass) {
     alert("Silakan isi email dan password!");
     return;
   }
 
-  // REVISI: Menggunakan alias 'auth_req' sebagai pengganti 'login' untuk keamanan
+  // Menampilkan indikator loading (opsional tapi disarankan)
+  console.log("Mencoba login...");
+
   fetch(`${API}?action=auth_req&email=${encodeURIComponent(email)}&pass=${encodeURIComponent(pass)}`)
     .then(r => r.json())
     .then(d => {
       if (d.status == "ok") {
-        // SIMPAN EMAIL & ROLE KE LOCAL STORAGE
-        localStorage.setItem("email", email); // Baris ini sangat penting
-        // Menyimpan data role ke local storage
+        // --- PERBAIKAN DI SINI ---
+        // Simpan email untuk keperluan fitur 'Setting' dan 'Ping'
+        localStorage.setItem("email", email); 
+        // Simpan role untuk navigasi halaman
         localStorage.setItem("role", d.role);
+        // Simpan lastOpen sebagai 'ID Sesi' unik untuk deteksi 2 device
+        localStorage.setItem("lastOpen", d.lastOpen); 
         
         // Pengalihan halaman berdasarkan role
         if (d.role == "admin") {
@@ -144,13 +149,18 @@ function login() {
         } else {
           location.href = "publik.html";
         }
-      } else {
+      } 
+      // --- TAMBAHAN LOGIKA MASA AKTIF ---
+      else if (d.status == "expired") {
+        alert("Masa aktif akun anda sudah habis, silahkan hubungi admin");
+      } 
+      else {
         alert("Email atau password salah");
       }
     })
     .catch((err) => {
       console.error("Login Error:", err);
-      alert("Gagal terhubung ke server. Pastikan URL API sudah benar.");
+      alert("Gagal terhubung ke server. Periksa koneksi internet atau Deployment Apps Script Anda.");
     });
 }
 </script>
