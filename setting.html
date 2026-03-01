@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Pengaturan - Rasionalisasi SNBT</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+:root {
+  --blue:#1f6feb; --blue2:#4fa3ff; --bg:#f4f8ff; --card:#ffffff;
+  --text:#1f2d3d; --shadow:0 8px 25px rgba(0,0,0,.08);
+}
+body { 
+  margin:0; background:var(--bg); font-family:Segoe UI,Arial; 
+  display:flex; justify-content:center; align-items:center; height:100vh;
+}
+.card-setting {
+  background:var(--card); padding:30px; border-radius:20px; 
+  box-shadow:var(--shadow); width:90%; max-width:400px; text-align:center;
+}
+h2 { margin-top:0; color:var(--blue); font-size:20px; margin-bottom:25px; }
+.form-group { text-align:left; margin-bottom:15px; }
+label { display:block; font-size:13px; font-weight:600; margin-bottom:5px; color:#666; }
+input {
+  width:100%; padding:12px; border-radius:10px; border:1px solid #dbe7ff;
+  font-size:14px; outline:none;
+}
+input:disabled { background:#f1f5f9; color:#94a3b8; cursor:not-allowed; }
+.btn-group { display:flex; gap:10px; margin-top:25px; }
+button {
+  flex:1; padding:12px; border-radius:10px; border:none; cursor:pointer;
+  font-weight:600; transition:all 0.2s;
+}
+.btn-back { background:#f1f5f9; color:#475569; }
+.btn-save { background:var(--blue); color:white; }
+button:hover { opacity:0.9; transform:translateY(-2px); }
+button:active { transform:translateY(0); }
+#msg { margin-top:15px; font-size:13px; color:#059669; display:none; }
+</style>
+</head>
+<body>
+
+<div class="card-setting">
+  <h2>🔒 Rubah Kata Sandi</h2>
+  
+  <div class="form-group">
+    <label>Email</label>
+    <input type="text" id="displayEmail" disabled>
+  </div>
+
+  <div class="form-group">
+    <label>Ubah Kata Sandi</label>
+    <input type="password" id="newPass" placeholder="Masukkan kata sandi baru">
+  </div>
+
+  <div class="btn-group">
+    <button class="btn-back" onclick="goBack()">Kembali</button>
+    <button class="btn-save" onclick="savePassword()">Simpan</button>
+  </div>
+
+  <div id="msg">✅ Kata sandi berhasil disimpan</div>
+</div>
+
+<script>
+// 1. Ambil data dari LocalStorage (Data login saat ini)
+const userEmail = localStorage.getItem("email") || "user@example.com";
+const userRole = localStorage.getItem("role") || "publik";
+document.getElementById("displayEmail").value = userEmail;
+
+// 2. Fungsi Kembali sesuai Role
+function goBack() {
+  if(userRole === "admin") {
+    location.href = "admin.html";
+  } else {
+    location.href = "publik.html";
+  }
+}
+
+// 3. Fungsi Simpan ke Spreadsheet
+function savePassword() {
+  const newPass = document.getElementById("newPass").value;
+  if(!newPass) { alert("Masukkan kata sandi baru!"); return; }
+
+  const btn = document.querySelector(".btn-save");
+  btn.innerText = "Proses...";
+  btn.disabled = true;
+
+  // URL Web App Google Script Anda (Ganti dengan URL yang sama di admin.html jika berbeda)
+  const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbwDcicJB50hogksank6y-U0CIeCKEiysMpSZfN24oaL9qZ7f3FRY_m2rCnSpcZyYWKAAA/exec";
+
+  fetch(WEB_APP_URL, {
+    method: "POST",
+    mode: "no-cors",
+    body: JSON.stringify({
+      action: "updatePassword",
+      email: userEmail,
+      newPass: newPass
+    })
+  }).then(() => {
+    document.getElementById("msg").style.display = "block";
+    btn.innerText = "Simpan";
+    btn.disabled = false;
+    document.getElementById("newPass").value = "";
+    
+    // Hilangkan pesan setelah 3 detik
+    setTimeout(() => {
+      document.getElementById("msg").style.display = "none";
+    }, 3000);
+  }).catch(err => {
+    alert("Terjadi kesalahan koneksi!");
+    btn.disabled = false;
+  });
+}
+</script>
+
+</body>
+</html>
